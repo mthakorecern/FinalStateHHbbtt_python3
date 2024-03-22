@@ -1,0 +1,2 @@
+OperatingPoint, measurementType, sysType, jetFlavor, etaMin, etaMax, ptMin, ptMax, discrMin, discrMax, formula
+0, mujets, central, 1, 0.0, 2.5, 20, 1000, 0, 1, 1.00948+3.0839e-06*log(x+19)*log(x+18)*(3-92.4852*log(x+18)) 
