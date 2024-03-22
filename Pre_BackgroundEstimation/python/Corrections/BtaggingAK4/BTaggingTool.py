@@ -58,8 +58,8 @@ class BTagWeightTool:
         if year=="2016":
           if 'deepjetflavb' in tagger.lower():
             #csvnamebc = path+'DeepCSV_2016LegacySF_V1_YearCorrelation-V1.csv'
-            csvnamebc = path +'/CSVs/wp_deepJet_2016_test.csv'
-            csvnamelight = path +'CSVs/wp_deepJet_2016_test.csv'
+            csvnamebc = path +'/CSVs/wp_deepJet_2016_tes2.csv'
+            csvnamelight = path +'CSVs/wp_deepJet_2016_test2.csv'
             effname = path +'/'+year+'/DeepJetFlavB_2016_eff_'+wp.upper()+'.root'
             
         if year=="2016APV":
