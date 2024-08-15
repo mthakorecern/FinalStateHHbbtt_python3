@@ -228,14 +228,17 @@ class mettrigsf(Module):
 		if search("TTTo",self.filename):
 			#print ("This is a TTbar sample : ",self.filename)
 			genParticles = Collection(event, "GenPart")
+			#Filter the genPart collection to pick out top (pdgid is 6) and make sure top quark in MC is defined at parton level, after radiation and before decay, using the 'isLastCopy' i.e status 62
 			top = list(filter(lambda gen : (gen.pdgId == 6) and (gen.status == 62), genParticles))
 			if len(top) > 0:
 				SF_top = 0.103*np.exp(-0.0118*top[0].pt) - 0.000134*top[0].pt + 0.973
 			
+			#Repeat the same for antitop
 			antitop = list(filter(lambda gen : (gen.pdgId == -6) and (gen.status == 62), genParticles))
 			if len(antitop) > 0:
 				SF_antitop = 0.103*np.exp(-0.0118*antitop[0].pt) - 0.000134*antitop[0].pt + 0.973
 		
+			#This branch is used for plotting "Top_pt_rwt"
 			self.out.fillBranch("Top_pt_rwt",np.sqrt(SF_top*SF_antitop))
 			self.out.fillBranch("Top_wt",SF_top)
 			self.out.fillBranch("antiTop_wt",SF_antitop)
