@@ -35,7 +35,7 @@ class TauToElectronFakeRate(Module):
 	def endJob(self):
 		print("\n\n\n>>>>>>>>>>>...Full DY Process........<<<<<<<<<<<<")
 		print("Numerator = ", self.numerator_count," Denomiantor = ",self.denominator_count)
-		print("Fake rate = %.3f%%" % (float(self.numerator_count * 100) / self.denominator_count))
+		print("Fake rate (Electron)= %.3f%%" % (float(self.numerator_count * 100) / self.denominator_count))
 		#pass
 
 
@@ -116,29 +116,32 @@ class TauToElectronFakeRate(Module):
 
 		# Count denominator if we have one tau decaying to an electron and the other hadronic
 		if electron_from_tau and hadronic_tau:
-			# Apply event-level pre-selections both for numerator and Denominator
+			if (((electron_from_tau.pt>10) and (abs(electron_from_tau.eta) < 2.5)) and ((hadronic_tau.pt>20) and (abs(hadronic_tau.eta) < 2.5))):
+				# Apply event-level pre-selections both for numerator and Denominator
 
-			#print ("Filling Denominator")
-			self.denominator_count += 1*event.crossSectionWeighting*event.pileupWeighting
-			self.denominator_count_file += 1*event.crossSectionWeighting*event.pileupWeighting
+				#print ("Filling Denominator")
+				self.denominator_count += 1*event.crossSectionWeighting*event.pileupWeighting
+				self.denominator_count_file += 1*event.crossSectionWeighting*event.pileupWeighting
 
 
-			# Check if the electron from tau decay matches any of the filtered taus or boosted taus
-			matched = False
-			for tau in Tau_enu:
-				if electron_from_tau.p4().DeltaR(tau.p4()) <= 0.1:
-					matched = True
-					break
-			for btau in boostedTau_enu:
-				if electron_from_tau.p4().DeltaR(btau.p4()) <= 0.1:
-					matched = True
-					break
+				# Check if the electron from tau decay matches any of the filtered taus or boosted taus
+				matched = False
+				for tau in Tau_enu:
+					if electron_from_tau.p4().DeltaR(tau.p4()) <= 0.05:
+						matched = True
+						break
+				for btau in boostedTau_enu:
+					if electron_from_tau.p4().DeltaR(btau.p4()) <= 0.05:
+						matched = True
+						break
 
-			if matched:
-				#print ("Filling ###Numerator###")
-				self.numerator_count += 1*event.crossSectionWeighting*event.pileupWeighting  # Increment numerator count
-				self.numerator_count_file += 1*event.crossSectionWeighting*event.pileupWeighting
-			return True
+				if matched:
+					#print ("Filling ###Numerator###")
+					self.numerator_count += 1*event.crossSectionWeighting*event.pileupWeighting  # Increment numerator count
+					self.numerator_count_file += 1*event.crossSectionWeighting*event.pileupWeighting
+				return True
+			else:
+				return False
 		else:
 			return False
 
