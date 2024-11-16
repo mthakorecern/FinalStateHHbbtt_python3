@@ -1,0 +1,6 @@
+<library file="fastMTTBinding.cc" name = "fastMTT_binding">
+  <use name="py2-pybind11"/>
+  <use name="python"/>
+  <use name="root"/>
+  <use name="TauAnalysis/ClassicSVfit"/>
+</library>
