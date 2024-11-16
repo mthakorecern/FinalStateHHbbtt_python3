@@ -1,0 +1,199 @@
+###################################################
+
+drop CaloMET_*
+drop ChsMET_*
+drop DeepMETResolutionTune_*
+drop DeepMETResponseTune_*
+drop FsrPhoton_*
+drop nFsrPhoton
+drop GenDressedLepton_*
+drop nGenDressedLepton
+drop GenIsolatedPhoton_*
+drop nGenIsolatedPhoton
+#drop GenJetAK8_*
+#drop nGenJetAK8
+drop GenMET_*
+drop GenVisTau_*
+drop nGenVisTau
+drop GenVtx_*
+drop nGenVtx
+drop Generator_*
+drop HLTriggerFinalPath
+drop HLTriggerFirstPath
+drop HTXS_*
+drop IsoTrack_*
+drop nIsoTrack
+drop L1_*
+drop L1Reco_*
+drop L1simulation_*
+drop LHE_*
+keep LHE_HT
+drop LHEPart_*
+drop nLHEPart
+drop LowPtElectron_*
+drop nLowPtElectron
+drop OtherPV_*
+drop nOtherPV
+drop Photon_*
+drop nPhoton
+drop PuppiMET_*
+drop RawPuppiMET_*
+drop SV_*
+drop nSV
+drop *SoftActivityJet*
+#drop SubGenJetAK8_*
+#drop nSubGenJetAK8
+#drop SubJet_*
+#drop nSubJet
+drop TkMET_*
+drop TrigObj_*
+drop nTrigObj
+drop btagWeight_*
+drop genTtbarId*
+#Get rid of the uncorrected branches MET_pt
+drop MET_pt
+drop MET_T1Smear_pt_jesTotalUp
+drop MET_T1Smear_pt_jesTotalDown
+drop MET_T1Smear_pt_jesAbsoluteUp
+drop MET_T1Smear_pt_jesAbsoluteDown
+drop MET_T1Smear_pt_jesAbsolute_2018Up
+drop MET_T1Smear_pt_jesAbsolute_2018Down
+drop MET_T1Smear_pt_jesAbsolute_2017Up
+drop MET_T1Smear_pt_jesAbsolute_2017Down
+drop MET_T1Smear_pt_jesAbsolute_2016Up
+drop MET_T1Smear_pt_jesAbsolute_2016Down
+drop MET_T1Smear_pt_jesBBEC1Up
+drop MET_T1Smear_pt_jesBBEC1Down
+drop MET_T1Smear_pt_jesBBEC1_2018Up
+drop MET_T1Smear_pt_jesBBEC1_2018Down
+drop MET_T1Smear_pt_jesBBEC1_2017Up
+drop MET_T1Smear_pt_jesBBEC1_2017Down
+drop MET_T1Smear_pt_jesBBEC1_2016Up
+drop MET_T1Smear_pt_jesBBEC1_2016Down
+drop MET_T1Smear_pt_jesEC2Up
+drop MET_T1Smear_pt_jesEC2Down
+drop MET_T1Smear_pt_jesEC2_2018Up
+drop MET_T1Smear_pt_jesEC2_2018Down
+drop MET_T1Smear_pt_jesEC2_2017Up
+drop MET_T1Smear_pt_jesEC2_2017Down
+drop MET_T1Smear_pt_jesEC2_2016Up
+drop MET_T1Smear_pt_jesEC2_2016Down
+drop MET_T1Smear_pt_jesFlavorQCDUp
+drop MET_T1Smear_pt_jesFlavorQCDDown
+drop MET_T1Smear_pt_jesHFUp
+drop MET_T1Smear_pt_jesHFDown
+drop MET_T1Smear_pt_jesHF_2018Up
+drop MET_T1Smear_pt_jesHF_2018Down
+drop MET_T1Smear_pt_jesHF_2017Up
+drop MET_T1Smear_pt_jesHF_2017Down
+drop MET_T1Smear_pt_jesHF_2016Up
+drop MET_T1Smear_pt_jesHF_2016Down
+drop MET_T1Smear_pt_jesRelativeBalUp
+drop MET_T1Smear_pt_jesRelativeBalDown
+drop MET_T1Smear_pt_jesRelativeSample_2018Up
+drop MET_T1Smear_pt_jesRelativeSample_2018Down
+drop MET_T1Smear_pt_jesRelativeSample_2017Up
+drop MET_T1Smear_pt_jesRelativeSample_2017Down
+drop MET_T1Smear_pt_jesRelativeSample_2016Up
+drop MET_T1Smear_pt_jesRelativeSample_2016Down
+drop MET_T1Smear_pt
+drop MET_T1Smear_pt_jerUp
+drop MET_T1Smear_pt_unclustEnUp
+drop MET_T1Smear_pt_jerDown
+drop MET_T1Smear_pt_unclustEnDown
+#Drop the old MET phi branches
+drop MET_phi
+drop MET_T1Smear_phi_jesTotalUp
+drop MET_T1Smear_phi_jesTotalDown
+drop MET_T1Smear_phi_jesAbsoluteUp
+drop MET_T1Smear_phi_jesAbsoluteDown
+drop MET_T1Smear_phi_jesAbsolute_2018Up
+drop MET_T1Smear_phi_jesAbsolute_2018Down
+drop MET_T1Smear_phi_jesAbsolute_2017Up
+drop MET_T1Smear_phi_jesAbsolute_2017Down
+drop MET_T1Smear_phi_jesAbsolute_2016Up
+drop MET_T1Smear_phi_jesAbsolute_2016Down
+drop MET_T1Smear_phi_jesBBEC1Up
+drop MET_T1Smear_phi_jesBBEC1Down
+drop MET_T1Smear_phi_jesBBEC1_2018Up
+drop MET_T1Smear_phi_jesBBEC1_2018Down
+drop MET_T1Smear_phi_jesBBEC1_2017Up
+drop MET_T1Smear_phi_jesBBEC1_2017Down
+drop MET_T1Smear_phi_jesBBEC1_2016Up
+drop MET_T1Smear_phi_jesBBEC1_2016Down
+drop MET_T1Smear_phi_jesEC2Up
+drop MET_T1Smear_phi_jesEC2Down
+drop MET_T1Smear_phi_jesEC2_2018Up
+drop MET_T1Smear_phi_jesEC2_2018Down
+drop MET_T1Smear_phi_jesEC2_2017Up
+drop MET_T1Smear_phi_jesEC2_2017Down
+drop MET_T1Smear_phi_jesEC2_2016Up
+drop MET_T1Smear_phi_jesEC2_2016Down
+drop MET_T1Smear_phi_jesFlavorQCDUp
+drop MET_T1Smear_phi_jesFlavorQCDDown
+drop MET_T1Smear_phi_jesHFUp
+drop MET_T1Smear_phi_jesHFDown
+drop MET_T1Smear_phi_jesHF_2018Up
+drop MET_T1Smear_phi_jesHF_2018Down
+drop MET_T1Smear_phi_jesHF_2017Up
+drop MET_T1Smear_phi_jesHF_2017Down
+drop MET_T1Smear_phi_jesHF_2016Up
+drop MET_T1Smear_phi_jesHF_2016Down
+drop MET_T1Smear_phi_jesRelativeBalUp
+drop MET_T1Smear_phi_jesRelativeBalDown
+drop MET_T1Smear_phi_jesRelativeSample_2018Up
+drop MET_T1Smear_phi_jesRelativeSample_2018Down
+drop MET_T1Smear_phi_jesRelativeSample_2017Up
+drop MET_T1Smear_phi_jesRelativeSample_2017Down
+drop MET_T1Smear_phi_jesRelativeSample_2016Up
+drop MET_T1Smear_phi_jesRelativeSample_2016Down
+drop MET_T1Smear_phi
+drop MET_T1Smear_phi_jerUp
+drop MET_T1Smear_phi_unclustEnUp
+drop MET_T1Smear_phi_jerDown
+drop MET_T1Smear_phi_unclustEnDown
+drop Jet_pt
+drop Jet_mass
+drop FatJet_pt
+drop FatJet_mass
+#Drop all HLT branches except the relevant ones
+drop HLT_*
+keep HLT_PFMETNoMu110_PFMHTNoMu110_IDTight
+keep HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+keep HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight
+keep HLT_PFMET110_PFMHT110_IDTight
+keep HLT_PFMET120_PFMHT120_IDTight
+keep HLT_PFMET170_HBHECleaned
+keep HLT_PFMET170_HBHE_BeamHaloCleaned
+
+
+#Drop all Flags
+drop Flag_*
+keep Flag_goodVertices
+keep Flag_globalSuperTightHalo2016Filter
+keep Flag_HBHENoiseFilter
+keep Flag_HBHENoiseIsoFilter
+keep Flag_EcalDeadCellTriggerPrimitiveFilter
+keep Flag_BadPFMuonFilter
+keep Flag_BadPFMuonDzFilter
+keep Flag_hfNoisyHitsFilter
+keep Flag_eeBadScFilter
+keep Flag_ecalBadCalibFilter
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

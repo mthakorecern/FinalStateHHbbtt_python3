@@ -1,0 +1,93 @@
+###################################################
+
+drop CaloMET_*
+drop ChsMET_*
+drop DeepMETResolutionTune_*
+drop DeepMETResponseTune_*
+drop FsrPhoton_*
+drop nFsrPhoton
+drop GenDressedLepton_*
+drop nGenDressedLepton
+drop GenIsolatedPhoton_*
+drop nGenIsolatedPhoton
+#drop GenJetAK8_*
+#drop nGenJetAK8
+drop GenMET_*
+drop GenVisTau_*
+drop nGenVisTau
+drop GenVtx_*
+drop nGenVtx
+drop Generator_*
+drop HLTriggerFinalPath
+drop HLTriggerFirstPath
+drop HTXS_*
+drop IsoTrack_*
+drop nIsoTrack
+drop L1_*
+drop L1Reco_*
+drop L1simulation_*
+drop LHE_*
+drop LHEPart_*
+drop nLHEPart
+drop LowPtElectron_*
+drop nLowPtElectron
+drop OtherPV_*
+drop nOtherPV
+drop Photon_*
+drop nPhoton
+drop PuppiMET_*
+drop RawPuppiMET_*
+drop SV_*
+drop nSV
+drop *SoftActivityJet*
+#drop SubGenJetAK8_*
+#drop nSubGenJetAK8
+#drop SubJet_*
+#drop nSubJet
+drop TkMET_*
+drop TrigObj_*
+drop nTrigObj
+drop btagWeight_*
+drop genTtbarId*
+
+#Drop all HLT branches except the relevant ones
+drop HLT_*
+keep HLT_PFMETNoMu110_PFMHTNoMu110_IDTight
+keep HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+keep HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight
+keep HLT_PFMET110_PFMHT110_IDTight
+keep HLT_PFMET120_PFMHT120_IDTight
+keep HLT_PFMET170_HBHECleaned
+keep HLT_PFMET170_HBHE_BeamHaloCleaned
+
+
+#Drop all Flags
+drop Flag_*
+keep Flag_goodVertices
+keep Flag_globalSuperTightHalo2016Filter
+keep Flag_HBHENoiseFilter
+keep Flag_HBHENoiseIsoFilter
+keep Flag_EcalDeadCellTriggerPrimitiveFilter
+keep Flag_BadPFMuonFilter
+keep Flag_BadPFMuonDzFilter
+keep Flag_hfNoisyHitsFilter
+keep Flag_eeBadScFilter
+keep Flag_ecalBadCalibFilter
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
