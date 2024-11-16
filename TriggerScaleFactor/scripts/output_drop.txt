@@ -34,5 +34,30 @@ keep npho_0p4
 keep ntau_0p1
 keep ntau_0p4
 keep run
-
+keep ngood_LooseJets
+keep ngood_MediumJets
+keep ngood_TightJets
+keep index_gLooseJets
+keep index_gMediumJets
+keep index_gTightJets
+keep ewkWWeight
+keep ewkZWeight
+keep ewkWDeborahsWeight
+keep ewkZDeborahsWeight
+keep qcdWWeight
+keep qcdZTo2LWeight
+keep GenV_pt
+keep WnnloWeight
+keep ZnnloWeight
+keep combinedWZgenPtWeight
+keep combinedWZgenPtDeborahWeight
+keep combinedWZgenPtDylanWeight 
+keep qcdWWeightRenUp
+keep qcdWWeightRenDown
+keep qcdWWeightFacUp
+keep qcdWWeightFacDown
+keep qcdZTo2LWeightRenUp
+keep qcdZTo2LWeightRenDown
+keep qcdZTo2LWeightFacUp
+keep qcdZTo2LWeightFacDown
 
