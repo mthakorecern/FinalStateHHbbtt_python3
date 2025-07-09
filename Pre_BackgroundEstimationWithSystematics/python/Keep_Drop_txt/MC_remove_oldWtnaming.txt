@@ -1,0 +1,13 @@
+keep *
+drop FinalWeighting
+drop crossSectionWeighting
+drop pileupWeighting
+drop pileupWeight_UP
+drop pileupWeight_DOWN
+drop FinalWeighting_pileupWeight_UP
+drop FinalWeighting_pileupWeight_DOWN
+#drop *GenPart*
+#drop *nGenPart*
+#drop *GenJet*
+#drop *SubGenJetAK8*
+#drop *GenJetAK8*
