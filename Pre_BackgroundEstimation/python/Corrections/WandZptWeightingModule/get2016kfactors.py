@@ -48,8 +48,9 @@ def get2016EWKW(pt):
         weight = 0.845925
     elif pt >= 1160:
         weight = 0.674034
-    
+
     return weight
+
 
 def get2016QCDW(pt):
     weight = 1
@@ -101,8 +102,9 @@ def get2016QCDW(pt):
         weight = 0.94805
     elif pt >= 1160:
         weight = 0.86956
-    
+
     return weight
+
 
 def get2016RenUpW(pt):
     weight = 1
@@ -154,8 +156,9 @@ def get2016RenUpW(pt):
         weight = 0.858763
     elif pt >= 1160:
         weight = 0.794909
-    
+
     return weight
+
 
 def get2016RenDownW(pt):
     weight = 1
@@ -207,8 +210,9 @@ def get2016RenDownW(pt):
         weight = 1.04704
     elif pt >= 1160:
         weight = 0.94791
-    
+
     return weight
+
 
 def get2016FacUpW(pt):
     weight = 1
@@ -260,8 +264,9 @@ def get2016FacUpW(pt):
         weight = 0.89605
     elif pt >= 1160:
         weight = 0.823212
-    
+
     return weight
+
 
 def get2016FacDownW(pt):
     weight = 1
@@ -313,10 +318,11 @@ def get2016FacDownW(pt):
         weight = 1.00802
     elif pt >= 1160:
         weight = 0.922172
-    
+
     return weight
 
-###########################################################################################
+##########################################################################
+
 
 def get2016EWKZ(pt):
     weight = 1
@@ -368,8 +374,9 @@ def get2016EWKZ(pt):
         weight = 0.789694
     elif pt >= 1160:
         weight = 0.781163
-    
+
     return weight
+
 
 def get2016QCDZ(pt):
     weight = 1
@@ -424,6 +431,7 @@ def get2016QCDZ(pt):
 
     return weight
 
+
 def get2016RenUpZ(pt):
     weight = 1
     if pt < 170:
@@ -474,8 +482,9 @@ def get2016RenUpZ(pt):
         weight = 0.729348
     elif pt >= 1160:
         weight = 0.833531
-    
+
     return weight
+
 
 def get2016RenDownZ(pt):
     weight = 1
@@ -527,8 +536,9 @@ def get2016RenDownZ(pt):
         weight = 0.921666
     elif pt >= 1160:
         weight = 1.02897
-    
+
     return weight
+
 
 def get2016FacUpZ(pt):
     weight = 1
@@ -580,8 +590,9 @@ def get2016FacUpZ(pt):
         weight = 0.77774
     elif pt >= 1160:
         weight = 0.87435
-    
+
     return weight
+
 
 def get2016FacDownZ(pt):
     weight = 1
@@ -633,5 +644,5 @@ def get2016FacDownZ(pt):
         weight = 0.862166
     elif pt >= 1160:
         weight = 0.981254
-    
+
     return weight

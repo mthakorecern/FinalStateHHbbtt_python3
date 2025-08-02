@@ -1,6 +1,9 @@
-<library file="fastMTTBinding.cc" name = "fastMTT_binding">
-  <use name="py2-pybind11"/>
-  <use name="python"/>
+<library name="fastMTT_binding" file="fastMTTBinding.cc">
   <use name="root"/>
+  <use name="python3"/>
   <use name="TauAnalysis/ClassicSVfit"/>
+  <flags CXXFLAGS="-I${CMSSW_BASE}/src/FinalStateHHbbtt/fastMTTPython/external/pybind11/include"/>
+  <export>
+    <lib name="1"/>
+  </export>
 </library>

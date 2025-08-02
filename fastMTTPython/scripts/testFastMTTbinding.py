@@ -1,9 +1,9 @@
-#Andrew Loeliger
-#quick script to check that the python version of the fast MTT binding is yielding consistent
-#answers to the cpp version of the testing script
+# Andrew Loeliger
+# quick script to check that the python version of the fast MTT binding is yielding consistent
+# answers to the cpp version of the testing script
 import pluginfastMTT_binding as fastMTT
 
-print (fastMTT.fastMTTmass(
+print((fastMTT.fastMTTmass(
     11.7491,
     -51.9172,
     787.352,
@@ -21,9 +21,9 @@ print (fastMTT.fastMTTmass(
     2.79362,
     0.13957,
     0)
-)
+))
 
-print (fastMTT.fastMTTpt(
+print((fastMTT.fastMTTpt(
     11.7491,
     -51.9172,
     787.352,
@@ -41,4 +41,4 @@ print (fastMTT.fastMTTpt(
     2.79362,
     0.13957,
     0)
-)
+))
