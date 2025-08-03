@@ -9,9 +9,14 @@ This setup is for aimed at performing the tasks of event and object selection, c
 
 <prep>```
 cmsrel CMSSW_15_0_10
+
 cd CMSSW_15_0_10/src/
+
 cmsenv
+
 git clone https://github.com/mthakorecern/FinalStateHHbbtt_python3.git
+
 cd $CMSSW_BASE/src/
+
 scram b -j4```
 <prep>
