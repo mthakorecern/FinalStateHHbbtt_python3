@@ -32,7 +32,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 # from FinalStateHHbbtt.Pre_BackgroundEstimation.OrthogonalityChecks.HadronicTauToAK8Jet.matchingAK8ToTaus_semileptonic import AddAK8MatchingToTaus
 # from FinalStateHHbbtt.Pre_BackgroundEstimation.OrthogonalityChecks.Standalone_AdditionalLepVetoFlag.Standalone_AdditionalLepVetoFlag import Standalone_AdditionalLepVetoFlag
 
-
+## Defining our custom nanoAOD module and Sets up which systematic variations (JES, JER, TES, MET Unclustered) should be evaluated.
 class cutsAndcategories(Module):
     def __init__(self, filename, year, isData, runNominal=False):
         # self.writeHistFile=True
@@ -1559,17 +1559,17 @@ class cutsAndcategories(Module):
                         or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)):
                     self.cutflow_dict["Atleast_2leptons_anykind (no Iso-cut for e/mu)"] += 1
 
-            list = {}
-            list["bb"] = selfPairing(boostedTau_enu, "bb")
-            list["tt"] = selfPairing(Tau_enu, "tt")
-            list["be"] = crossPairing(boostedTau_enu, Electron_enu, "be")
-            list["bm"] = crossPairing(boostedTau_enu, Muon_enu, "bm")
-            list["te"] = crossPairing(Tau_enu, Electron_enu, "te")
-            list["tm"] = crossPairing(Tau_enu, Muon_enu, "tm")
+            pairDict = {}
+            pairDict["bb"] = selfPairing(boostedTau_enu, "bb")
+            pairDict["tt"] = selfPairing(Tau_enu, "tt")
+            pairDict["be"] = crossPairing(boostedTau_enu, Electron_enu, "be")
+            pairDict["bm"] = crossPairing(boostedTau_enu, Muon_enu, "bm")
+            pairDict["te"] = crossPairing(Tau_enu, Electron_enu, "te")
+            pairDict["tm"] = crossPairing(Tau_enu, Muon_enu, "tm")
 
-            Keymax = max(list, key=lambda x: list[x][0])
+            Keymax = max(pairDict, key=lambda x: pairDict[x][0])
 
-            if (list[Keymax][0] < 0):
+            if (pairDict[Keymax][0] < 0):
                 # return False
                 # Electron and Muon isolation failed - move on to the next
                 # systematics
@@ -1578,11 +1578,11 @@ class cutsAndcategories(Module):
 
             if (sys == ""):
                 self.cutflow_dict["Atleast_one_pair_anykind (Iso-cut applied for e/mu)"] += 1
-                if ((list["bb"][0] > 0) or (list["tt"][0] > 0)):
+                if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauTau_pair"] += 1
-                if ((list["be"][0] > 0) or (list["te"][0] > 0)):
+                if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauElectron_pair"] += 1
-                if ((list["bm"][0] > 0) or (list["tm"][0] > 0)):
+                if ((pairDict["bm"][0] > 0) or (pairDict["tm"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauMuon_pair"] += 1
 
             gFatJet_index = [FatJet_enu[0][0]]
@@ -1607,7 +1607,7 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("boost%s" % (sys), 1)
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 2)
-                gboostedTau_index = [list[Keymax][1], list[Keymax][2]]
+                gboostedTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (sys),
                                         [boostedTau[gboostedTau_index[0]].decayMode,
@@ -1650,7 +1650,7 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("boost%s" % (sys), 0)
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 2)
-                gTau_index = [list[Keymax][1], list[Keymax][2]]
+                gTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (
                         sys), [Tau[gTau_index[0]].decayMode, Tau[gTau_index[0]].decayMode])
@@ -1688,8 +1688,8 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("boost%s" % (sys), 1)
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 1)
-                gboostedTau_index = [list[Keymax][1]]
-                gElectron_index = [list[Keymax][2]]
+                gboostedTau_index = [pairDict[Keymax][1]]
+                gElectron_index = [pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (
                         sys), [boostedTau[gboostedTau_index[0]].decayMode])
@@ -1725,8 +1725,8 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("boost%s" % (sys), 0)
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 1)
-                gTau_index = [list[Keymax][1]]
-                gElectron_index = [list[Keymax][2]]
+                gTau_index = [pairDict[Keymax][1]]
+                gElectron_index = [pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (sys), [
                                         Tau[gTau_index[0]].decayMode])
@@ -1759,8 +1759,8 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("boost%s" % (sys), 1)
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 1)
-                gboostedTau_index = [list[Keymax][1]]
-                gMuon_index = [list[Keymax][2]]
+                gboostedTau_index = [pairDict[Keymax][1]]
+                gMuon_index = [pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (
                         sys), [boostedTau[gboostedTau_index[0]].decayMode])
@@ -1798,8 +1798,8 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("boost%s" % (sys), 0)
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 1)
-                gTau_index = [list[Keymax][1]]
-                gMuon_index = [list[Keymax][2]]
+                gTau_index = [pairDict[Keymax][1]]
+                gMuon_index = [pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (sys), [
                                         Tau[gTau_index[0]].decayMode])
@@ -2100,9 +2100,9 @@ def call_postpoc(files):
             cut=None,
             branchsel=None,
             modules=[
-                mainModule(),
-                fatjetVarModule(),
-                wandzWtModule()],
+                mainModule()],
+                #fatjetVarModule(),
+                #wandzWtModule()],
             postfix=post,
             noOut=False,
             outputbranchsel=None)
