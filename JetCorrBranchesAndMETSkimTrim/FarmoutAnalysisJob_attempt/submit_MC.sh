@@ -1,0 +1,20 @@
+DEST=/hdfs/store/user/mithakor/2024_JetID_JetVetoMaps_JES_JER
+JSON_BASE=/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/JetCorrBranchesAndMETSkimTrim/2024
+
+# python3 submit_jobs.py \
+#     --inputList Without_Top.txt \
+#     --destination $DEST \
+#     --jobName MC \
+#     --jetidjson $JSON_BASE/jetid.json \
+#     --vetomapjson $JSON_BASE/jetvetomaps.json \
+#     --jercjson $JSON_BASE/jet_jerc.json.gz  \
+#     --isMC
+
+python3 submit_jobs.py \
+    --inputList Top.txt \
+    --destination $DEST \
+    --jobName MC \
+    --jetidjson $JSON_BASE/jetid.json \
+    --vetomapjson $JSON_BASE/jetvetomaps.json \
+    --jercjson $JSON_BASE/jet_jerc.json.gz  \
+    --isMC
