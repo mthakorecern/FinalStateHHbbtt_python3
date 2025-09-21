@@ -7,10 +7,8 @@ from TauPOG.TauIDSFs.TauIDSFTool import TauESTool
 class TauEnergyScaleForHPSandBoosted(Module):
     def __init__(self, year, isData=False, tauID_wp='Loose', ele_wp='VVLoose'):
         print("ACTIVATE:  Tau Energy Scale Producer")
-        if (year == '2016'):
-            self.year = '2016_postVFP'
-        elif (year == '2016APV'):
-            self.year = '2016_preVFP'
+        if (year == '2024'):
+            self.year = '2024'
         else:
             self.year = year
         self.isData = isData
@@ -18,11 +16,11 @@ class TauEnergyScaleForHPSandBoosted(Module):
         self.tauID_wp = tauID_wp
         self.ele_wp = ele_wp
         # Initialize Tau Energy Scale (TES) tool
-        self.tesTool = TauESTool(
-            'UL' + self.year,
-            'DeepTau2018v2p5VSjet',
-            wp=tauID_wp,
-            wp_vsele=ele_wp)
+        # self.tesTool = TauESTool(
+        #     'UL' + self.year,
+        #     'DeepTau2018v2p5VSjet',
+        #     wp=tauID_wp,
+        #     wp_vsele=ele_wp)
 
     def beginJob(self):
         pass
