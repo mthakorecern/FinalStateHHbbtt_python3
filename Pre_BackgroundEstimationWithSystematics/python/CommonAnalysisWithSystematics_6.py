@@ -14,7 +14,7 @@ from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModu
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
-from PhysicsTools.NATModules.modules.leptonTaubranches import LeptonTauBranches
+# from PhysicsTools.NATModules.modules.leptonTaubranches import LeptonTauBranches
 
 class cutsAndcategories(Module):
     def __init__(self, filename, year, isData, runNominal=False, cutflowDir="."):
@@ -849,14 +849,17 @@ class cutsAndcategories(Module):
                         continue
                     # Found the bug in the code - I was only applying isolation
                     # for boostedTaus but none for HPS
-                    if ((tag == "be") or (tag == "te")):
-                        if not ElectronIsolationCut(
-                                col1[i][1], col2[j][1], tag):
-                            continue
+                    
+                    ## Commenting out the isolation part for now. Might add it in the future.
 
-                    elif ((tag == "bm") or (tag == "tm")):
-                        if not MuonIsolationCut(col1[i][1], col2[j][1], tag):
-                            continue
+                    # if ((tag == "be") or (tag == "te")):
+                    #     if not ElectronIsolationCut(
+                    #             col1[i][1], col2[j][1], tag):
+                    #         continue
+
+                    # elif ((tag == "bm") or (tag == "tm")):
+                    #     if not MuonIsolationCut(col1[i][1], col2[j][1], tag):
+                    #         continue
 
                     sumFourVector = self.pair1FV + self.pair2FV
                     pt = sumFourVector.Pt()
@@ -1937,7 +1940,7 @@ def call_postpoc():
         inputFiles=[inputFile],
         cut=preselection,
         branchsel=None,
-        modules=[LeptonTauBranches(), tesModule(),
+        modules=[tesModule(),
                 module_inst],
         postfix="",
         noOut=False,
