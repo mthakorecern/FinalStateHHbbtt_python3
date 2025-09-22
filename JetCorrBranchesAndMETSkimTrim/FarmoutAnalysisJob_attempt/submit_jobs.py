@@ -68,7 +68,7 @@ def main(args):
         f'--output-dir={args.destination}/{job_name}',
         '--opsys=rhel9',
         '--memory-requirements=5000',
-        '--disk-requirements=25000',
+        '--disk-requirements=20000',
         '--input-dir=/',
         f'--extra-inputs={extra_inputs}',
         job_name,
@@ -97,8 +97,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--destination", required=True, help="HDFS or local destination for output")
     parser.add_argument("--jobName", required=True, help="Base name for this submission")
-    parser.add_argument("--submitDirPath", default="/nfs_scratch/"+os.environ["USER"]+"/JET_correction_Condor_Jobs",
-                        help="Scratch area for submit files (default = /nfs_scratch/$USER/JET_correction_Condor_Jobs)")
+    parser.add_argument("--submitDirPath", default="/nfs_scratch/"+os.environ["USER"]+"/JET_JES_JER_Softdrop_Condor_Jobs",
+                        help="Scratch area for submit files (default =/nfs_scratch/mithakor/JET_JES_JER_Softdrop_Condor_Jobs)")
     parser.add_argument("--goldenjson", required=False)
     parser.add_argument("--jetidjson", required=True)
     parser.add_argument("--vetomapjson", required=True)

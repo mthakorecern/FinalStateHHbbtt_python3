@@ -147,6 +147,8 @@ class cutsAndcategories(Module):
                 self.out.branch("softdropmass%s" % (sys), "F")
                 self.out.branch("softdropmassnom%s" % (sys), "F")
                 self.out.branch("pnetmass%s" % (sys), "F")
+                self.out.branch("globalparT3mass%s" % (sys), "F")
+
             self.out.branch("channel%s" % (sys), "I")
             self.out.branch("boost%s" % (sys), "I")
 
@@ -370,6 +372,8 @@ class cutsAndcategories(Module):
         def getMETpt(sys):
             if ((sys == "") or (sys == "tesUp") or (sys == "tesDown")):
                 return event.PuppiMET_pt
+            return event.PuppiMET_pt
+
             # elif sys == "jesTotalUp":
             #     return event.METcorrected_ptScaleUp
             # elif sys == "jesTotalDown":
@@ -479,7 +483,9 @@ class cutsAndcategories(Module):
 
         def getMETphi(sys):
             if ((sys == "")  or (sys == "tesUp") or (sys == "tesDown")):
-                return event.METcorrected_phi
+                return event.PuppiMET_phi
+            return event.PuppiMET_phi
+
             # elif sys == "jesTotalUp":
             #     return event.METcorrected_phiScaleUp
             # elif sys == "jesTotalDown":
