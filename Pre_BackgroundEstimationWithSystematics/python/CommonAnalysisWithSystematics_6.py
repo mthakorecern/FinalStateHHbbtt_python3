@@ -14,6 +14,7 @@ from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModu
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
+from PhysicsTools.NATModules.modules.leptonTaubranches import LeptonTauBranches
 
 class cutsAndcategories(Module):
     def __init__(self, filename, year, isData, runNominal=False, cutflowDir="."):
@@ -1297,8 +1298,14 @@ class cutsAndcategories(Module):
 
             # FatJet_enu = filter(lambda x: (x[1].pt_nom >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
             # FatJet_enu = filter(lambda x: (getjetpt(x[1],sys) >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
-            FatJet_enu = [x for x in enumerate(FatJet) if (
-                getjetpt(x[1], sys) >= 200) and (abs(x[1].eta) < 2.5) and ((x[1].globalParT3_Xbb / (x[1].globalParT3_Xbb + x[1].globalParT3_QCD)) > 0.855)]
+            FatJet_enu = [
+                x for x in enumerate(FatJet)
+                if (getjetpt(x[1], sys) >= 200)
+                and (abs(x[1].eta) < 2.5)
+                and ((x[1].globalParT3_Xbb + x[1].globalParT3_QCD) > 0
+                and (x[1].globalParT3_Xbb / (x[1].globalParT3_Xbb + x[1].globalParT3_QCD) > 0.855))
+            ]
+
             if (len(FatJet_enu) == 0):
                 # move on to the next systematics
                 fillBranchesWithDefault(sys)
@@ -1930,7 +1937,7 @@ def call_postpoc():
         inputFiles=[inputFile],
         cut=preselection,
         branchsel=None,
-        modules=[tesModule(),
+        modules=[LeptonTauBranches(), tesModule(),
                 module_inst],
         postfix="",
         noOut=False,
