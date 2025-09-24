@@ -114,10 +114,11 @@ class cutsAndcategories(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.cutflow_dict = OrderedDict([
-            ("Events Generated", int(inputFile["cutflow"].GetBinContent(2))),
-            ("met_50", int(inputFile["cutflow"].GetBinContent(3))),
-            ("nFatJet>0", int(inputFile["cutflow"].GetBinContent(4))),
-            ("METFilters,Triggers,PVCond,met_150", inputTree.GetEntries()),
+            ("No cuts (for Data) and Sum of Gen Weights (for MC) ", int(inputFile["cutflow"].GetBinContent(1))),
+            ("FatJet Requirement (for Data) and Events Generated/No cuts (for MC)", int(inputFile["cutflow"].GetBinContent(2))),
+            ("PuppiMET_pt Threshold (for Data) (>50) and FatJet Requirement (for MC)", int(inputFile["cutflow"].GetBinContent(3))),
+            ("MET Filters (for Data) and PuppiMET_pt Threshold (for MC) (>50)", int(inputFile["cutflow"].GetBinContent(4))),
+            ("METFilters,PVCond,PuppiMET_pt_50", inputTree.GetEntries()),
             ("met_180", 0),
             ("AK8_sel_NoAK8bbTag", 0),
             (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
