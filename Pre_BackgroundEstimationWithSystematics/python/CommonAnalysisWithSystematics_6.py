@@ -113,29 +113,83 @@ class cutsAndcategories(Module):
         pass
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        self.cutflow_dict = OrderedDict([
-            ("No cuts (for Data) and Sum of Gen Weights (for MC) ", int(inputFile["cutflow"].GetBinContent(1))),
-            ("FatJet Requirement (for Data) and Events Generated/No cuts (for MC)", int(inputFile["cutflow"].GetBinContent(2))),
-            ("PuppiMET_pt Threshold (for Data) (>50) and FatJet Requirement (for MC)", int(inputFile["cutflow"].GetBinContent(3))),
-            ("MET Filters (for Data) and PuppiMET_pt Threshold (for MC) (>50)", int(inputFile["cutflow"].GetBinContent(4))),
-            ("METFilters,PVCond,PuppiMET_pt_50", inputTree.GetEntries()),
-            ("met_180", 0),
-            ("AK8_sel_NoAK8bbTag", 0),
-            (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
-            (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
-            (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
-            ("Atleast_2leptons_anykind (no Iso-cut for e/mu)", 0),
-            ("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
-            (" ...breakdown..> Atleast_one_TauTau_pair", 0),
-            (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
-            (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
-            (" ...breakdown..> TT_channel (max pt pair)", 0),
-            (" ...breakdown..> ET_channel (max pt pair)", 0),
-            (" ...breakdown..> MT_channel (max pt pair)", 0),
-            ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
-            ("Visible Mass HTT > 20 cut", 0),
-            ("Medium AK4 btag veto", 0)])
+        if self.isMC:
+            self.cutflow_dict = OrderedDict([
+                ("Skimming Stage: Sum of Gen Weights for MC", int(inputFile["cutflow"].GetBinContent(1))),
+                ("Skimming Stage: Events Generated/No cuts", int(inputFile["cutflow"].GetBinContent(2))),
+                ("Skimming Stage: FatJet Requirement (nFatJet > 0) ", int(inputFile["cutflow"].GetBinContent(3))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 50)", int(inputFile["cutflow"].GetBinContent(4))),
+                ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(5))),
+                ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(6))),
+                ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(7))),
+                ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET > 150, nGood PVs > 0", inputTree.GetEntries()),
+                
+                ## Pre-selection Cuts
+                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
+                ("Events after all object-level selections (before overlap cleaning)", 0),
+
+
+                (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
+                (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
+                (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
+                
+                ("Atleast_2leptons_anykind (no Iso-cut for e/mu)", 0),
+                #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
+                (" ...breakdown..> Atleast_one_TauTau_pair", 0),
+                (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
+                (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
+                (" ...breakdown..> TT_channel (max pt pair)", 0),
+                (" ...breakdown..> ET_channel (max pt pair)", 0),
+                (" ...breakdown..> MT_channel (max pt pair)", 0),
+                
+                ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                
+                ("Visible Mass HTT > 20 cut", 0),
+                ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
+                ("Final surviving events (nominal only)", 0),
+                ("Final surviving events (including JES/JER variations, MC only)", 0)])
+
+        else:
+            self.cutflow_dict = OrderedDict([
+                ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(1))),
+                ("Skimming Stage: FatJet Requirement (nFatJet > 0) ", int(inputFile["cutflow"].GetBinContent(2))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 50)", int(inputFile["cutflow"].GetBinContent(3))),
+                ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(4))),
+                ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(5))),
+                ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(6))),
+                ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET > 150, nGood PVs > 0", inputTree.GetEntries()),
+                
+                ## Pre-selection Cuts
+                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
+                ("Events after all object-level selections (before overlap cleaning)", 0),
+
+
+                (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
+                (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
+                (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
+                
+                ("Atleast_2leptons_anykind (no Iso-cut for e/mu)", 0),
+                #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
+                (" ...breakdown..> Atleast_one_TauTau_pair", 0),
+                (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
+                (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
+                (" ...breakdown..> TT_channel (max pt pair)", 0),
+                (" ...breakdown..> ET_channel (max pt pair)", 0),
+                (" ...breakdown..> MT_channel (max pt pair)", 0),
+                
+                ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                
+                ("Visible Mass HTT > 20 cut", 0),
+                ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
+                ("Final surviving events (nominal only)", 0)])
+
         
+        
+         
         if ((self.year == "2024") and (self.isMC)):
             self.totalEvents = int(inputTree.GetEntries())
             print(("Total Events in MC file = ", self.totalEvents))
@@ -606,12 +660,12 @@ class cutsAndcategories(Module):
             """
             Select central jets (2024 baseline):
             - pt > 30 GeV
-            - |eta| < 2.5
+            - |eta| <= 2.5
             - jetId > 1
             - event has not been vetoed (Flag_JetVetoed == 0)
             """
 
-            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and ak4Object_enu[1].jetId > 1 and getattr(event, "Flag_JetVetoed", 0) == 0:
+            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) <= 2.5 and ak4Object_enu[1].jetId > 1 and getattr(event, "Flag_JetVetoed", 0) == 0:
                 return True
 
             return False
@@ -1266,17 +1320,19 @@ class cutsAndcategories(Module):
         elif (self.isData):
             if ((event.PuppiMET_pt < 180)):
                 return False
+        
+        self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
 
         # FatJet_skim_enu = filter(lambda x: (x[1].pt_nom >= 180) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
         
         FatJet_skim_enu = [x for x in enumerate(FatJet) if (
-        x[1].pt_nom >= 180
-        and abs(x[1].eta) < 2.5
-        and (x[1].globalParT3_Xbb + x[1].globalParT3_QCD) > 0
-        and (x[1].globalParT3_Xbb / (x[1].globalParT3_Xbb + x[1].globalParT3_QCD)) > 0.855
-        )]
+        x[1].pt_nom >= 180)
+        and abs(x[1].eta) <= 2.5
+        and (x[1].jetId > 1)]
         if (len(FatJet_skim_enu) == 0):
             return False
+
+        self.cutflow_dict["Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)"] += 1
 
         # If the event survives this then no need of this variable
         del FatJet_skim_enu
@@ -1298,16 +1354,15 @@ class cutsAndcategories(Module):
                 continue
 
             if sys == "":
-                self.cutflow_dict["met_180"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt > 180"] += 1
 
             # FatJet_enu = filter(lambda x: (x[1].pt_nom >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
             # FatJet_enu = filter(lambda x: (getjetpt(x[1],sys) >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
             FatJet_enu = [
                 x for x in enumerate(FatJet)
-                if (getjetpt(x[1], sys) >= 200)
-                and (abs(x[1].eta) < 2.5)
-                and ((x[1].globalParT3_Xbb + x[1].globalParT3_QCD) > 0
-                and (x[1].globalParT3_Xbb / (x[1].globalParT3_Xbb + x[1].globalParT3_QCD) > 0.855))
+                if (getjetpt(x[1], sys) > 200)
+                and (abs(x[1].eta) <= 2.5 and (x[1].jetId > 1))
+
             ]
 
             if (len(FatJet_enu) == 0):
@@ -1317,8 +1372,6 @@ class cutsAndcategories(Module):
 
             # Fill the cutflow_hist for "AK8_sel"
             # self.cutflow2_hist.Fill(2.5)
-            if sys == "":
-                self.cutflow_dict["AK8_sel_NoAK8bbTag"] += 1
 
             # HbbScoreList = [(obj_enu[1].particleNetLegacy_Xbb/(obj_enu[1].particleNetLegacy_Xbb + obj_enu[1].particleNetLegacy_QCD)) for obj_enu in FatJet_enu]
             HbbPtList = [(getjetpt(obj_enu[1], sys)) for obj_enu in FatJet_enu]
@@ -1338,22 +1391,24 @@ class cutsAndcategories(Module):
             Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(
                 x, sys)]
 
+
             Tau_enu = [
                 x for x in enumerate(Tau) if (
                     gettaupt(
                         x[1], sys) > 20) and (
                     abs(
-                        x[1].eta) < 2.5) and (
+                        x[1].eta) <= 2.5) and (
                     abs(
                         x[1].dz) < 0.2) and (
                     x[1].idDecayModeNewDMs) and (
                     x[1].idDeepTau2018v2p5VSjet >= 4) and (
                     x[1].idDeepTau2018v2p5VSe >= 2) and (
                     x[1].idDeepTau2018v2p5VSmu >= 1)]  # The HPS tau id are not bitmps anymore
-
+            
             # boostedTau_enu = filter(lambda x: (x[1].pt > 20) and (abs(x[1].eta) < 2.5) and (x[1].rawDeepTau2018v2p7VSjet>=0.85), enumerate(boostedTau))
             boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (
-                abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet	 >= 0.85)]
+                abs(x[1].eta) <= 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet	 >= 0.85)]
+            
 
             # self.higgsBBFV.SetPtEtaPhiM(FatJet_enu[0][1].pt_nom,FatJet_enu[0][1].eta,FatJet_enu[0][1].phi,FatJet_enu[0][1].mass_nom)
             self.higgsBBFV.SetPtEtaPhiM(
@@ -1368,8 +1423,11 @@ class cutsAndcategories(Module):
 
             # incorporate ECAL transistion veto : https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaUL2016To2018#General_note_about_ID_SFs
             # https://cms-pub-talk.web.cern.ch/t/egamma-or/30044/2
-            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10]
-            Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
+            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (
+                abs(x[1].eta) <= 2.5) and x[1].cutBased >= 2]
+            
+
+            #Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
 
             ###################################################################
             # Code for addtional lepton veto
@@ -1385,12 +1443,17 @@ class cutsAndcategories(Module):
             # if self.muID == 2:
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (
                 abs(x[1].eta) < 2.4) and x[1].looseId]
+
+            
             # elif self.muID == 3:
             # Muon_enu = filter(lambda x: x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].mediumId, enumerate(Muon))
             # elif self.muID == 4:
             # Muon_enu = filter(lambda x: x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].tightId, enumerate(Muon))
 
             # Object cleaning procedures
+            if sys == "":  # only count once for nominal
+                self.cutflow_dict["Events after all object-level selections (before overlap cleaning)"] += 1
+
             Jet_enu = [x for x in Jet_enu if JetFatJetOverlap(x, sys)]
 
             Electron_enu = list(filter(FatJetConeIsolation, Electron_enu))
@@ -1457,7 +1520,7 @@ class cutsAndcategories(Module):
                 continue
 
             if (sys == ""):
-                self.cutflow_dict["Atleast_one_pair_anykind (Iso-cut applied for e/mu)"] += 1
+                #self.cutflow_dict["Atleast_one_pair_anykind"] += 1
                 if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauTau_pair"] += 1
                 if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
@@ -1533,7 +1596,7 @@ class cutsAndcategories(Module):
                 gTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
                 if (sys == ""):
                     self.out.fillBranch("allTaus_decayMode%s" % (
-                        sys), [Tau[gTau_index[0]].decayMode, Tau[gTau_index[0]].decayMode])
+                        sys), [Tau[gTau_index[0]].decayMode, Tau[gTau_index[1]].decayMode])
                 # firstLepton  =  fastMTTlepton(pt = Tau[gTau_index[0]].pt,eta = Tau[gTau_index[0]].eta,phi = Tau[gTau_index[0]].phi,m = Tau[gTau_index[0]].mass,leptonType = 'Tau',tauDecayMode=Tau[gTau_index[0]].decayMode)
                 firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]],
                                                         sys),
@@ -1848,7 +1911,7 @@ class cutsAndcategories(Module):
             # Fill cut flow
             if (sys == ""):
                 if ((len(gJet_Mediumindex) == 0)):
-                    self.cutflow_dict["Medium AK4 btag veto"] += 1
+                    self.cutflow_dict["Medium AK4 b-tag veto (events with 0 medium b-tagged jets)"] += 1
 
             self.out.fillBranch("index_gboostedTaus%s" %
                                 (sys), gboostedTau_index)
@@ -1901,8 +1964,12 @@ class cutsAndcategories(Module):
         if passAsingleSystematic > 0:
             if (nominal_bool == 1):
                 self.out.fillBranch("eventnominal", 1)
+                self.cutflow_dict["Final surviving events (nominal only)"] += 1
             else:
                 self.out.fillBranch("eventnominal", 0)
+
+            if self.isMC:
+                self.cutflow_dict["Final surviving events (including JES/JER variations, MC only)"] += 1
             return True
         else:
             return False

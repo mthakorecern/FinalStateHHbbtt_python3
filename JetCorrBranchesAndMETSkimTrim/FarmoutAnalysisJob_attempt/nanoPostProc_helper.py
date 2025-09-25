@@ -14,7 +14,9 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 
 # Custom modules
 from PhysicsTools.NATModules.modules.jetVetoMap import jetVMAP
+from PhysicsTools.NATModules.modules.fatJetvetoMap import fatJetVMAP
 from PhysicsTools.NATModules.modules.jetId import jetId
+from PhysicsTools.NATModules.modules.fatjetId import fatJetId
 from PhysicsTools.NATModules.modules.jetCorr import jetJERC
 from PhysicsTools.NATModules.modules.fatjetcorr import fatJetJERC
 
@@ -72,12 +74,23 @@ def process_file(inputFile, outputFile,
     # JetID
     modules.append(jetId(jetidjson, jetType="AK4PUPPI"))
     print("Added JetID module")
+    
+    modules.append(fatJetId(jetidjson, jetType="AK8PUPPI"))
+    print("Added FatJetID module")
+
 
     # JetVetoMap
     modules.append(jetVMAP(vetomapjson,
                            corrName="Summer24Prompt24_RunBCDEFGHI_V1",
                            veto_map_name="jetvetomap"))
     print("Added JetVetoMap module")
+
+    modules.append(fatJetVMAP(vetomapjson,
+                           corrName="Summer24Prompt24_RunBCDEFGHI_V1",
+                           veto_map_name="jetvetomap"))
+    print("Added FatJetVetoMap module")
+
+
 
     if isMC:
         # AK4 jets
