@@ -126,7 +126,7 @@ class cutsAndcategories(Module):
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt > 180", 0),
-                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1) and not vetoed by jetvetomaps", 0),
                 ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
@@ -163,7 +163,7 @@ class cutsAndcategories(Module):
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt > 180", 0),
-                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1) and not vetoed by jetvetomaps", 0),
                 ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
@@ -270,10 +270,16 @@ class cutsAndcategories(Module):
 
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        cutflow_file = os.path.join(self.cutflowDir, "cutflow2_" + self.filename + ".json")
-        os.makedirs(os.path.dirname(cutflow_file), exist_ok=True)
-        with open(cutflow_file, "w") as outfile:
+        local_cutflow = os.path.join("intermediate", "cutflow_" + self.filename + ".json")
+        os.makedirs(os.path.dirname(local_cutflow), exist_ok=True)
+        with open(local_cutflow, "w") as outfile:
             json.dump(self.cutflow_dict, outfile, indent=4)
+
+        final_cutflow = os.path.join(self.cutflowDir, "cutflow_" + self.filename + ".json")
+        os.makedirs(os.path.dirname(final_cutflow), exist_ok=True)
+        shutil.move(local_cutflow, final_cutflow)
+
+        print(f"Cutflow JSON written to {final_cutflow}")
         # pass
 
     def analyze(self, event):
@@ -1328,11 +1334,14 @@ class cutsAndcategories(Module):
         FatJet_skim_enu = [x for x in enumerate(FatJet) if (
         x[1].pt_nom >= 180)
         and abs(x[1].eta) <= 2.5
-        and (x[1].jetId > 1)]
+        and (x[1].jetId > 1) and getattr(event, "Flag_FatJetVetoed", 0) == 0]
         if (len(FatJet_skim_enu) == 0):
             return False
 
-        self.cutflow_dict["Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)"] += 1
+        if getattr(event, "Flag_FatJetVetoed", 0) == 1:
+            return False
+
+        self.cutflow_dict["Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1) and not vetoed by jetvetomaps"] += 1
 
         # If the event survives this then no need of this variable
         del FatJet_skim_enu
