@@ -8,6 +8,7 @@ import shutil
 import math
 import argparse
 import json
+import subprocess
 from collections import OrderedDict
 from FinalStateHHbbtt.fastMTTPython.fastMTTtool import *
 from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModule.TauEnergyScaleForHPSandBoosted import TauEnergyScaleForHPSandBoosted
@@ -17,7 +18,7 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 # from PhysicsTools.NATModules.modules.leptonTaubranches import LeptonTauBranches
 
 class cutsAndcategories(Module):
-    def __init__(self, filename, year, isData, runNominal=False, cutflowDir="."):
+    def __init__(self, filename, year, isData, runNominal=False, cutflowDir=None):
 
         self.runNominal = runNominal
         print("ACTIVATE: cutsAndcategories")
@@ -71,6 +72,8 @@ class cutsAndcategories(Module):
                 (self.year_unc),
                 "jesRelativeSample_%sDown" %
                 (self.year_unc),
+                "UnclustUp",
+                "UnclustDown",
                 "tesUp",
                 "tesDown"]
 
@@ -122,12 +125,12 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(6))),
                 ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(7))),
-                ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET > 150, nGood PVs > 0", inputTree.GetEntries()),
+                ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 180", 0),
-                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1) and not vetoed by jetvetomaps", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
+                ("Pre-selection: PuppiMET_pt >= 120", 0),
+                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -135,7 +138,7 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
                 
-                ("Atleast_2leptons_anykind (no Iso-cut for e/mu)", 0),
+                ("Atleast_2leptons_anykind", 0),
                 #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
                 (" ...breakdown..> Atleast_one_TauTau_pair", 0),
                 (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
@@ -144,9 +147,9 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
-                ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
-                ("Visible Mass HTT > 20 cut", 0),
+                #("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
                 ("Final surviving events (nominal only)", 0),
                 ("Final surviving events (including JES/JER variations, MC only)", 0)])
@@ -159,12 +162,12 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(4))),
                 ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(6))),
-                ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET > 150, nGood PVs > 0", inputTree.GetEntries()),
+                ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 180", 0),
-                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1) and not vetoed by jetvetomaps", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
+                ("Pre-selection: PuppiMET_pt >= 120", 0),
+                ("Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -172,7 +175,7 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
                 
-                ("Atleast_2leptons_anykind (no Iso-cut for e/mu)", 0),
+                ("Atleast_2leptons_anykind", 0),
                 #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
                 (" ...breakdown..> Atleast_one_TauTau_pair", 0),
                 (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
@@ -181,9 +184,9 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
-                ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
-                ("Visible Mass HTT > 20 cut", 0),
+                #("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
                 ("Final surviving events (nominal only)", 0)])
 
@@ -245,7 +248,7 @@ class cutsAndcategories(Module):
             self.out.branch("ngood_Muons%s" % (sys), "I")
             self.out.branch("ngood_FatJets%s" % (sys), "I")
             self.out.branch("ngood_Jets%s" % (sys), "I")
-            # self.out.branch("ngood_LooseJets%s"%(sys),"I")
+            self.out.branch("ngood_LooseJets%s"%(sys),"I")
             self.out.branch("ngood_MediumJets%s" % (sys), "I")
             self.out.branch("ngood_TightJets%s" % (sys), "I")
 
@@ -261,7 +264,7 @@ class cutsAndcategories(Module):
                             lenVar="ngood_FatJets%s" % (sys))
             self.out.branch("index_gJets%s" % (sys), "I",
                             lenVar="ngood_Jets%s" % (sys))
-            # self.out.branch("index_gLooseJets%s"%(sys),"I",lenVar="ngood_LooseJets%s"%(sys))
+            self.out.branch("index_gLooseJets%s"%(sys),"I",lenVar="ngood_LooseJets%s"%(sys))
             self.out.branch("index_gMediumJets%s" % (sys), "I",
                             lenVar="ngood_MediumJets%s" % (sys))
             self.out.branch("index_gTightJets%s" % (sys), "I",
@@ -270,17 +273,35 @@ class cutsAndcategories(Module):
 
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        local_cutflow = os.path.join("intermediate", "cutflow_" + self.filename + ".json")
-        os.makedirs(os.path.dirname(local_cutflow), exist_ok=True)
-        with open(local_cutflow, "w") as outfile:
+            # Where the ROOT file is written
+        output_dir = os.path.dirname(outputFile.GetName())
+        base_name = os.path.splitext(os.path.basename(outputFile.GetName()))[0]
+
+        # Create local JSON in same directory as ROOT output
+        local_json_path = os.path.join(output_dir, f"{base_name}_cutflow.json")
+        with open(local_json_path, "w") as outfile:
             json.dump(self.cutflow_dict, outfile, indent=4)
+        print(f"[INFO] Cutflow JSON written locally: {local_json_path}")
 
-        final_cutflow = os.path.join(self.cutflowDir, "cutflow_" + self.filename + ".json")
-        os.makedirs(os.path.dirname(final_cutflow), exist_ok=True)
-        shutil.move(local_cutflow, final_cutflow)
+        # Use provided cutflowDir if available, else fallback
+        cutflow_dir = getattr(self, "cutflowDir", None)
 
-        print(f"Cutflow JSON written to {final_cutflow}")
-        # pass
+        if cutflow_dir is None or cutflow_dir.strip() == "":
+            print("[INFO] No cutflowDir provided. Defaulting to ROOT output directory.")
+            cutflow_dir = output_dir  
+        # Ensure cutflowDir exists
+        os.makedirs(cutflow_dir, exist_ok=True)
+
+        # Destination JSON path
+        final_json_path = os.path.join(cutflow_dir, f"{base_name}_cutflow.json")
+
+        try:
+            shutil.move(local_json_path, final_json_path)
+            print(f"[INFO] Cutflow JSON moved to: {final_json_path}")
+        except Exception as e:
+            print(f"[ERROR] Failed to move cutflow JSON to {final_json_path}")
+            print(f"       Reason: {e}")
+
 
     def analyze(self, event):
         def gettaupt(tau, sys):
@@ -300,7 +321,8 @@ class cutsAndcategories(Module):
                 return tau.mass_nom
 
         def getjetpt(jet, sys):
-            if ((sys == "") or (sys == "tesUp") or (sys == "tesDown")):
+            if ((sys == "") or (sys == "UnclustUp") or (
+                    sys == "UnclustDown") or (sys == "tesUp") or (sys == "tesDown")):
                 return jet.pt_nom
             elif sys == "jesTotalUp":
                 return jet.pt_jesTotalUp
@@ -366,7 +388,8 @@ class cutsAndcategories(Module):
                     return jet.pt_jesRelativeSample_2024Down
                 
         def getjetmass(jet, sys):
-            if ((sys == "") or (sys == "tesUp") or (sys == "tesDown")):
+            if ((sys == "") or (sys == "UnclustUp") or (
+                    sys == "UnclustDown") or (sys == "tesUp") or (sys == "tesDown")):
                 return jet.mass_nom
             elif sys == "jesTotalUp":
                 return jet.mass_jesTotalUp
@@ -433,223 +456,144 @@ class cutsAndcategories(Module):
 
         def getMETpt(sys):
             if ((sys == "") or (sys == "tesUp") or (sys == "tesDown")):
-                return event.PuppiMET_pt
-            return event.PuppiMET_pt
-
-            # elif sys == "jesTotalUp":
-            #     return event.METcorrected_ptScaleUp
-            # elif sys == "jesTotalDown":
-            #     return event.METcorrected_ptScaleDown
-            # elif sys == "jerUp":
-            #     return event.METcorrected_ptResUp
-            # elif sys == "jerDown":
-            #     return event.METcorrected_ptResDown
-            # elif sys == "jesAbsoluteUp":
-            #     return event.METcorrected_ptScaleAbsoluteUp
-            # elif sys == "jesAbsoluteDown":
-            #     return event.METcorrected_ptScaleAbsoluteDown
-            # elif sys == "jesAbsolute_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleAbsolute_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleAbsolute_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleAbsolute_2018Up
-            # elif sys == "jesAbsolute_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleAbsolute_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleAbsolute_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleAbsolute_2018Down
-            # elif sys == "jesBBEC1Up":
-            #     return event.METcorrected_ptScaleBBEC1Up
-            # elif sys == "jesBBEC1Down":
-            #     return event.METcorrected_ptScaleBBEC1Down
-            # elif sys == "jesBBEC1_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleBBEC1_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleBBEC1_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleBBEC1_2018Up
-            # elif sys == "jesBBEC1_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleBBEC1_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleBBEC1_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleBBEC1_2018Down
-            # elif sys == "jesEC2Up":
-            #     return event.METcorrected_ptScaleEC2Up
-            # elif sys == "jesEC2Down":
-            #     return event.METcorrected_ptScaleEC2Down
-            # elif sys == "jesEC2_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleEC2_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleEC2_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleEC2_2018Up
-            # elif sys == "jesEC2_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleEC2_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleEC2_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleEC2_2018Down
-            # elif sys == "jesFlavorQCDUp":
-            #     return event.METcorrected_ptScaleFlavorQCDUp
-            # elif sys == "jesFlavorQCDDown":
-            #     return event.METcorrected_ptScaleFlavorQCDDown
-            # elif sys == "jesHFUp":
-            #     return event.METcorrected_ptScaleHFUp
-            # elif sys == "jesHFDown":
-            #     return event.METcorrected_ptScaleHFDown
-            # elif sys == "jesHF_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleHF_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleHF_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleHF_2018Up
-            # elif sys == "jesHF_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleHF_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleHF_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleHF_2018Down
-            # elif sys == "jesRelativeBalUp":
-            #     return event.METcorrected_ptScaleRelativeBalUp
-            # elif sys == "jesRelativeBalDown":
-            #     return event.METcorrected_ptScaleRelativeBalDown
-            # elif sys == "jesRelativeSample_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleRelativeSample_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleRelativeSample_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleRelativeSample_2018Up
-            # elif sys == "jesRelativeSample_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_ptScaleRelativeSample_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_ptScaleRelativeSample_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_ptScaleRelativeSample_2018Down
-            # elif sys == "UnclustUp":
-            #     return event.METcorrected_ptUnclustUp
-            # elif sys == "UnclustDown":
-            #     return event.METcorrected_ptUnclustDown
+                return event.PuppiMET_pt_nom
+            elif sys == "jesTotalUp":
+                return event.PuppiMET_pt_jesTotalUp
+            elif sys == "jesTotalDown":
+                return event.PuppiMET_pt_jesTotalDown
+            elif sys == "jerUp":
+                return event.PuppiMET_pt_jerUp
+            elif sys == "jerDown":
+                return event.PuppiMET_pt_jerDown
+            elif sys == "jesAbsoluteUp":
+                return event.PuppiMET_pt_jesAbsoluteUp
+            elif sys == "jesAbsoluteDown":
+                return event.PuppiMET_pt_jesAbsoluteDown
+            elif sys == "jesAbsolute_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesAbsolute_2024Up
+            elif sys == "jesAbsolute_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesAbsolute_2024Down
+            elif sys == "jesBBEC1Up":
+                return event.PuppiMET_pt_jesBBEC1Up
+            elif sys == "jesBBEC1Down":
+                return event.PuppiMET_pt_jesBBEC1Down
+            elif sys == "jesBBEC1_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesBBEC1_2024Up
+            elif sys == "jesBBEC1_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesBBEC1_2024Down
+            elif sys == "jesEC2Up":
+                return event.PuppiMET_pt_jesEC2Up
+            elif sys == "jesEC2Down":
+                return event.PuppiMET_pt_jesEC2Down
+            elif sys == "jesEC2_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesEC2_2024Up
+            elif sys == "jesEC2_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesEC2_2024Down
+            elif sys == "jesFlavorQCDUp":
+                return event.PuppiMET_pt_jesFlavorQCDUp
+            elif sys == "jesFlavorQCDDown":
+                return event.PuppiMET_pt_jesFlavorQCDDown
+            elif sys == "jesHFUp":
+                return event.PuppiMET_pt_jesHFUp
+            elif sys == "jesHFDown":
+                return event.PuppiMET_pt_jesHFDown
+            elif sys == "jesHF_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesHF_2024Up
+            elif sys == "jesHF_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesHF_2024Down
+            elif sys == "jesRelativeBalUp":
+                return event.PuppiMET_pt_jesRelativeBalUp
+            elif sys == "jesRelativeBalDown":
+                return event.PuppiMET_pt_jesRelativeBalDown
+            elif sys == "jesRelativeSample_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesRelativeSample_2024Up
+            elif sys == "jesRelativeSample_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_pt_jesRelativeSample_2024Down
+            elif sys == "UnclustUp":
+                return event.PuppiMET_ptUnclusteredUp
+            elif sys == "UnclustDown":
+                return event.PuppiMET_ptUnclusteredDown
 
         def getMETphi(sys):
-            if ((sys == "")  or (sys == "tesUp") or (sys == "tesDown")):
-                return event.PuppiMET_phi
-            return event.PuppiMET_phi
-
-            # elif sys == "jesTotalUp":
-            #     return event.METcorrected_phiScaleUp
-            # elif sys == "jesTotalDown":
-            #     return event.METcorrected_phiScaleDown
-            # elif sys == "jerUp":
-            #     return event.METcorrected_phiResUp
-            # elif sys == "jerDown":
-            #     return event.METcorrected_phiResDown
-            # elif sys == "jesAbsoluteUp":
-            #     return event.METcorrected_phiScaleAbsoluteUp
-            # elif sys == "jesAbsoluteDown":
-            #     return event.METcorrected_phiScaleAbsoluteDown
-            # elif sys == "jesAbsolute_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleAbsolute_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleAbsolute_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleAbsolute_2018Up
-            # elif sys == "jesAbsolute_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleAbsolute_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleAbsolute_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleAbsolute_2018Down
-            # elif sys == "jesBBEC1Up":
-            #     return event.METcorrected_phiScaleBBEC1Up
-            # elif sys == "jesBBEC1Down":
-            #     return event.METcorrected_phiScaleBBEC1Down
-            # elif sys == "jesBBEC1_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleBBEC1_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleBBEC1_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleBBEC1_2018Up
-            # elif sys == "jesBBEC1_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleBBEC1_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleBBEC1_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleBBEC1_2018Down
-            # elif sys == "jesEC2Up":
-            #     return event.METcorrected_phiScaleEC2Up
-            # elif sys == "jesEC2Down":
-            #     return event.METcorrected_phiScaleEC2Down
-            # elif sys == "jesEC2_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleEC2_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleEC2_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleEC2_2018Up
-            # elif sys == "jesEC2_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleEC2_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleEC2_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleEC2_2018Down
-            # elif sys == "jesFlavorQCDUp":
-            #     return event.METcorrected_phiScaleFlavorQCDUp
-            # elif sys == "jesFlavorQCDDown":
-            #     return event.METcorrected_phiScaleFlavorQCDDown
-            # elif sys == "jesHFUp":
-            #     return event.METcorrected_phiScaleHFUp
-            # elif sys == "jesHFDown":
-            #     return event.METcorrected_phiScaleHFDown
-            # elif sys == "jesHF_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleHF_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleHF_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleHF_2018Up
-            # elif sys == "jesHF_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleHF_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleHF_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleHF_2018Down
-            # elif sys == "jesRelativeBalUp":
-            #     return event.METcorrected_phiScaleRelativeBalUp
-            # elif sys == "jesRelativeBalDown":
-            #     return event.METcorrected_phiScaleRelativeBalDown
-            # elif sys == "jesRelativeSample_%sUp" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleRelativeSample_2016Up
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleRelativeSample_2017Up
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleRelativeSample_2018Up
-            # elif sys == "jesRelativeSample_%sDown" % (self.year_unc):
-            #     if (self.year_unc == "2016"):
-            #         return event.METcorrected_phiScaleRelativeSample_2016Down
-            #     elif (self.year_unc == "2017"):
-            #         return event.METcorrected_phiScaleRelativeSample_2017Down
-            #     elif (self.year_unc == "2018"):
-            #         return event.METcorrected_phiScaleRelativeSample_2018Down
+            if ((sys == "")  or (sys == "UnclustUp") or (
+                    sys == "UnclustDown") or (sys == "tesUp") or (sys == "tesDown")):
+                return event.PuppiMET_phi_nom
+            elif sys == "jesTotalUp":
+                return event.PuppiMET_phi_jesTotalUp
+            elif sys == "jesTotalDown":
+                return event.PuppiMET_phi_jesTotalDown
+            elif sys == "jerUp":
+                return event.PuppiMET_phi_jerUp
+            elif sys == "jerDown":
+                return event.PuppiMET_phi_jerDown
+            elif sys == "jesAbsoluteUp":
+                return event.PuppiMET_phi_jesAbsoluteUp
+            elif sys == "jesAbsoluteDown":
+                return event.PuppiMET_phi_jesAbsoluteDown
+            elif sys == "jesAbsolute_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesAbsolute_2024Up
+            elif sys == "jesAbsolute_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesAbsolute_2024Down
+            elif sys == "jesBBEC1Up":
+                return event.PuppiMET_phi_jesBBEC1Up
+            elif sys == "jesBBEC1Down":
+                return event.PuppiMET_phi_jesBBEC1Down
+            elif sys == "jesBBEC1_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesBBEC1_2024Up
+            elif sys == "jesBBEC1_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesBBEC1_2024Down
+            elif sys == "jesEC2Up":
+                return event.PuppiMET_phi_jesEC2Up
+            elif sys == "jesEC2Down":
+                return event.PuppiMET_phi_jesEC2Down
+            elif sys == "jesEC2_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesEC2_2024Up
+            elif sys == "jesEC2_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesEC2_2024Down
+            elif sys == "jesFlavorQCDUp":
+                return event.PuppiMET_phi_jesFlavorQCDUp
+            elif sys == "jesFlavorQCDDown":
+                return event.PuppiMET_phi_jesFlavorQCDDown
+            elif sys == "jesHFUp":
+                return event.PuppiMET_phi_jesHFUp
+            elif sys == "jesHFDown":
+                return event.PuppiMET_phi_jesHFDown
+            elif sys == "jesHF_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesHF_2024Up
+            elif sys == "jesHF_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesHF_2024Down
+            elif sys == "jesRelativeBalUp":
+                return event.PuppiMET_phi_jesRelativeBalUp
+            elif sys == "jesRelativeBalDown":
+                return event.PuppiMET_phi_jesRelativeBalDown
+            elif sys == "jesRelativeSample_%sUp" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesRelativeSample_2024Up
+            elif sys == "jesRelativeSample_%sDown" % (self.year_unc):
+                if (self.year_unc == "2024"):
+                    return event.PuppiMET_phi_jesRelativeSample_2024Down
+            elif sys == "UnclustUp":
+                return event.PuppiMET_phiUnclusteredUp
+            elif sys == "UnclustDown":
+                return event.PuppiMET_phiUnclusteredDown
 
         # def applyPOGselectionToAK4(ak4Object_enu, sys):
         #     # Based on the Jet MET object contact suggestion - we can remove the pile up ID requirememt.
@@ -668,10 +612,10 @@ class cutsAndcategories(Module):
             - pt > 30 GeV
             - |eta| <= 2.5
             - jetId > 1
-            - event has not been vetoed (Flag_JetVetoed == 0)
             """
 
-            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) <= 2.5 and ak4Object_enu[1].jetId > 1 and getattr(event, "Flag_JetVetoed", 0) == 0:
+            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) <= 2.5 and ak4Object_enu[1].jetId > 1: 
+                #and getattr(event, "Flag_JetVetoed", 0) == 0:
                 return True
 
             return False
@@ -1317,31 +1261,31 @@ class cutsAndcategories(Module):
             #                        event.METcorrected_ptUnclustDown])
 
             # Now reject events (skim further)
-                if event.PuppiMET_pt < 180:# and (
+                if event.PuppiMET_pt_nom < 120:# and (
                         #min_upvar < 180) and (min_downvar < 180)):
                     return False
             # Delete the min variables - not used for the rest of the code
             #del min_upvar
             #del min_downvar
         elif (self.isData):
-            if ((event.PuppiMET_pt < 180)):
+            if ((event.PuppiMET_pt_nom < 120)):
                 return False
         
-        self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
+        self.cutflow_dict["Pre-selection: PuppiMET_pt >= 120"] += 1
 
         # FatJet_skim_enu = filter(lambda x: (x[1].pt_nom >= 180) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
         
         FatJet_skim_enu = [x for x in enumerate(FatJet) if (
         x[1].pt_nom >= 180)
         and abs(x[1].eta) <= 2.5
-        and (x[1].jetId > 1) and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+        and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
         if (len(FatJet_skim_enu) == 0):
             return False
 
-        if getattr(event, "Flag_FatJetVetoed", 0) == 1:
-            return False
+        # if getattr(event, "Flag_FatJetVetoed", 0) == 1:
+        #     return False
 
-        self.cutflow_dict["Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1) and not vetoed by jetvetomaps"] += 1
+        self.cutflow_dict["Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)"] += 1
 
         # If the event survives this then no need of this variable
         del FatJet_skim_enu
@@ -1357,19 +1301,19 @@ class cutsAndcategories(Module):
             # Fill the cutflow_hist for "met >= 180"
             # self.cutflow2_hist.Fill(1.5)
 
-            if ((getMETpt(sys) < 180)):
+            if ((getMETpt(sys) < 120)):
                 fillBranchesWithDefault(sys)
                 # return False
                 continue
 
             if sys == "":
-                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt > 180"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >= 120"] += 1
 
             # FatJet_enu = filter(lambda x: (x[1].pt_nom >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
             # FatJet_enu = filter(lambda x: (getjetpt(x[1],sys) >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
             FatJet_enu = [
                 x for x in enumerate(FatJet)
-                if (getjetpt(x[1], sys) > 200)
+                if (getjetpt(x[1], sys) > 180)
                 and (abs(x[1].eta) <= 2.5 and (x[1].jetId > 1))
 
             ]
@@ -1410,7 +1354,7 @@ class cutsAndcategories(Module):
                     abs(
                         x[1].dz) < 0.2) and (
                     x[1].idDecayModeNewDMs) and (
-                    x[1].idDeepTau2018v2p5VSjet >= 4) and (
+                    x[1].idDeepTau2018v2p5VSjet >= 3) and (
                     x[1].idDeepTau2018v2p5VSe >= 2) and (
                     x[1].idDeepTau2018v2p5VSmu >= 1)]  # The HPS tau id are not bitmps anymore
             
@@ -1509,7 +1453,7 @@ class cutsAndcategories(Module):
             if (sys == ""):
                 if (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)
                         or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)):
-                    self.cutflow_dict["Atleast_2leptons_anykind (no Iso-cut for e/mu)"] += 1
+                    self.cutflow_dict["Atleast_2leptons_anykind"] += 1
 
             pairDict = {}
             pairDict["bb"] = selfPairing(boostedTau_enu, "bb")
@@ -1783,25 +1727,25 @@ class cutsAndcategories(Module):
                     self.cutflow_dict[" ...breakdown..> MT_channel (max pt pair)"] += 1
 
             self.met.SetPtEtaPhiM(getMETpt(sys), 0.0, getMETphi(sys), 0.0)
-            pass_quality_delcuts = (
-                ((abs(
-                    self.higgsBBFV.DeltaPhi(
-                        self.met))) > 1) and (
-                    (self.pair1FV.DeltaR(
-                        self.pair2FV)) > 0) and (
-                    (self.pair1FV.DeltaR(
-                        self.pair2FV)) < 1.5))
+            # pass_quality_delcuts = (
+            #     ((abs(
+            #         self.higgsBBFV.DeltaPhi(
+            #             self.met))) > 1) and (
+            #         (self.pair1FV.DeltaR(
+            #             self.pair2FV)) > 0) and (
+            #         (self.pair1FV.DeltaR(
+            #             self.pair2FV)) < 1.5))
 
-            if not pass_quality_delcuts:
-                # move on to the next systematic
-                fillBranchesWithDefault(sys)
-                continue
-            # delete the temp variable
-            del pass_quality_delcuts
+            # if not pass_quality_delcuts:
+            #     # move on to the next systematic
+            #     fillBranchesWithDefault(sys)
+            #     continue
+            # # delete the temp variable
+            # del pass_quality_delcuts
 
-            # Fill cut flow
-            if (sys == ""):
-                self.cutflow_dict["DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut"] += 1
+            # # Fill cut flow
+            # if (sys == ""):
+            #     self.cutflow_dict["DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut"] += 1
 
             self.out.fillBranch("Hbb_met_phi%s" %
                                 (sys), self.higgsBBFV.DeltaPhi(self.met))
@@ -1820,14 +1764,14 @@ class cutsAndcategories(Module):
             self.higgsTTvisFV = self.pair1FV + self.pair2FV
             self.RadionvisFV = self.higgsTTvisFV + self.higgsBBFV
 
-            if (self.higgsTTvisFV.M() <= 20):
-                fillBranchesWithDefault(sys)
-                # move to next systematic
-                continue
+            # if (self.higgsTTvisFV.M() <= 20):
+            #     fillBranchesWithDefault(sys)
+            #     # move to next systematic
+            #     continue
 
-            # Fill cut flow
-            if (sys == ""):
-                self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
+            # # Fill cut flow
+            # if (sys == ""):
+            #     self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
 
             Jet_enu = [
                 x for x in Jet_enu if removeOverlapOfAK4WithLightHeavyLeptons(
@@ -1842,9 +1786,9 @@ class cutsAndcategories(Module):
                     Muon,
                     sys)]
             gJet_index = [x[0] for x in Jet_enu]
-            #Jet_enu_Loose = [
-            #    x for x in Jet_enu if x[1].btagUParTAK4B >= self.LooseJet]
-            #gJet_Looseindex = [x[0] for x in Jet_enu_Loose]
+            Jet_enu_Loose = [
+               x for x in Jet_enu if x[1].btagUParTAK4B >= self.LooseJet]
+            gJet_Looseindex = [x[0] for x in Jet_enu_Loose]
             Jet_enu_Medium = [
                 x for x in Jet_enu if x[1].btagUParTAK4B >= self.MediumJet]
             gJet_Mediumindex = [x[0] for x in Jet_enu_Medium]
@@ -1911,7 +1855,7 @@ class cutsAndcategories(Module):
             self.out.fillBranch("ngood_Muons%s" % (sys), len(gMuon_index))
             self.out.fillBranch("ngood_FatJets%s" % (sys), len(gFatJet_index))
             self.out.fillBranch("ngood_Jets%s" % (sys), len(gJet_index))
-            # self.out.fillBranch("ngood_LooseJets%s"%(sys),len(gJet_Looseindex))
+            self.out.fillBranch("ngood_LooseJets%s"%(sys),len(gJet_Looseindex))
             self.out.fillBranch("ngood_MediumJets%s" %
                                 (sys), len(gJet_Mediumindex))
             self.out.fillBranch("ngood_TightJets%s" %
@@ -1929,7 +1873,7 @@ class cutsAndcategories(Module):
             self.out.fillBranch("index_gMuons%s" % (sys), gMuon_index)
             self.out.fillBranch("index_gFatJets%s" % (sys), gFatJet_index)
             self.out.fillBranch("index_gJets%s" % (sys), gJet_index)
-            # self.out.fillBranch("index_gLooseJets%s"%(sys),gJet_Looseindex)
+            self.out.fillBranch("index_gLooseJets%s"%(sys),gJet_Looseindex)
             self.out.fillBranch("index_gMediumJets%s" %
                                 (sys), gJet_Mediumindex)
             self.out.fillBranch("index_gTightJets%s" % (sys), gJet_Tightindex)
