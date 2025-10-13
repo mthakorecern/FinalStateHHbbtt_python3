@@ -40,16 +40,23 @@ def main(args):
         f.write("\n".join(normalize_path(p) for p in inputFiles))
 
     helper = "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6.py"
+    extra_inputs = ",".join(filter(None, [
+        "/afs/hep.wisc.edu/user/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/JetCorrBranchesAndMETSkimTrim/2024/GoldenJSON_2024.json" if not args.isMC else "",
+        "/afs/hep.wisc.edu/user/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/JetCorrBranchesAndMETSkimTrim/2024/jetid.json",
+        helper,
+    ]))
 
     commandList = [
         'farmoutAnalysisJobs',
         '--fwklite',
         '--infer-cmssw-path',
         '--input-files-per-job=1',
+        '--job-generates-output-name',
         '--use-singularity=rhel9',
         f'--input-file-list={inputFileTextName}',
         '--assume-input-files-exist',
         '--max-usercode-size=350',
+        '--use-hdfs',
         f'--submit-dir={overallSubmitDir}/submit',
         f'--output-dag-file={dagLocation}/dag',
         f'--output-dir={args.destination}/{job_name}',
@@ -57,7 +64,7 @@ def main(args):
         '--memory-requirements=2000',
         '--disk-requirements=10000',
         '--input-dir=/',
-        f'--extra-inputs={helper}',
+        f'--extra-inputs={extra_inputs}',
         job_name,
         helper,   # must be executable with shebang
         '--',
