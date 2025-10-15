@@ -1621,7 +1621,10 @@ class cutsAndcategories(Module):
                 self.cutflow_dict["Final surviving events"] += 1
             else:
                 self.out.fillBranch("eventnominal", 0)
-                self.cutflow_dict["Final surviving events"] += 1
+            return True
+        else:
+            return False
+
 
             
 def call_postpoc():
