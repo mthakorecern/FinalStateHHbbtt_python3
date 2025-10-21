@@ -20,6 +20,10 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collect
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NATModules.modules.fatjetId import fatJetId
 from PhysicsTools.NATModules.modules.jetId import jetId
+from PhysicsTools.NATModules.modules.jetVetoMap import jetVMAP
+from PhysicsTools.NATModules.modules.fatJetvetoMap import fatJetVMAP
+
+
 
 class cutsAndcategories(Module):
     def __init__(self, filename, year, isData, runNominal=False, cutflowDir=None):
@@ -959,24 +963,24 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTTvis_pt%s" % (sys), -1.00)
                 self.out.fillBranch("HTTvis_deltaR%s" % (sys), -1.00)
 
-                self.out.fillBranch("HTT_HPS_m", -999.0)
-                self.out.fillBranch("HTT_HPS_eta", -999.0)
-                self.out.fillBranch("HTT_HPS_phi", -999.0)
-                self.out.fillBranch("HTT_boosted_m", -999.0)
-                self.out.fillBranch("HTT_boosted_eta", -999.0)
-                self.out.fillBranch("HTT_boosted_phi", -999.0)
-                self.out.fillBranch("HTTvis_HPS_m", -999.0)
-                self.out.fillBranch("HTTvis_HPS_eta", -999.0)
-                self.out.fillBranch("HTTvis_HPS_phi", -999.0)
-                self.out.fillBranch("HTTvis_boosted_m", -999.0)
-                self.out.fillBranch("HTTvis_boosted_eta", -999.0)
-                self.out.fillBranch("HTTvis_boosted_phi", -999.0)
+                self.out.fillBranch("HTT_HPS_m", -1.0)
+                self.out.fillBranch("HTT_HPS_eta", -1.0)
+                self.out.fillBranch("HTT_HPS_phi", -99.99)
+                self.out.fillBranch("HTT_boosted_m", -1.0)
+                self.out.fillBranch("HTT_boosted_eta", -1.0)
+                self.out.fillBranch("HTT_boosted_phi", -99.99)
+                self.out.fillBranch("HTTvis_HPS_m", -1.0)
+                self.out.fillBranch("HTTvis_HPS_eta", -1.0)
+                self.out.fillBranch("HTTvis_HPS_phi", -99.99)
+                self.out.fillBranch("HTTvis_boosted_m", -1.0)
+                self.out.fillBranch("HTTvis_boosted_eta", -1.0)
+                self.out.fillBranch("HTTvis_boosted_phi", -99.99)
 
                 for prefix in ["HPS", "boosted"]:
                     for lep in ["Ele", "Mu"]:
-                        self.out.fillBranch(f"HTT_{prefix}_{lep}_m", -999.0)
-                        self.out.fillBranch(f"HTT_{prefix}_{lep}_eta", -999.0)
-                        self.out.fillBranch(f"HTT_{prefix}_{lep}_phi", -999.0)
+                        self.out.fillBranch(f"HTT_{prefix}_{lep}_m", -1.0)
+                        self.out.fillBranch(f"HTT_{prefix}_{lep}_eta", -1.0)
+                        self.out.fillBranch(f"HTT_{prefix}_{lep}_phi", -99.99)
 
                 self.out.fillBranch("nallTaus%s" % (sys), 0)
                 self.out.fillBranch("allTaus_pt%s" % (sys), [])
@@ -1049,6 +1053,17 @@ class cutsAndcategories(Module):
 
         nominal_bool = 0
         for sys in self.jesUnc:
+
+            for vec in [
+                self.higgsTTFV,
+                self.higgsTTvisFV,
+                self.higgsBBFV,
+                self.RadionFV,
+                self.RadionvisFV,
+                self.pair1FV,
+                self.pair2FV
+            ]:
+                vec.SetPxPyPzE(0, 0, 0, 0)
         
             if ((getMETpt(sys) < 120)):
                 fillBranchesWithDefault(sys)
@@ -1185,32 +1200,22 @@ class cutsAndcategories(Module):
                
                 self.pair2FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[1]], sys), boostedTau[gboostedTau_index[1]].eta, boostedTau[gboostedTau_index[1]].phi, gettaumass(boostedTau[gboostedTau_index[1]], sys))
 
-                if len(boostedTau) >= 2:
-                    bt_taus = sorted(boostedTau, key=lambda t: t.pt, reverse=True)[:2]
-                    l1 = fastMTTlepton(pt=bt_taus[0].pt, eta=bt_taus[0].eta, phi=bt_taus[0].phi, m=bt_taus[0].mass, leptonType='Tau', tauDecayMode=bt_taus[0].decayMode)
-                    l2 = fastMTTlepton(pt=bt_taus[1].pt, eta=bt_taus[1].eta, phi=bt_taus[1].phi, m=bt_taus[1].mass, leptonType='Tau', tauDecayMode=bt_taus[1].decayMode)
-                    self.theFastMTTtool.setFirstLepton(l1)
-                    self.theFastMTTtool.setSecondLepton(l2)
-                    self.theFastMTTtool.setTheMET(theMET)
-                    httvec_boosted = self.theFastMTTtool.getFastMTTfourvector()
-                    self.out.fillBranch("HTT_boosted_m", httvec_boosted[3])
-                    self.out.fillBranch("HTT_boosted_eta", httvec_boosted[1])
-                    self.out.fillBranch("HTT_boosted_phi", httvec_boosted[2])
-                    bt1 = ROOT.TLorentzVector(); bt2 = ROOT.TLorentzVector()
-                    bt1.SetPtEtaPhiM(boostedTau[0].pt, boostedTau[0].eta, boostedTau[0].phi, boostedTau[0].mass)
-                    bt2.SetPtEtaPhiM(boostedTau[1].pt, boostedTau[1].eta, boostedTau[1].phi, boostedTau[1].mass)
-                    httvis_boost = bt1 + bt2
-                    self.out.fillBranch("HTTvis_boosted_m", httvis_boost.M())
-                    self.out.fillBranch("HTTvis_boosted_eta", httvis_boost.Eta())
-                    self.out.fillBranch("HTTvis_boosted_phi", httvis_boost.Phi())
-                else:
-                    self.out.fillBranch("HTTvis_boosted_m", -999.0)
-                    self.out.fillBranch("HTTvis_boosted_eta", -999.0)
-                    self.out.fillBranch("HTTvis_boosted_phi", -999.0)
-                    self.out.fillBranch("HTT_boosted_m", -999.0)
-                    self.out.fillBranch("HTT_boosted_eta", -999.0)
-                    self.out.fillBranch("HTT_boosted_phi", -999.0)
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
+                
+                self.out.fillBranch("HTT_boosted_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_phi", self.higgsTTFV.Phi())
+
+                self.out.fillBranch("HTTvis_boosted_m", self.higgsTTvisFV.M())
+                self.out.fillBranch("HTTvis_boosted_eta", self.higgsTTvisFV.Eta())
+                self.out.fillBranch("HTTvis_boosted_phi", self.higgsTTvisFV.Phi())
+                
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
             
@@ -1230,37 +1235,23 @@ class cutsAndcategories(Module):
                 secondLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[1]], sys), eta=Tau[gTau_index[1]].eta, phi=Tau[gTau_index[1]].phi, m=gettaumass(Tau[gTau_index[1]], sys),
                                              leptonType='Tau', tauDecayMode=Tau[gTau_index[1]].decayMode)
                 self.pair2FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[1]], sys), Tau[gTau_index[1]].eta, Tau[gTau_index[1]].phi, gettaumass(Tau[gTau_index[1]], sys))
+
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
+
+                self.out.fillBranch("HTT_HPS_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_HPS_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_HPS_phi", self.higgsTTFV.Phi())
+
+                self.out.fillBranch("HTTvis_HPS_m", self.higgsTTvisFV.M())
+                self.out.fillBranch("HTTvis_HPS_eta", self.higgsTTvisFV.Eta())
+                self.out.fillBranch("HTTvis_HPS_phi", self.higgsTTvisFV.Phi())
                 
-                if len(Tau) >= 2:
-                    hps_taus = sorted(Tau, key=lambda t: t.pt, reverse=True)[:2]
-                    l1 = fastMTTlepton(pt=hps_taus[0].pt, eta=hps_taus[0].eta, phi=hps_taus[0].phi, m=hps_taus[0].mass, leptonType='Tau', tauDecayMode=hps_taus[0].decayMode)
-                    l2 = fastMTTlepton(pt=hps_taus[1].pt, eta=hps_taus[1].eta, phi=hps_taus[1].phi, m=hps_taus[1].mass, leptonType='Tau', tauDecayMode=hps_taus[1].decayMode)
-                    self.theFastMTTtool.setFirstLepton(l1)
-                    self.theFastMTTtool.setSecondLepton(l2)
-                    self.theFastMTTtool.setTheMET(theMET)
-
-                    httvec_hps = self.theFastMTTtool.getFastMTTfourvector()
-                    self.out.fillBranch("HTT_HPS_m", httvec_hps[3])
-                    self.out.fillBranch("HTT_HPS_eta", httvec_hps[1])
-                    self.out.fillBranch("HTT_HPS_phi", httvec_hps[2])
-
-                    hps1 = ROOT.TLorentzVector(); hps2 = ROOT.TLorentzVector()
-                    hps1.SetPtEtaPhiM(Tau[0].pt, Tau[0].eta, Tau[0].phi, Tau[0].mass)
-                    hps2.SetPtEtaPhiM(Tau[1].pt, Tau[1].eta, Tau[1].phi, Tau[1].mass)
-                    httvis_hps = hps1 + hps2
-
-                    self.out.fillBranch("HTTvis_HPS_m", httvis_hps.M())
-                    self.out.fillBranch("HTTvis_HPS_eta", httvis_hps.Eta())
-                    self.out.fillBranch("HTTvis_HPS_phi", httvis_hps.Phi())
-                else:
-                    self.out.fillBranch("HTT_HPS_m", -999.0)
-                    self.out.fillBranch("HTT_HPS_eta", -999.0)
-                    self.out.fillBranch("HTT_HPS_phi", -999.0)
-                    self.out.fillBranch("HTTvis_HPS_m", -999.0)
-                    self.out.fillBranch("HTTvis_HPS_eta", -999.0)
-                    self.out.fillBranch("HTTvis_HPS_phi", -999.0)
-                                
-
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
             
@@ -1281,25 +1272,16 @@ class cutsAndcategories(Module):
                 secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
                 self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
 
-                if len(boostedTau) >= 1 and len(Electron) >= 1:
-                    btau = sorted(boostedTau, key=lambda t: t.pt, reverse=True)[0]
-                    ele = sorted(Electron, key=lambda e: e.pt, reverse=True)[0]
-                    l1 = fastMTTlepton(pt=btau.pt, eta=btau.eta, phi=btau.phi,
-                                    m=btau.mass, leptonType='Tau', tauDecayMode=btau.decayMode)
-                    l2 = fastMTTlepton(pt=ele.pt, eta=ele.eta, phi=ele.phi,
-                                    m=ele.mass, leptonType='Electron')
-                    self.theFastMTTtool.setFirstLepton(l1)
-                    self.theFastMTTtool.setSecondLepton(l2)
-                    self.theFastMTTtool.setTheMET(theMET)
-                    httvec = self.theFastMTTtool.getFastMTTfourvector()
-                    self.out.fillBranch("HTT_boosted_Ele_m", httvec[3])
-                    self.out.fillBranch("HTT_boosted_Ele_eta", httvec[1])
-                    self.out.fillBranch("HTT_boosted_Ele_phi", httvec[2])
-                else:
-                    self.out.fillBranch("HTT_boosted_Ele_m", -999.0)
-                    self.out.fillBranch("HTT_boosted_Ele_eta", -999.0)
-                    self.out.fillBranch("HTT_boosted_Ele_phi", -999.0)
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+            
+                self.out.fillBranch("HTT_boosted_Ele_m",self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_Ele_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_Ele_phi", self.higgsTTFV.Phi())
 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
@@ -1321,24 +1303,16 @@ class cutsAndcategories(Module):
                 secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
                 self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
 
-                if len(Tau) >= 1 and len(Electron) >= 1:
-                    tau = sorted(Tau, key=lambda t: t.pt, reverse=True)[0]
-                    ele = sorted(Electron, key=lambda e: e.pt, reverse=True)[0]
-                    l1 = fastMTTlepton(pt=tau.pt, eta=tau.eta, phi=tau.phi,
-                                    m=tau.mass, leptonType='Tau', tauDecayMode=tau.decayMode)
-                    l2 = fastMTTlepton(pt=ele.pt, eta=ele.eta, phi=ele.phi,
-                                    m=ele.mass, leptonType='Electron')
-                    self.theFastMTTtool.setFirstLepton(l1)
-                    self.theFastMTTtool.setSecondLepton(l2)
-                    self.theFastMTTtool.setTheMET(theMET)
-                    httvec = self.theFastMTTtool.getFastMTTfourvector()
-                    self.out.fillBranch("HTT_HPS_Ele_m", httvec[3])
-                    self.out.fillBranch("HTT_HPS_Ele_eta", httvec[1])
-                    self.out.fillBranch("HTT_HPS_Ele_phi", httvec[2])
-                else:
-                    self.out.fillBranch("HTT_HPS_Ele_m", -999.0)
-                    self.out.fillBranch("HTT_HPS_Ele_eta", -999.0)
-                    self.out.fillBranch("HTT_HPS_Ele_phi", -999.0)
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+
+                self.out.fillBranch("HTT_HPS_Ele_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_HPS_Ele_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_HPS_Ele_phi", self.higgsTTFV.Phi())
                 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
@@ -1362,28 +1336,17 @@ class cutsAndcategories(Module):
                 secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt, eta=Muon[gMuon_index[0]].eta, phi=Muon[gMuon_index[0]].phi, m=Muon[gMuon_index[0]].mass, leptonType='Muon', tauDecayMode=-1)
                 self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta,  Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
 
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
-                if len(boostedTau) >= 1 and len(Muon) >= 1:
-                    btau = sorted(boostedTau, key=lambda t: t.pt, reverse=True)[0]
-                    mu = sorted(Muon, key=lambda m: m.pt, reverse=True)[0]
-                    l1 = fastMTTlepton(pt=btau.pt, eta=btau.eta, phi=btau.phi,
-                                    m=btau.mass, leptonType='Tau', tauDecayMode=btau.decayMode)
-                    l2 = fastMTTlepton(pt=mu.pt, eta=mu.eta, phi=mu.phi,
-                                    m=mu.mass, leptonType='Muon')
-                    self.theFastMTTtool.setFirstLepton(l1)
-                    self.theFastMTTtool.setSecondLepton(l2)
-                    self.theFastMTTtool.setTheMET(theMET)
-                    httvec = self.theFastMTTtool.getFastMTTfourvector()
-                    self.out.fillBranch("HTT_boosted_Mu_m", httvec[3])
-                    self.out.fillBranch("HTT_boosted_Mu_eta", httvec[1])
-                    self.out.fillBranch("HTT_boosted_Mu_phi", httvec[2])
-                else:
-                    self.out.fillBranch("HTT_boosted_Mu_m", -999.0)
-                    self.out.fillBranch("HTT_boosted_Mu_eta", -999.0)
-                    self.out.fillBranch("HTT_boosted_Mu_phi", -999.0)
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
 
-                # Fill the cutflow_hist for "SL_channel"
-                # self.cutflow2_hist.Fill(5.5)
+                self.out.fillBranch("HTT_boosted_Mu_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_Mu_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_Mu_phi", self.higgsTTFV.Phi())
+
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> MT_channel (max pt pair)"] += 1
 
@@ -1406,25 +1369,16 @@ class cutsAndcategories(Module):
 
                 self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta, Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
 
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
-                if len(Tau) >= 1 and len(Muon) >= 1:
-                    tau = sorted(Tau, key=lambda t: t.pt, reverse=True)[0]
-                    mu = sorted(Muon, key=lambda m: m.pt, reverse=True)[0]
-                    l1 = fastMTTlepton(pt=tau.pt, eta=tau.eta, phi=tau.phi,
-                                    m=tau.mass, leptonType='Tau', tauDecayMode=tau.decayMode)
-                    l2 = fastMTTlepton(pt=mu.pt, eta=mu.eta, phi=mu.phi,
-                                    m=mu.mass, leptonType='Muon')
-                    self.theFastMTTtool.setFirstLepton(l1)
-                    self.theFastMTTtool.setSecondLepton(l2)
-                    self.theFastMTTtool.setTheMET(theMET)
-                    httvec = self.theFastMTTtool.getFastMTTfourvector()
-                    self.out.fillBranch("HTT_HPS_Mu_m", httvec[3])
-                    self.out.fillBranch("HTT_HPS_Mu_eta", httvec[1])
-                    self.out.fillBranch("HTT_HPS_Mu_phi", httvec[2])
-                else:
-                    self.out.fillBranch("HTT_HPS_Mu_m", -999.0)
-                    self.out.fillBranch("HTT_HPS_Mu_eta", -999.0)
-                    self.out.fillBranch("HTT_HPS_Mu_phi", -999.0)
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+
+                self.out.fillBranch("HTT_HPS_Mu_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_HPS_Mu_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_HPS_Mu_phi", self.higgsTTFV.Phi())
                 
                 
                 if (sys == ""):
@@ -1454,15 +1408,15 @@ class cutsAndcategories(Module):
             self.out.fillBranch("Hbb_met_phi%s" %
                                 (sys), self.higgsBBFV.DeltaPhi(self.met))
 
-            self.theFastMTTtool.setFirstLepton(firstLepton)
-            self.theFastMTTtool.setSecondLepton(secondLepton)
-            self.theFastMTTtool.setTheMET(theMET)
-            higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+            # self.theFastMTTtool.setFirstLepton(firstLepton)
+            # self.theFastMTTtool.setSecondLepton(secondLepton)
+            # self.theFastMTTtool.setTheMET(theMET)
+            # higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
             
-            self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+            # self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
             self.RadionFV = self.higgsTTFV + self.higgsBBFV
 
-            self.higgsTTvisFV = self.pair1FV + self.pair2FV
+            # self.higgsTTvisFV = self.pair1FV + self.pair2FV
             self.RadionvisFV = self.higgsTTvisFV + self.higgsBBFV
 
             # if (self.higgsTTvisFV.M() <= 20):
@@ -1606,6 +1560,8 @@ class cutsAndcategories(Module):
                 nominal_bool = 1
             passAsingleSystematic = passAsingleSystematic + 1
 
+
+
         gp3_masses = []
         for fj in FatJet:
             if hasattr(fj, "globalParT3_massCorrX2p"):
@@ -1663,6 +1619,12 @@ def call_postpoc():
         modules=[#tesModule(),
                 jetId("jetid.json", jetType="AK4PUPPI"),
                 fatJetId("jetid.json", jetType="AK8PUPPI"),
+                jetVMAP("jetvetomaps.json",
+                           corrName="Summer24Prompt24_RunBCDEFGHI_V1",
+                           veto_map_name="jetvetomap"),
+                fatJetVMAP("jetvetomaps.json",
+                           corrName="Summer24Prompt24_RunBCDEFGHI_V1",
+                           veto_map_name="jetvetomap"),
                 module_inst],
         postfix="",
         noOut=False,
