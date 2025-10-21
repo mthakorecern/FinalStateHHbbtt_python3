@@ -16,16 +16,9 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module 
 
 
-# Importing veto map module
-from PhysicsTools.NATModules.modules.jetVetoMap import jetVMAP ## New Module added from https://github.com/cms-cat/nanoAOD-tools-modules/blob/master/python/modules/jetVetoMap.py
-
-from PhysicsTools.NATModules.modules.jetId import jetId ## New Module added from https://github.com/cms-cat/nanoAOD-tools-modules/blob/master/python/modules/jetVetoMap.py
-
-from PhysicsTools.NATModules.modules.jetCorr import jetJERC ## New module added from https://github.com/cms-cat/nanoAOD-tools-modules/blob/master/python/modules/jetCorr.py 
-
-## Custom FatJet correction Module
-from PhysicsTools.NATModules.modules.fatjetcorr import fatJetJERC  # AK8 (new)
-
+from PhysicsTools.NATModules.modules.jetVetoMap import jetVMAP 
+from PhysicsTools.NATModules.modules.jetId import jetId 
+from PhysicsTools.NATModules.modules.jetCorr import jetJERC
 
 
 class EventCounter(Module):
@@ -54,12 +47,11 @@ def chunk_processor(args):
         print("Processing MC (no Golden JSON applied).")
     
     modules.append(EventCounter())
-    ## JET ID Branch Creation
+
     modules.append(jetId(jetidjson, jetType="AK4PUPPI"))
     print(f"Added JetID module")
   
 
-    ## Applying JetVeto Maps
     modules.append(jetVMAP(vetomapjson,
                             corrName="Summer24Prompt24_RunBCDEFGHI_V1",
                             veto_map_name="jetvetomap"))

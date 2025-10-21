@@ -43,6 +43,7 @@ def main(args):
     extra_inputs = ",".join(filter(None, [
         "/afs/hep.wisc.edu/user/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/JetCorrBranchesAndMETSkimTrim/2024/GoldenJSON_2024.json" if not args.isMC else "",
         "/afs/hep.wisc.edu/user/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/JetCorrBranchesAndMETSkimTrim/2024/jetid.json",
+        "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/jetvetomaps.json",
         helper,
     ]))
 
