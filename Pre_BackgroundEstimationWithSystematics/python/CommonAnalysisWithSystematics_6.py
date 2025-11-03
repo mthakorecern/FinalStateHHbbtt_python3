@@ -15,7 +15,6 @@ from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModu
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
-# from PhysicsTools.NATModules.modules.leptonTaubranches import LeptonTauBranches
 
 class cutsAndcategories(Module):
     def __init__(self, filename, year, isData, runNominal=False, cutflowDir=None):
@@ -198,6 +197,8 @@ class cutsAndcategories(Module):
             print(("Total Events in MC file = ", self.totalEvents))
         self.out = wrappedOutputTree
         self.out.branch("eventnominal", "I")
+        self.out.branch("FatJet_globalParT3Xbb_mass", "F", lenVar="nFatJet")
+
         
         for sys in self.jesUnc:
             if sys == "":
@@ -206,36 +207,60 @@ class cutsAndcategories(Module):
                 self.out.branch("softdropmass%s" % (sys), "F")
                 self.out.branch("softdropmassnom%s" % (sys), "F")
                 self.out.branch("pnetmass%s" % (sys), "F")
-                self.out.branch("globalparT3mass%s" % (sys), "F")
 
-            self.out.branch("channel%s" % (sys), "I")
-            self.out.branch("boost%s" % (sys), "I")
-
-            if sys == "":
+                ### Fast MTT Variables
                 self.out.branch("HTT_m%s" % (sys), "F")
                 self.out.branch("HTT_eta%s" % (sys), "F")
                 self.out.branch("HTT_phi%s" % (sys), "F")
                 self.out.branch("HTT_pt%s" % (sys), "F")
+
+                self.out.branch("HTT_HPS_m%s" % (sys), "F")
+                self.out.branch("HTT_HPS_eta%s" % (sys), "F")
+                self.out.branch("HTT_HPS_phi%s" % (sys), "F")
+
+                self.out.branch("HTT_boosted_m%s" % (sys), "F")
+                self.out.branch("HTT_boosted_eta%s" % (sys), "F")
+                self.out.branch("HTT_boosted_phi%s" % (sys), "F")
+
+                ### Visible Variables
                 self.out.branch("HTTvis_m%s" % (sys), "F")
                 self.out.branch("HTTvis_eta%s" % (sys), "F")
                 self.out.branch("HTTvis_phi%s" % (sys), "F")
                 self.out.branch("HTTvis_pt%s" % (sys), "F")
                 self.out.branch("HTTvis_deltaR%s" % (sys), "F")
+                
+                self.out.branch("HTTvis_HPS_m%s" % (sys), "F")
+                self.out.branch("HTTvis_HPS_eta%s" % (sys), "F")
+                self.out.branch("HTTvis_HPS_phi%s" % (sys), "F")
+                
+                self.out.branch("HTTvis_boosted_m%s" % (sys), "F")
+                self.out.branch("HTTvis_boosted_eta%s" % (sys), "F")
+                self.out.branch("HTTvis_boosted_phi%s" % (sys), "F")
+
+                ### Lepton-specific Fast MTT Variables
+                for prefix in ["HPS", "boosted"]:
+                    for lep in ["Ele", "Mu"]:
+                        self.out.branch(f"HTT_{prefix}_{lep}_m%s" % (sys), "F")
+                        self.out.branch(f"HTT_{prefix}_{lep}_eta%s" % (sys), "F")
+                        self.out.branch(f"HTT_{prefix}_{lep}_phi%s" % (sys), "F")
+                
+                ### All Tau Branches
                 self.out.branch("nallTaus%s" % (sys), "I")
-                self.out.branch("allTaus_pt%s" % (sys), "F",
-                                lenVar="nallTaus%s" % (sys))
-                self.out.branch("allTaus_eta%s" % (sys), "F",
-                                lenVar="nallTaus%s" % (sys))
-                self.out.branch("allTaus_phi%s" % (sys), "F",
-                                lenVar="nallTaus%s" % (sys))
-                self.out.branch("allTaus_mass%s" %
-                                (sys), "F", lenVar="nallTaus%s" % (sys))
-                self.out.branch("allTaus_decayMode%s" %
-                                (sys), "F", lenVar="nallTaus%s" % (sys))
+                self.out.branch("allTaus_pt%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
+                self.out.branch("allTaus_eta%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
+                self.out.branch("allTaus_phi%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
+                self.out.branch("allTaus_mass%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
+                self.out.branch("allTaus_decayMode%s" %(sys), "F", lenVar="nallTaus%s" % (sys))
+                
+                ### Resonance Branches
                 self.out.branch("Xvis_m%s" % (sys), "F")
                 self.out.branch("Xvis_eta%s" % (sys), "F")
                 self.out.branch("Xvis_phi%s" % (sys), "F")
                 self.out.branch("Xvis_pt%s" % (sys), "F")
+
+
+            self.out.branch("channel%s" % (sys), "I")
+            self.out.branch("boost%s" % (sys), "I")
 
             self.out.branch("X_m%s" % (sys), "F")
             self.out.branch("X_eta%s" % (sys), "F")
@@ -252,47 +277,35 @@ class cutsAndcategories(Module):
             self.out.branch("ngood_MediumJets%s" % (sys), "I")
             self.out.branch("ngood_TightJets%s" % (sys), "I")
 
-            self.out.branch("index_gElectrons%s" % (sys), "I",
-                            lenVar="ngood_Electrons%s" % (sys))
-            self.out.branch("index_gMuons%s" % (sys), "I",
-                            lenVar="ngood_Muons%s" % (sys))
-            self.out.branch("index_gTaus%s" % (sys), "I",
-                            lenVar="ngood_Taus%s" % (sys))
-            self.out.branch("index_gboostedTaus%s" %
-                            (sys), "I", lenVar="ngood_boostedTaus%s" % (sys))
-            self.out.branch("index_gFatJets%s" % (sys), "I",
-                            lenVar="ngood_FatJets%s" % (sys))
-            self.out.branch("index_gJets%s" % (sys), "I",
-                            lenVar="ngood_Jets%s" % (sys))
+            self.out.branch("index_gElectrons%s" % (sys), "I", lenVar="ngood_Electrons%s" % (sys))
+            self.out.branch("index_gMuons%s" % (sys), "I", lenVar="ngood_Muons%s" % (sys))
+            self.out.branch("index_gTaus%s" % (sys), "I", lenVar="ngood_Taus%s" % (sys))
+            self.out.branch("index_gboostedTaus%s" % (sys), "I", lenVar="ngood_boostedTaus%s" % (sys))
+            self.out.branch("index_gFatJets%s" % (sys), "I", lenVar="ngood_FatJets%s" % (sys))
+            self.out.branch("index_gJets%s" % (sys), "I", lenVar="ngood_Jets%s" % (sys))
             self.out.branch("index_gLooseJets%s"%(sys),"I",lenVar="ngood_LooseJets%s"%(sys))
-            self.out.branch("index_gMediumJets%s" % (sys), "I",
-                            lenVar="ngood_MediumJets%s" % (sys))
-            self.out.branch("index_gTightJets%s" % (sys), "I",
-                            lenVar="ngood_TightJets%s" % (sys))
+            self.out.branch("index_gMediumJets%s" % (sys), "I", lenVar="ngood_MediumJets%s" % (sys))
+            self.out.branch("index_gTightJets%s" % (sys), "I", lenVar="ngood_TightJets%s" % (sys))
+            
             self.out.branch("Hbb_met_phi%s" % (sys), "F")
 
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-            # Where the ROOT file is written
         output_dir = os.path.dirname(outputFile.GetName())
         base_name = os.path.splitext(os.path.basename(outputFile.GetName()))[0]
 
-        # Create local JSON in same directory as ROOT output
         local_json_path = os.path.join(output_dir, f"{base_name}_cutflow.json")
         with open(local_json_path, "w") as outfile:
             json.dump(self.cutflow_dict, outfile, indent=4)
         print(f"[INFO] Cutflow JSON written locally: {local_json_path}")
 
-        # Use provided cutflowDir if available, else fallback
         cutflow_dir = getattr(self, "cutflowDir", None)
 
         if cutflow_dir is None or cutflow_dir.strip() == "":
             print("[INFO] No cutflowDir provided. Defaulting to ROOT output directory.")
             cutflow_dir = output_dir  
-        # Ensure cutflowDir exists
-        os.makedirs(cutflow_dir, exist_ok=True)
 
-        # Destination JSON path
+        os.makedirs(cutflow_dir, exist_ok=True)
         final_json_path = os.path.join(cutflow_dir, f"{base_name}_cutflow.json")
 
         try:
@@ -633,44 +646,31 @@ class cutsAndcategories(Module):
         #             return True
         #     return False
 
-        def pass_cuts_EleID(electronObject_enu):
-            for cutnr in range(0, 10):
-                if cutnr == 7:
-                    continue
-                # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
-                # 0x7) < self.eleID:
-                if (electronObject_enu[1].vidNestedWPBitmap >> (
-                        cutnr * 3) & 0x7) < 2:
-                    return False
-            return True
+        # def pass_cuts_EleID(electronObject_enu):
+        #     for cutnr in range(0, 10):
+        #         if cutnr == 7:
+        #             continue
+        #         # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
+        #         # 0x7) < self.eleID:
+        #         if (electronObject_enu[1].vidNestedWPBitmap >> (
+        #                 cutnr * 3) & 0x7) < 2:
+        #             return False
+        #     return True
 
         # FatJet and Jet overlap, separation > 1.2 (0.8 + 0.4)
         def JetFatJetOverlap(jetObject_enu, sys):
-            # self.jetFV.SetPtEtaPhiM(jetObject_enu[1].pt_nom,jetObject_enu[1].eta,jetObject_enu[1].phi,jetObject_enu[1].mass_nom)
-            self.jetFV.SetPtEtaPhiM(
-                getjetpt(
-                    jetObject_enu[1],
-                    sys),
-                jetObject_enu[1].eta,
-                jetObject_enu[1].phi,
-                getjetmass(
-                    jetObject_enu[1],
-                    sys))
+            self.jetFV.SetPtEtaPhiM(getjetpt(jetObject_enu[1],sys), jetObject_enu[1].eta, jetObject_enu[1].phi, getjetmass(jetObject_enu[1], sys))
             deltaR = self.jetFV.DeltaR(self.higgsBBFV)
-            if deltaR > 1.2:
+            if deltaR > 1.2: #(0.8+0.4)
                 return True
             else:
                 return False
 
         # Function used by electron(muon) cleaning vs AK8 > 0.8
         def FatJetConeIsolation(leptonObject_enu):
-            self.lepFV.SetPtEtaPhiM(
-                leptonObject_enu[1].pt,
-                leptonObject_enu[1].eta,
-                leptonObject_enu[1].phi,
-                leptonObject_enu[1].mass)
+            self.lepFV.SetPtEtaPhiM(leptonObject_enu[1].pt, leptonObject_enu[1].eta, leptonObject_enu[1].phi, leptonObject_enu[1].mass)
             deltaR = self.lepFV.DeltaR(self.higgsBBFV)
-            if deltaR > 0.8:
+            if deltaR > 0.8: #(0.8)
                 return True
             else:
                 return False
@@ -678,132 +678,69 @@ class cutsAndcategories(Module):
         # Function used by Tau(boostedTau) cleaning vs AK8 > 0.8
         def FatJetTauOverlap(tauObject_enu, boost):
             if boost == 1:
-                self.tauFV.SetPtEtaPhiM(
-                    tauObject_enu[1].pt,
-                    tauObject_enu[1].eta,
-                    tauObject_enu[1].phi,
-                    tauObject_enu[1].mass)
+                self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt, tauObject_enu[1].eta, tauObject_enu[1].phi, tauObject_enu[1].mass)
             else:
-                # self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt_nom,tauObject_enu[1].eta,tauObject_enu[1].phi,tauObject_enu[1].mass_nom)
-                self.tauFV.SetPtEtaPhiM(
-                    tauObject_enu[1].pt,
-                    tauObject_enu[1].eta,
-                    tauObject_enu[1].phi,
-                    tauObject_enu[1].mass)
+                self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt, tauObject_enu[1].eta, tauObject_enu[1].phi, tauObject_enu[1].mass)
             deltaR = self.tauFV.DeltaR(self.higgsBBFV)
-            if deltaR > 1.5:
+            if deltaR > 1.5:  #(0.8+0.4) but taking slightly conservative approach and going for 1.5
                 return True
             else:
                 return False
 
-        # Function used by Tau(boostedTau) cleaning vs Electrons > 0.05
+        # Function used by Tau(boostedTau) cleaning vs Electrons > 0.05. This is to retain the Taus, which are close to Electrons for pairing
         def ElectronTauOverlap(tauObject_enu, elecoll_enu, boost):
             if boost == 1:
-                self.tauFV.SetPtEtaPhiM(
-                    tauObject_enu[1].pt,
-                    tauObject_enu[1].eta,
-                    tauObject_enu[1].phi,
-                    tauObject_enu[1].mass)
+                self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt,  tauObject_enu[1].eta, tauObject_enu[1].phi, tauObject_enu[1].mass)
             else:
-                # self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt_nom,tauObject_enu[1].eta,tauObject_enu[1].phi,tauObject_enu[1].mass_nom)
-                self.tauFV.SetPtEtaPhiM(
-                    tauObject_enu[1].pt,
-                    tauObject_enu[1].eta,
-                    tauObject_enu[1].phi,
-                    tauObject_enu[1].mass)
+                self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt, tauObject_enu[1].eta, tauObject_enu[1].phi, tauObject_enu[1].mass)
             for electron in elecoll_enu:
-                self.eleFV.SetPtEtaPhiM(
-                    electron[1].pt, electron[1].eta, electron[1].phi, 0.0)
+                self.eleFV.SetPtEtaPhiM(electron[1].pt, electron[1].eta, electron[1].phi, 0.0)
                 deltaR = self.tauFV.DeltaR(self.eleFV)
                 if deltaR <= 0.05:
                     return False
             return True
 
-        # Function used by Tau(boostedTau) cleaning vs Muons > 0.05
+        # Function used by Tau(boostedTau) cleaning vs Muons > 0.05. This is to retain the Muons, which are close to Electrons for pairing
         def MuonTauOverlap(tauObject_enu, mucoll_enu, boost):
             if boost == 1:
-                self.tauFV.SetPtEtaPhiM(
-                    tauObject_enu[1].pt,
-                    tauObject_enu[1].eta,
-                    tauObject_enu[1].phi,
-                    tauObject_enu[1].mass)
+                self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt, tauObject_enu[1].eta, tauObject_enu[1].phi, tauObject_enu[1].mass)
             else:
-                # self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt_nom,tauObject_enu[1].eta,tauObject_enu[1].phi,tauObject_enu[1].mass_nom)
-                self.tauFV.SetPtEtaPhiM(
-                    tauObject_enu[1].pt,
-                    tauObject_enu[1].eta,
-                    tauObject_enu[1].phi,
-                    tauObject_enu[1].mass)
+                self.tauFV.SetPtEtaPhiM(tauObject_enu[1].pt, tauObject_enu[1].eta, tauObject_enu[1].phi, tauObject_enu[1].mass)
             for muon in mucoll_enu:
-                self.muFV.SetPtEtaPhiM(
-                    muon[1].pt, muon[1].eta, muon[1].phi, muon[1].mass)
+                self.muFV.SetPtEtaPhiM(muon[1].pt, muon[1].eta, muon[1].phi, muon[1].mass)
                 deltaR = self.tauFV.DeltaR(self.muFV)
                 if deltaR <= 0.05:
                     return False
             return True
 
-        def removeOverlapOfAK4WithLightHeavyLeptons(
-                ak4Object_enu,
-                gTau_index,
-                Tau_coll,
-                gbTau_index,
-                bTau_coll,
-                gEle_index,
-                Ele_coll,
-                gMu_index,
-                Mu_coll,
+        def removeOverlapOfAK4WithLightHeavyLeptons(ak4Object_enu, gTau_index, Tau_coll, gbTau_index, bTau_coll, gEle_index, Ele_coll, gMu_index, Mu_coll,
                 sys):
-            # self.jetFV.SetPtEtaPhiM(ak4Object_enu[1].pt_nom,ak4Object_enu[1].eta,ak4Object_enu[1].phi,ak4Object_enu[1].mass_nom)
             self.jetFV.SetPtEtaPhiM(
-                getjetpt(
-                    ak4Object_enu[1],
-                    sys),
-                ak4Object_enu[1].eta,
-                ak4Object_enu[1].phi,
-                getjetmass(
-                    ak4Object_enu[1],
-                    sys))
+                getjetpt(ak4Object_enu[1], sys), ak4Object_enu[1].eta, ak4Object_enu[1].phi, getjetmass(ak4Object_enu[1], sys))
 
             for index in gEle_index:
-                self.eleFV.SetPtEtaPhiM(
-                    Ele_coll[index].pt,
-                    Ele_coll[index].eta,
-                    Ele_coll[index].phi,
-                    0.0)
+                self.eleFV.SetPtEtaPhiM(Ele_coll[index].pt, Ele_coll[index].eta, Ele_coll[index].phi, 0.0)
                 deltaR = self.jetFV.DeltaR(self.eleFV)
                 if deltaR <= 0.4:
                     return False
 
             for index in gMu_index:
-                self.muFV.SetPtEtaPhiM(
-                    Mu_coll[index].pt,
-                    Mu_coll[index].eta,
-                    Mu_coll[index].phi,
-                    Mu_coll[index].mass)
+                self.muFV.SetPtEtaPhiM(Mu_coll[index].pt, Mu_coll[index].eta, Mu_coll[index].phi, Mu_coll[index].mass)
                 deltaR = self.jetFV.DeltaR(self.muFV)
                 if deltaR <= 0.4:
                     return False
 
             for index in gTau_index:
-                self.tauFV.SetPtEtaPhiM(
-                    Tau_coll[index].pt,
-                    Tau_coll[index].eta,
-                    Tau_coll[index].phi,
-                    Tau_coll[index].mass)
+                self.tauFV.SetPtEtaPhiM(Tau_coll[index].pt, Tau_coll[index].eta, Tau_coll[index].phi, Tau_coll[index].mass)
                 deltaR = self.jetFV.DeltaR(self.tauFV)
                 if deltaR <= 0.4:
                     return False
 
             for index in gbTau_index:
-                self.tauFV.SetPtEtaPhiM(
-                    bTau_coll[index].pt,
-                    bTau_coll[index].eta,
-                    bTau_coll[index].phi,
-                    bTau_coll[index].mass)
+                self.tauFV.SetPtEtaPhiM(bTau_coll[index].pt, bTau_coll[index].eta, bTau_coll[index].phi, bTau_coll[index].mass)
                 deltaR = self.jetFV.DeltaR(self.tauFV)
                 if deltaR <= 0.4:
                     return False
-
             return True
 
         def selfPairing(col1, tag):
@@ -874,173 +811,173 @@ class cutsAndcategories(Module):
                         index2 = col2[j][0]
             return (combinedPt, index1, index2)
 
-        def MuonIsolationCut(tau, muo, tag):
-            tagprotection = ((tag == "bm") or (tag == "tm"))
-            if not tagprotection:
-                print("The tags are not correct in Electron Isolation ##ERROR##------")
-                sys.exit()
+        # def MuonIsolationCut(tau, muo, tag):
+        #     tagprotection = ((tag == "bm") or (tag == "tm"))
+        #     if not tagprotection:
+        #         print("The tags are not correct in Electron Isolation ##ERROR##------")
+        #         sys.exit()
 
-            isTau = ""
+        #     isTau = ""
 
-            self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
-            self.muFV.SetPtEtaPhiM(muo.pt, muo.eta, muo.phi, muo.mass)
-            deltaR = (self.tauFV).DeltaR(self.muFV)
-            isolationCut = 0.25
+        #     self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
+        #     self.muFV.SetPtEtaPhiM(muo.pt, muo.eta, muo.phi, muo.mass)
+        #     deltaR = (self.tauFV).DeltaR(self.muFV)
+        #     isolationCut = 0.25
 
-            if (tag == "tm"):
-                if ((muo.pfRelIso04_all) < isolationCut):
-                    return True
-                else:
-                    return False
+        #     if (tag == "tm"):
+        #         if ((muo.pfRelIso04_all) < isolationCut):
+        #             return True
+        #         else:
+        #             return False
 
-            if deltaR < 0.7:
-                isTau = "close"
-            if isTau == "close":
-                self.leadingMatch.SetPtEtaPhiM(
-                    tau.LeadingMuonPt,
-                    tau.LeadingMuonEta,
-                    tau.LeadingMuonPhi,
-                    tau.LeadingMuonM)
-                self.subleadingMatch.SetPtEtaPhiM(
-                    tau.SubLeadingMuonPt,
-                    tau.SubLeadingMuonEta,
-                    tau.SubLeadingMuonPhi,
-                    tau.SubLeadingMuonM)
-                self.subsubleadingMatch.SetPtEtaPhiM(
-                    tau.SubSubLeadingMuonPt,
-                    tau.SubSubLeadingMuonEta,
-                    tau.SubSubLeadingMuonPhi,
-                    tau.SubSubLeadingMuonM)
-                if (self.muFV.DeltaR(self.leadingMatch) < 0.05):
-                    if ((tau.LeadingMuonCorrIso / tau.LeadingMuonPt) < isolationCut):
-                        # print ("Leading Muon Matched")
-                        return True
-                    else:
-                        return False
-                elif (self.muFV.DeltaR(self.subleadingMatch) < 0.05):
-                    if ((tau.SubLeadingMuonCorrIso /
-                         tau.SubLeadingMuonPt) < isolationCut):
-                        # print ("subLeading Muon Matched")
-                        return True
-                    else:
-                        return False
-                elif (self.muFV.DeltaR(self.subsubleadingMatch) < 0.05):
-                    if ((tau.SubSubLeadingMuonCorrIso /
-                         tau.SubSubLeadingMuonPt) < isolationCut):
-                        # print ("subsubLeading Muon Matched")
-                        return True
-                    else:
-                        return False
-                else:
-                    if ((muo.pfRelIso04_all) < isolationCut):
-                        # print ("pf Muon Isolation")
-                        return True
-                    else:
-                        return False
+        #     if deltaR < 0.7:
+        #         isTau = "close"
+        #     if isTau == "close":
+        #         self.leadingMatch.SetPtEtaPhiM(
+        #             tau.LeadingMuonPt,
+        #             tau.LeadingMuonEta,
+        #             tau.LeadingMuonPhi,
+        #             tau.LeadingMuonM)
+        #         self.subleadingMatch.SetPtEtaPhiM(
+        #             tau.SubLeadingMuonPt,
+        #             tau.SubLeadingMuonEta,
+        #             tau.SubLeadingMuonPhi,
+        #             tau.SubLeadingMuonM)
+        #         self.subsubleadingMatch.SetPtEtaPhiM(
+        #             tau.SubSubLeadingMuonPt,
+        #             tau.SubSubLeadingMuonEta,
+        #             tau.SubSubLeadingMuonPhi,
+        #             tau.SubSubLeadingMuonM)
+        #         if (self.muFV.DeltaR(self.leadingMatch) < 0.05):
+        #             if ((tau.LeadingMuonCorrIso / tau.LeadingMuonPt) < isolationCut):
+        #                 # print ("Leading Muon Matched")
+        #                 return True
+        #             else:
+        #                 return False
+        #         elif (self.muFV.DeltaR(self.subleadingMatch) < 0.05):
+        #             if ((tau.SubLeadingMuonCorrIso /
+        #                  tau.SubLeadingMuonPt) < isolationCut):
+        #                 # print ("subLeading Muon Matched")
+        #                 return True
+        #             else:
+        #                 return False
+        #         elif (self.muFV.DeltaR(self.subsubleadingMatch) < 0.05):
+        #             if ((tau.SubSubLeadingMuonCorrIso /
+        #                  tau.SubSubLeadingMuonPt) < isolationCut):
+        #                 # print ("subsubLeading Muon Matched")
+        #                 return True
+        #             else:
+        #                 return False
+        #         else:
+        #             if ((muo.pfRelIso04_all) < isolationCut):
+        #                 # print ("pf Muon Isolation")
+        #                 return True
+        #             else:
+        #                 return False
 
-            elif isTau == "":
-                if ((muo.pfRelIso04_all) < isolationCut):
-                    return True
-                else:
-                    return False
+        #     elif isTau == "":
+        #         if ((muo.pfRelIso04_all) < isolationCut):
+        #             return True
+        #         else:
+        #             return False
 
-        # passing the inidivial eletrons from the collection to apply the
-        # correction
-        def ElectronIsolationCut(tau, ele, tag):
-            tagprotection = ((tag == "be") or (tag == "te"))
-            if not tagprotection:
-                print("The tags are not correct in Electron Isolation ##ERROR##------")
-                sys.exit()
+        # # passing the inidivial eletrons from the collection to apply the
+        # # correction
+        # def ElectronIsolationCut(tau, ele, tag):
+        #     tagprotection = ((tag == "be") or (tag == "te"))
+        #     if not tagprotection:
+        #         print("The tags are not correct in Electron Isolation ##ERROR##------")
+        #         sys.exit()
 
-            isTau = ""
-            isolationCut = 0.0
+        #     isTau = ""
+        #     isolationCut = 0.0
 
-            if abs(ele.eta) <= 1.479:
-                isolationCut = 0.194 + (0.535 / ele.pt)
-            elif (abs(ele.eta) > 1.479) and (abs(ele.eta) <= 2.5):
-                # Endcap values
-                # loose =  0.108 + (0.963/ele.pt)
-                # medium = 0.0658 + (0.963/ele.pt)
-                # tight =0.0445 + (0.963/ele.pt)
-                isolationCut = 0.184 + (0.519 / ele.pt)
-            else:
-                return False
+        #     if abs(ele.eta) <= 1.479:
+        #         isolationCut = 0.194 + (0.535 / ele.pt)
+        #     elif (abs(ele.eta) > 1.479) and (abs(ele.eta) <= 2.5):
+        #         # Endcap values
+        #         # loose =  0.108 + (0.963/ele.pt)
+        #         # medium = 0.0658 + (0.963/ele.pt)
+        #         # tight =0.0445 + (0.963/ele.pt)
+        #         isolationCut = 0.184 + (0.519 / ele.pt)
+        #     else:
+        #         return False
 
-            if (tag == "te"):
-                if ((ele.pfRelIso03_all) < isolationCut):
-                    return True
-                else:
-                    return False
+        #     if (tag == "te"):
+        #         if ((ele.pfRelIso03_all) < isolationCut):
+        #             return True
+        #         else:
+        #             return False
 
-            self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
-            self.eleFV.SetPtEtaPhiM(ele.pt, ele.eta, ele.phi, 0.0)
-            deltaR = (self.tauFV).DeltaR(self.eleFV)
+        #     self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
+        #     self.eleFV.SetPtEtaPhiM(ele.pt, ele.eta, ele.phi, 0.0)
+        #     deltaR = (self.tauFV).DeltaR(self.eleFV)
 
-            if deltaR < 0.6:
-                isTau = "close"
-            if isTau == "close":
-                self.leadingMatch.SetPtEtaPhiM(
-                    tau.LeadingElectronPt,
-                    tau.LeadingElectronEta,
-                    tau.LeadingElectronPhi,
-                    0.0)
-                self.subleadingMatch.SetPtEtaPhiM(
-                    tau.SubLeadingElectronPt,
-                    tau.SubLeadingElectronEta,
-                    tau.SubLeadingElectronPhi,
-                    0.0)
-                self.subsubleadingMatch.SetPtEtaPhiM(
-                    tau.SubSubLeadingElectronPt,
-                    tau.SubSubLeadingElectronEta,
-                    tau.SubSubLeadingElectronPhi,
-                    0.0)
-                if (self.eleFV.DeltaR(self.leadingMatch) < 0.05):
-                    if ((tau.LeadingElectronCorrIso /
-                         tau.LeadingElectronPt) < isolationCut):
-                        # print ("Leading Ele Matched")
-                        return True
-                    else:
-                        return False
-                elif (self.eleFV.DeltaR(self.subleadingMatch) < 0.05):
-                    if ((tau.SubLeadingElectronCorrIso /
-                         tau.SubLeadingElectronPt) < isolationCut):
-                        # print ("subLeading Ele Matched")
-                        return True
-                    else:
-                        return False
-                elif (self.eleFV.DeltaR(self.subsubleadingMatch) < 0.05):
-                    if ((tau.SubSubLeadingElectronCorrIso /
-                         tau.SubSubLeadingElectronPt) < isolationCut):
-                        # print ("subsubLeading Ele Matched")
-                        return True
-                    else:
-                        return False
-                else:
-                    if ((ele.pfRelIso03_all) < isolationCut):
-                        print("use pf Ele Isolation")
-                        return True
-                    else:
-                        return False
+        #     if deltaR < 0.6:
+        #         isTau = "close"
+        #     if isTau == "close":
+        #         self.leadingMatch.SetPtEtaPhiM(
+        #             tau.LeadingElectronPt,
+        #             tau.LeadingElectronEta,
+        #             tau.LeadingElectronPhi,
+        #             0.0)
+        #         self.subleadingMatch.SetPtEtaPhiM(
+        #             tau.SubLeadingElectronPt,
+        #             tau.SubLeadingElectronEta,
+        #             tau.SubLeadingElectronPhi,
+        #             0.0)
+        #         self.subsubleadingMatch.SetPtEtaPhiM(
+        #             tau.SubSubLeadingElectronPt,
+        #             tau.SubSubLeadingElectronEta,
+        #             tau.SubSubLeadingElectronPhi,
+        #             0.0)
+        #         if (self.eleFV.DeltaR(self.leadingMatch) < 0.05):
+        #             if ((tau.LeadingElectronCorrIso /
+        #                  tau.LeadingElectronPt) < isolationCut):
+        #                 # print ("Leading Ele Matched")
+        #                 return True
+        #             else:
+        #                 return False
+        #         elif (self.eleFV.DeltaR(self.subleadingMatch) < 0.05):
+        #             if ((tau.SubLeadingElectronCorrIso /
+        #                  tau.SubLeadingElectronPt) < isolationCut):
+        #                 # print ("subLeading Ele Matched")
+        #                 return True
+        #             else:
+        #                 return False
+        #         elif (self.eleFV.DeltaR(self.subsubleadingMatch) < 0.05):
+        #             if ((tau.SubSubLeadingElectronCorrIso /
+        #                  tau.SubSubLeadingElectronPt) < isolationCut):
+        #                 # print ("subsubLeading Ele Matched")
+        #                 return True
+        #             else:
+        #                 return False
+        #         else:
+        #             if ((ele.pfRelIso03_all) < isolationCut):
+        #                 print("use pf Ele Isolation")
+        #                 return True
+        #             else:
+        #                 return False
 
-            elif isTau == "":
-                if ((ele.pfRelIso03_all) < isolationCut):
-                    return True
-                else:
-                    return False
+        #     elif isTau == "":
+        #         if ((ele.pfRelIso03_all) < isolationCut):
+        #             return True
+        #         else:
+        #             return False
 
-        def ElectronIsolationCut_addlepveto(eleObject_enu):
-            #For 2024: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun3 
-            isolationCut = 0.0
-            if abs(eleObject_enu[1].eta) <= 1.479:
-                isolationCut = 0.194 + (0.535 / eleObject_enu[1].pt)
-            elif (abs(eleObject_enu[1].eta) > 1.479) and (abs(eleObject_enu[1].eta) <= 2.5):
-                isolationCut = 0.184 + (0.519 / eleObject_enu[1].pt)
-            else:
-                return False
-            if ((eleObject_enu[1].pfRelIso03_all) < isolationCut):
-                return True
-            else:
-                return False
+        # def ElectronIsolationCut_addlepveto(eleObject_enu):
+        #     #For 2024: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun3 
+        #     isolationCut = 0.0
+        #     if abs(eleObject_enu[1].eta) <= 1.479:
+        #         isolationCut = 0.194 + (0.535 / eleObject_enu[1].pt)
+        #     elif (abs(eleObject_enu[1].eta) > 1.479) and (abs(eleObject_enu[1].eta) <= 2.5):
+        #         isolationCut = 0.184 + (0.519 / eleObject_enu[1].pt)
+        #     else:
+        #         return False
+        #     if ((eleObject_enu[1].pfRelIso03_all) < isolationCut):
+        #         return True
+        #     else:
+        #         return False
 
         def fillBranchesWithDefault(sys):
             if sys == "":
@@ -1059,6 +996,28 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTTvis_phi%s" % (sys), -99.99)
                 self.out.fillBranch("HTTvis_pt%s" % (sys), -1.00)
                 self.out.fillBranch("HTTvis_deltaR%s" % (sys), -1.00)
+
+                self.out.fillBranch("HTT_HPS_m", -1.0)
+                self.out.fillBranch("HTT_HPS_eta", -1.0)
+                self.out.fillBranch("HTT_HPS_phi", -99.99)                
+                self.out.fillBranch("HTT_boosted_m", -1.0)
+                self.out.fillBranch("HTT_boosted_eta", -1.0)
+                self.out.fillBranch("HTT_boosted_phi", -99.99)
+                
+                self.out.fillBranch("HTTvis_HPS_m", -1.0)
+                self.out.fillBranch("HTTvis_HPS_eta", -1.0)
+                self.out.fillBranch("HTTvis_HPS_phi", -99.99)
+                self.out.fillBranch("HTTvis_boosted_m", -1.0)
+                self.out.fillBranch("HTTvis_boosted_eta", -1.0)
+                self.out.fillBranch("HTTvis_boosted_phi", -99.99)
+                
+                for prefix in ["HPS", "boosted"]:
+                    for lep in ["Ele", "Mu"]:
+                        self.out.fillBranch(f"HTT_{prefix}_{lep}_m", -1.0)
+                        self.out.fillBranch(f"HTT_{prefix}_{lep}_eta", -1.0)
+                        self.out.fillBranch(f"HTT_{prefix}_{lep}_phi", -99.99)
+
+                
                 self.out.fillBranch("nallTaus%s" % (sys), 0)
                 self.out.fillBranch("allTaus_pt%s" % (sys), [])
                 self.out.fillBranch("allTaus_eta%s" % (sys), [])
@@ -1085,7 +1044,7 @@ class cutsAndcategories(Module):
             self.out.fillBranch("ngood_Muons%s" % (sys), 0)
             self.out.fillBranch("ngood_FatJets%s" % (sys), 0)
             self.out.fillBranch("ngood_Jets%s" % (sys), 0)
-            # self.out.fillBranch("ngood_LooseJets%s"%(sys),0)
+            self.out.fillBranch("ngood_LooseJets%s"%(sys),0)
             self.out.fillBranch("ngood_MediumJets%s" % (sys), 0)
             self.out.fillBranch("ngood_TightJets%s" % (sys), 0)
 
@@ -1095,7 +1054,7 @@ class cutsAndcategories(Module):
             self.out.fillBranch("index_gboostedTaus%s" % (sys), [])
             self.out.fillBranch("index_gFatJets%s" % (sys), [])
             self.out.fillBranch("index_gJets%s" % (sys), [])
-            # self.out.fillBranch("index_gLooseJets%s"%(sys),[])
+            self.out.fillBranch("index_gLooseJets%s"%(sys),[])
             self.out.fillBranch("index_gMediumJets%s" % (sys), [])
             self.out.fillBranch("index_gTightJets%s" % (sys), [])
 
@@ -1103,187 +1062,54 @@ class cutsAndcategories(Module):
         Electron = Collection(event, 'Electron', 'nElectron')
         FatJet = Collection(event, 'FatJet', 'nFatJet')
 
-        # if (self.year == "2018"):
-        #     if ((self.isData) and (event.run >= 319077)):
-        #         Jet_Vetoenu = list(filter(
-        #             applyPOGselectionToAK4_for2018Veto, enumerate(Jet)))
-        #         # Adding buffer region (in eta-phi) for AK8 Jet veto for HEM:
-        #         # https://mattermost.web.cern.ch/cms-hh-bbtautau/pl/6fk8on61rj8d7jnrwxnwj9uiph
-        #         FatJet_Vetoenu = [
-        #             x for x in enumerate(FatJet) if (
-        #                 x[1].eta < -
-        #                 1.1) and (
-        #                 x[1].eta > -
-        #                 2.7) and (
-        #                 x[1].phi < -
-        #                 0.67) and (
-        #                 x[1].phi > -
-        #                 1.77) and (
-        #                 x[1].jetId > 1)]
-        #         Electron_Vetoenu = [
-        #             x for x in enumerate(Electron) if x[1].pt > 10 and (
-        #                 (int(
-        #                     x[1].cutBased)) >= 2) and (
-        #                 x[1].eta < -
-        #                 1.3) and (
-        #                 x[1].eta > -
-        #                 2.5) and (
-        #                 x[1].phi < -
-        #                 0.87) and (
-        #                     x[1].phi > -
-        #                     1.57)]
-        #         if ((len(FatJet_Vetoenu) > 0) or (len(Jet_Vetoenu) > 0)
-        #                 or (len(Electron_Vetoenu) > 0)):
-        #             return False
-        #     if ((self.isMC)):
-        #         frac = np.random.uniform(0.0, 1.0)
-        #         # (1-0.647724485)
-        #         if (frac > 0.352275515):
-        #             Jet_Vetoenu = list(filter(
-        #                 applyPOGselectionToAK4_for2018Veto, enumerate(Jet)))
-        #             # Adding buffer region (in eta-phi) for AK8 Jet veto for
-        #             # HEM:
-        #             # https://mattermost.web.cern.ch/cms-hh-bbtautau/pl/6fk8on61rj8d7jnrwxnwj9uiph
-        #             FatJet_Vetoenu = [
-        #                 x for x in enumerate(FatJet) if (
-        #                     x[1].eta < -
-        #                     1.1) and (
-        #                     x[1].eta > -
-        #                     2.7) and (
-        #                     x[1].phi < -
-        #                     0.67) and (
-        #                     x[1].phi > -
-        #                     1.77) and (
-        #                     x[1].jetId > 1)]
-        #             Electron_Vetoenu = [
-        #                 x for x in enumerate(Electron) if x[1].pt > 10 and (
-        #                     (int(
-        #                         x[1].cutBased)) >= 2) and (
-        #                     x[1].eta < -
-        #                     1.3) and (
-        #                     x[1].eta > -
-        #                     2.5) and (
-        #                     x[1].phi < -
-        #                     0.87) and (
-        #                     x[1].phi > -
-        #                     1.57)]
-        #             if ((len(FatJet_Vetoenu) > 0) or (len(Jet_Vetoenu) > 0)
-        #                     or (len(Electron_Vetoenu) > 0)):
-        #                 return False
-
         if (self.isMC):
             if (self.year_unc == "2024"):
-            #     min_upvar = min([event.METcorrected_ptScaleUp,
-            #                      event.METcorrected_ptScaleAbsoluteUp,
-            #                      event.METcorrected_ptScaleAbsolute_2018Up,
-            #                      event.METcorrected_ptScaleBBEC1Up,
-            #                      event.METcorrected_ptScaleBBEC1_2018Up,
-            #                      event.METcorrected_ptScaleEC2Up,
-            #                      event.METcorrected_ptScaleEC2_2018Up,
-            #                      event.METcorrected_ptScaleFlavorQCDUp,
-            #                      event.METcorrected_ptScaleHFUp,
-            #                      event.METcorrected_ptScaleHF_2018Up,
-            #                      event.METcorrected_ptScaleRelativeBalUp,
-            #                      event.METcorrected_ptScaleRelativeSample_2018Up,
-            #                      event.METcorrected_ptResUp,
-            #                      event.METcorrected_ptUnclustUp])
-            #     min_downvar = min([event.METcorrected_ptScaleDown,
-            #                        event.METcorrected_ptScaleAbsoluteDown,
-            #                        event.METcorrected_ptScaleAbsolute_2018Down,
-            #                        event.METcorrected_ptScaleBBEC1Down,
-            #                        event.METcorrected_ptScaleBBEC1_2018Down,
-            #                        event.METcorrected_ptScaleEC2Down,
-            #                        event.METcorrected_ptScaleEC2_2018Down,
-            #                        event.METcorrected_ptScaleFlavorQCDDown,
-            #                        event.METcorrected_ptScaleHFDown,
-            #                        event.METcorrected_ptScaleHF_2018Down,
-            #                        event.METcorrected_ptScaleRelativeBalDown,
-            #                        event.METcorrected_ptScaleRelativeSample_2018Down,
-            #                        event.METcorrected_ptResDown,
-            #                        event.METcorrected_ptUnclustDown])
-            # elif (self.year_unc == "2017"):
-            #     min_upvar = min([event.METcorrected_ptScaleUp,
-            #                      event.METcorrected_ptScaleAbsoluteUp,
-            #                      event.METcorrected_ptScaleAbsolute_2017Up,
-            #                      event.METcorrected_ptScaleBBEC1Up,
-            #                      event.METcorrected_ptScaleBBEC1_2017Up,
-            #                      event.METcorrected_ptScaleEC2Up,
-            #                      event.METcorrected_ptScaleEC2_2017Up,
-            #                      event.METcorrected_ptScaleFlavorQCDUp,
-            #                      event.METcorrected_ptScaleHFUp,
-            #                      event.METcorrected_ptScaleHF_2017Up,
-            #                      event.METcorrected_ptScaleRelativeBalUp,
-            #                      event.METcorrected_ptScaleRelativeSample_2017Up,
-            #                      event.METcorrected_ptResUp,
-            #                      event.METcorrected_ptUnclustUp])
-            #     min_downvar = min([event.METcorrected_ptScaleDown,
-            #                        event.METcorrected_ptScaleAbsoluteDown,
-            #                        event.METcorrected_ptScaleAbsolute_2017Down,
-            #                        event.METcorrected_ptScaleBBEC1Down,
-            #                        event.METcorrected_ptScaleBBEC1_2017Down,
-            #                        event.METcorrected_ptScaleEC2Down,
-            #                        event.METcorrected_ptScaleEC2_2017Down,
-            #                        event.METcorrected_ptScaleFlavorQCDDown,
-            #                        event.METcorrected_ptScaleHFDown,
-            #                        event.METcorrected_ptScaleHF_2017Down,
-            #                        event.METcorrected_ptScaleRelativeBalDown,
-            #                        event.METcorrected_ptScaleRelativeSample_2017Down,
-            #                        event.METcorrected_ptResDown,
-            #                        event.METcorrected_ptUnclustDown])
-            # elif (self.year_unc == "2016"):
-            #     min_upvar = min([event.METcorrected_ptScaleUp,
-            #                      event.METcorrected_ptScaleAbsoluteUp,
-            #                      event.METcorrected_ptScaleAbsolute_2016Up,
-            #                      event.METcorrected_ptScaleBBEC1Up,
-            #                      event.METcorrected_ptScaleBBEC1_2016Up,
-            #                      event.METcorrected_ptScaleEC2Up,
-            #                      event.METcorrected_ptScaleEC2_2016Up,
-            #                      event.METcorrected_ptScaleFlavorQCDUp,
-            #                      event.METcorrected_ptScaleHFUp,
-            #                      event.METcorrected_ptScaleHF_2016Up,
-            #                      event.METcorrected_ptScaleRelativeBalUp,
-            #                      event.METcorrected_ptScaleRelativeSample_2016Up,
-            #                      event.METcorrected_ptResUp,
-            #                      event.METcorrected_ptUnclustUp])
-            #     min_downvar = min([event.METcorrected_ptScaleDown,
-            #                        event.METcorrected_ptScaleAbsoluteDown,
-            #                        event.METcorrected_ptScaleAbsolute_2016Down,
-            #                        event.METcorrected_ptScaleBBEC1Down,
-            #                        event.METcorrected_ptScaleBBEC1_2016Down,
-            #                        event.METcorrected_ptScaleEC2Down,
-            #                        event.METcorrected_ptScaleEC2_2016Down,
-            #                        event.METcorrected_ptScaleFlavorQCDDown,
-            #                        event.METcorrected_ptScaleHFDown,
-            #                        event.METcorrected_ptScaleHF_2016Down,
-            #                        event.METcorrected_ptScaleRelativeBalDown,
-            #                        event.METcorrected_ptScaleRelativeSample_2016Down,
-            #                        event.METcorrected_ptResDown,
-            #                        event.METcorrected_ptUnclustDown])
-
+                min_upvar = min([event.PuppiMET_pt_jesTotalUp,
+                                 event.PuppiMET_pt_jesAbsoluteUp,
+                                 event.PuppiMET_pt_jesAbsolute_2024Up,
+                                 event.PuppiMET_pt_jesBBEC1Up,
+                                 event.PuppiMET_pt_jesBBEC1_2024Up,
+                                 event.PuppiMET_pt_jesEC2Up,
+                                 event.PuppiMET_pt_jesEC2_2024Up,
+                                 event.PuppiMET_pt_jesFlavorQCDUp,
+                                 event.PuppiMET_pt_jesHFUp,
+                                 event.PuppiMET_pt_jesHF_2024Up,
+                                 event.PuppiMET_pt_jesRelativeBalUp,
+                                 event.PuppiMET_pt_jesRelativeSample_2024Up,
+                                 event.PuppiMET_pt_jerUp,
+                                 event.PuppiMET_ptUnclusteredUp])
+                
+                min_downvar = min([event.PuppiMET_pt_jesTotalDown,
+                                   event.PuppiMET_pt_jesAbsoluteDown,
+                                   event.PuppiMET_pt_jesAbsolute_2024Down,
+                                   event.PuppiMET_pt_jesBBEC1Down,
+                                   event.PuppiMET_pt_jesBBEC1_2024Down,
+                                   event.PuppiMET_pt_jesEC2Down,
+                                   event.PuppiMET_pt_jesEC2_2024Down,
+                                   event.PuppiMET_pt_jesFlavorQCDDown,
+                                   event.PuppiMET_pt_jesHFDown,
+                                   event.PuppiMET_pt_jesHF_2024Down,
+                                   event.PuppiMET_pt_jesRelativeBalDown,
+                                   event.PuppiMET_pt_jesRelativeSample_2024Down,
+                                   event.PuppiMET_pt_jerDown,
+                                   event.PuppiMET_ptUnclusteredDown])
+            
             # Now reject events (skim further)
-                if event.PuppiMET_pt_nom < 120:# and (
-                        #min_upvar < 180) and (min_downvar < 180)):
-                    return False
+            if (event.PuppiMET_pt_nom < 120: and (
+                    min_upvar < 120) and (min_downvar < 120)):
+                return False
             # Delete the min variables - not used for the rest of the code
-            #del min_upvar
-            #del min_downvar
+            del min_upvar
+            del min_downvar
         elif (self.isData):
             if ((event.PuppiMET_pt_nom < 120)):
                 return False
         
         self.cutflow_dict["Pre-selection: PuppiMET_pt >= 120"] += 1
-
-        # FatJet_skim_enu = filter(lambda x: (x[1].pt_nom >= 180) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
-        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (
-        x[1].pt_nom >= 180)
-        and abs(x[1].eta) <= 2.5
-        and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+      
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt_nom >= 180) and abs(x[1].eta) <= 2.5 and (x[1].jetId > 1)]
         if (len(FatJet_skim_enu) == 0):
             return False
-
-        # if getattr(event, "Flag_FatJetVetoed", 0) == 1:
-        #     return False
 
         self.cutflow_dict["Events surviving the FatJet skim  (pt_nom >= 180, |eta| <= 2.5, jetId>1)"] += 1
 
@@ -1298,134 +1124,59 @@ class cutsAndcategories(Module):
 
         nominal_bool = 0
         for sys in self.jesUnc:
-            # Fill the cutflow_hist for "met >= 180"
-            # self.cutflow2_hist.Fill(1.5)
+            for vec in [self.higgsTTFV, self.higgsTTvisFV, self.higgsBBFV, self.RadionFV, self.RadionvisFV, self.pair1FV, self.pair2FV]:
+                vec.SetPxPyPzE(0, 0, 0, 0)
 
             if ((getMETpt(sys) < 120)):
                 fillBranchesWithDefault(sys)
-                # return False
                 continue
 
             if sys == "":
                 self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >= 120"] += 1
 
-            # FatJet_enu = filter(lambda x: (x[1].pt_nom >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
-            # FatJet_enu = filter(lambda x: (getjetpt(x[1],sys) >= 200) and (abs(x[1].eta) < 2.5) and (x[1].jetId>1) and (x[1].msoftdrop_nom>=30), enumerate(FatJet))
-            FatJet_enu = [
-                x for x in enumerate(FatJet)
-                if (getjetpt(x[1], sys) > 180)
-                and (abs(x[1].eta) <= 2.5 and (x[1].jetId > 1))
-
-            ]
+            FatJet_enu = [x for x in enumerate(FatJet) if (getjetpt(x[1], sys) > 180) and (abs(x[1].eta) <= 2.5 and (x[1].jetId > 1))]
 
             if (len(FatJet_enu) == 0):
-                # move on to the next systematics
                 fillBranchesWithDefault(sys)
                 continue
 
-            # Fill the cutflow_hist for "AK8_sel"
-            # self.cutflow2_hist.Fill(2.5)
-
-            # HbbScoreList = [(obj_enu[1].particleNetLegacy_Xbb/(obj_enu[1].particleNetLegacy_Xbb + obj_enu[1].particleNetLegacy_QCD)) for obj_enu in FatJet_enu]
             HbbPtList = [(getjetpt(obj_enu[1], sys)) for obj_enu in FatJet_enu]
-            # zipPair = zip(FatJet_enu,HbbScoreList)
             zipPair = list(zip(FatJet_enu, HbbPtList))
-            FatJet_enu = [
-                fatjetobject_enu for fatjetobject_enu,
-                _ in sorted(
-                    zipPair,
-                    key=lambda x: x[1],
-                    reverse=True)]
+            FatJet_enu = [fatjetobject_enu for fatjetobject_enu, _ in sorted(zipPair, key=lambda x: x[1], reverse=True)]
 
-            # remove the HbbPtList, zipPair
             del HbbPtList
             del zipPair
 
-            Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(
-                x, sys)]
+            Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(x, sys)]
 
-
-            Tau_enu = [
-                x for x in enumerate(Tau) if (
-                    gettaupt(
-                        x[1], sys) > 20) and (
-                    abs(
-                        x[1].eta) <= 2.5) and (
-                    abs(
-                        x[1].dz) < 0.2) and (
-                    x[1].idDecayModeNewDMs) and (
-                    x[1].idDeepTau2018v2p5VSjet >= 3) and (
-                    x[1].idDeepTau2018v2p5VSe >= 2) and (
-                    x[1].idDeepTau2018v2p5VSmu >= 1)]  # The HPS tau id are not bitmps anymore
+            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) <= 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 3) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
             
-            # boostedTau_enu = filter(lambda x: (x[1].pt > 20) and (abs(x[1].eta) < 2.5) and (x[1].rawDeepTau2018v2p7VSjet>=0.85), enumerate(boostedTau))
-            boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (
-                abs(x[1].eta) <= 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet	 >= 0.85)]
+            boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) <= 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
+
+            self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1], sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
+
+            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) <= 2.5) and x[1].cutBased >= 2]
             
-
-            # self.higgsBBFV.SetPtEtaPhiM(FatJet_enu[0][1].pt_nom,FatJet_enu[0][1].eta,FatJet_enu[0][1].phi,FatJet_enu[0][1].mass_nom)
-            self.higgsBBFV.SetPtEtaPhiM(
-                getjetpt(
-                    FatJet_enu[0][1],
-                    sys),
-                FatJet_enu[0][1].eta,
-                FatJet_enu[0][1].phi,
-                getjetmass(
-                    FatJet_enu[0][1],
-                    sys))
-
-            # incorporate ECAL transistion veto : https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaUL2016To2018#General_note_about_ID_SFs
-            # https://cms-pub-talk.web.cern.ch/t/egamma-or/30044/2
-            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (
-                abs(x[1].eta) <= 2.5) and x[1].cutBased >= 2]
-            
-
-            #Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
-
-            ###################################################################
-            # Code for addtional lepton veto
-            # Electron_addlep_enu = filter(lambda x: (x[1].pt > 10) and ((abs(x[1].eta) <= 1.44) or (abs(x[1].eta) >= 1.57)) and (x[1].cutBased>=2), enumerate(Electron))
-            # Electron_addlep_enu = filter(ElectronIsolationCut_addlepveto,Electron_addlep_enu)
-            # Electron_addlep_enu = filter(FatJetConeIsolation,Electron_addlep_enu)
-
-            # Muon_addlep_enu = filter(lambda x: x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].looseId and (x[1].pfRelIso04_all<0.25), enumerate(Muon))
-            # Muon_addlep_enu = filter(FatJetConeIsolation,Muon_addlep_enu)
-
-            ###################################################################
-
-            # if self.muID == 2:
-            Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (
-                abs(x[1].eta) < 2.4) and x[1].looseId]
+            Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
 
             
-            # elif self.muID == 3:
-            # Muon_enu = filter(lambda x: x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].mediumId, enumerate(Muon))
-            # elif self.muID == 4:
-            # Muon_enu = filter(lambda x: x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].tightId, enumerate(Muon))
-
             # Object cleaning procedures
             if sys == "":  # only count once for nominal
                 self.cutflow_dict["Events after all object-level selections (before overlap cleaning)"] += 1
 
             Jet_enu = [x for x in Jet_enu if JetFatJetOverlap(x, sys)]
-
+            
             Electron_enu = list(filter(FatJetConeIsolation, Electron_enu))
+            
             Muon_enu = list(filter(FatJetConeIsolation, Muon_enu))
-
+            
             Tau_enu = [x for x in Tau_enu if FatJetTauOverlap(x, boost=0)]
-            boostedTau_enu = [
-                x for x in boostedTau_enu if FatJetTauOverlap(
-                    x, boost=1)]
-
-            Tau_enu = [x for x in Tau_enu if ElectronTauOverlap(
-                x, Electron_enu, boost=0)]
-            boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(
-                x, Electron_enu, boost=1)]
-
-            Tau_enu = [x for x in Tau_enu if MuonTauOverlap(
-                x, Muon_enu, boost=0)]
-            boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(
-                x, Muon_enu, boost=1)]
+            Tau_enu = [x for x in Tau_enu if ElectronTauOverlap(x, Electron_enu, boost=0)]
+            Tau_enu = [x for x in Tau_enu if MuonTauOverlap(x, Muon_enu, boost=0)]
+            
+            boostedTau_enu = [x for x in boostedTau_enu if FatJetTauOverlap(, boost=1)]
+            boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(x, Electron_enu, boost=1)]
+            boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(x, Muon_enu, boost=1)]
 
             # Cutflow counting
             if sys == "":
@@ -1437,13 +1188,7 @@ class cutsAndcategories(Module):
                     self.cutflow_dict[
                         " ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)"] += 1
 
-            enoughleptonstopair = (
-                ((len(Tau_enu) +
-                  len(Muon_enu) +
-                    len(Electron_enu)) >= 2) or (
-                    (len(boostedTau_enu) +
-                     len(Muon_enu) +
-                        len(Electron_enu)) >= 2))
+            enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2))
 
             if not enoughleptonstopair:
                 # move to the next systematics
@@ -1451,8 +1196,7 @@ class cutsAndcategories(Module):
                 continue
 
             if (sys == ""):
-                if (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)
-                        or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)):
+                if (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)):
                     self.cutflow_dict["Atleast_2leptons_anykind"] += 1
 
             pairDict = {}
@@ -1466,14 +1210,10 @@ class cutsAndcategories(Module):
             Keymax = max(pairDict, key=lambda x: pairDict[x][0])
 
             if (pairDict[Keymax][0] < 0):
-                # return False
-                # Electron and Muon isolation failed - move on to the next
-                # systematics
                 fillBranchesWithDefault(sys)
                 continue
 
             if (sys == ""):
-                #self.cutflow_dict["Atleast_one_pair_anykind"] += 1
                 if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauTau_pair"] += 1
                 if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
@@ -1490,13 +1230,9 @@ class cutsAndcategories(Module):
             firstLepton = fastMTTlepton()
             secondLepton = fastMTTlepton()
             theMET = fastMTTmet(
-                # measuredX = event.METcorrected_pt * math.cos(event.METcorrected_phi),
-                # measuredY = event.METcorrected_pt * math.sin(event.METcorrected_phi),
                 measuredX=getMETpt(sys) * math.cos(getMETphi(sys)),
                 measuredY=getMETpt(sys) * math.sin(getMETphi(sys)),
-                xx=event.PuppiMET_covXX,
-                xy=event.PuppiMET_covXY,
-                yy=event.PuppiMET_covYY)
+                xx=event.PuppiMET_covXX, xy=event.PuppiMET_covXY, yy=event.PuppiMET_covYY)
 
             if Keymax == "bb":
                 self.out.fillBranch("channel%s" % (sys), 0)
@@ -1505,80 +1241,72 @@ class cutsAndcategories(Module):
                     self.out.fillBranch("nallTaus%s" % (sys), 2)
                 gboostedTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
                 if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (sys),
-                                        [boostedTau[gboostedTau_index[0]].decayMode,
-                                         boostedTau[gboostedTau_index[1]].decayMode])
-                # firstLepton  =  fastMTTlepton(pt = boostedTau[gboostedTau_index[0]].pt,eta = boostedTau[gboostedTau_index[0]].eta,phi = boostedTau[gboostedTau_index[0]].phi,m = boostedTau[gboostedTau_index[0]].mass,leptonType = 'Tau',tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
-                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],
-                                                        sys),
-                                            eta=boostedTau[gboostedTau_index[0]].eta,
-                                            phi=boostedTau[gboostedTau_index[0]].phi,
-                                            m=gettaumass(boostedTau[gboostedTau_index[0]],
-                                                         sys),
-                                            leptonType='Tau',
-                                            tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]],
-                                                   sys),
-                                          boostedTau[gboostedTau_index[0]].eta,
-                                          boostedTau[gboostedTau_index[0]].phi,
-                                          gettaumass(boostedTau[gboostedTau_index[0]],
-                                                     sys))
-                secondLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[1]],
-                                                         sys),
-                                             eta=boostedTau[gboostedTau_index[1]].eta,
-                                             phi=boostedTau[gboostedTau_index[1]].phi,
-                                             m=gettaumass(boostedTau[gboostedTau_index[1]],
-                                                          sys),
-                                             leptonType='Tau',
-                                             tauDecayMode=boostedTau[gboostedTau_index[1]].decayMode)
-                self.pair2FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[1]],
-                                                   sys),
-                                          boostedTau[gboostedTau_index[1]].eta,
-                                          boostedTau[gboostedTau_index[1]].phi,
-                                          gettaumass(boostedTau[gboostedTau_index[1]],
-                                                     sys))
-                # Fill the cutflow_hist for "FH_channel"
-                # self.cutflow2_hist.Fill(4.5)
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode, boostedTau[gboostedTau_index[1]].decayMode])
+
+                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
+
+                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]], sys))
+                
+                secondLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[1]], sys), eta=boostedTau[gboostedTau_index[1]].eta, phi=boostedTau[gboostedTau_index[1]].phi, m=gettaumass(boostedTau[gboostedTau_index[1]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[1]].decayMode)
+                
+                self.pair2FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[1]], sys), boostedTau[gboostedTau_index[1]].eta, boostedTau[gboostedTau_index[1]].phi,  gettaumass(boostedTau[gboostedTau_index[1]], sys))
+
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
+                
+                self.out.fillBranch("HTT_boosted_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_phi", self.higgsTTFV.Phi())
+
+                self.out.fillBranch("HTTvis_boosted_m", self.higgsTTvisFV.M())
+                self.out.fillBranch("HTTvis_boosted_eta", self.higgsTTvisFV.Eta())
+                self.out.fillBranch("HTTvis_boosted_phi", self.higgsTTvisFV.Phi())
+
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
+            
             elif Keymax == "tt":
                 self.out.fillBranch("channel%s" % (sys), 0)
                 self.out.fillBranch("boost%s" % (sys), 0)
+                
                 if (sys == ""):
                     self.out.fillBranch("nallTaus%s" % (sys), 2)
                 gTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
                 if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (
-                        sys), [Tau[gTau_index[0]].decayMode, Tau[gTau_index[1]].decayMode])
-                # firstLepton  =  fastMTTlepton(pt = Tau[gTau_index[0]].pt,eta = Tau[gTau_index[0]].eta,phi = Tau[gTau_index[0]].phi,m = Tau[gTau_index[0]].mass,leptonType = 'Tau',tauDecayMode=Tau[gTau_index[0]].decayMode)
-                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]],
-                                                        sys),
-                                            eta=Tau[gTau_index[0]].eta,
-                                            phi=Tau[gTau_index[0]].phi,
-                                            m=gettaumass(Tau[gTau_index[0]],
-                                                         sys),
-                                            leptonType='Tau',
-                                            tauDecayMode=Tau[gTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(
-                    Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
-                secondLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[1]],
-                                                         sys),
-                                             eta=Tau[gTau_index[1]].eta,
-                                             phi=Tau[gTau_index[1]].phi,
-                                             m=gettaumass(Tau[gTau_index[1]],
-                                                          sys),
-                                             leptonType='Tau',
-                                             tauDecayMode=Tau[gTau_index[1]].decayMode)
-                self.pair2FV.SetPtEtaPhiM(gettaupt(
-                    Tau[gTau_index[1]], sys), Tau[gTau_index[1]].eta, Tau[gTau_index[1]].phi, gettaumass(Tau[gTau_index[0]], sys))
-                # firstLepton  =  fastMTTlepton(pt = Tau[gTau_index[0]].pt_nom,eta = Tau[gTau_index[0]].eta,phi = Tau[gTau_index[0]].phi,m = Tau[gTau_index[0]].mass_nom,leptonType = 'Tau',tauDecayMode=Tau[gTau_index[0]].decayMode)
-                # self.pair1FV.SetPtEtaPhiM(Tau[gTau_index[0]].pt_nom, Tau[gTau_index[0]].eta,Tau[gTau_index[0]].phi,Tau[gTau_index[0]].mass_nom)
-                # secondLepton =  fastMTTlepton(pt = Tau[gTau_index[1]].pt_nom,eta = Tau[gTau_index[1]].eta,phi = Tau[gTau_index[1]].phi,m = Tau[gTau_index[1]].mass_nom,leptonType = 'Tau',tauDecayMode=Tau[gTau_index[1]].decayMode)
-                # self.pair2FV.SetPtEtaPhiM(Tau[gTau_index[1]].pt_nom, Tau[gTau_index[1]].eta,Tau[gTau_index[1]].phi,Tau[gTau_index[1]].mass_nom)
-                # Fill the cutflow_hist for "FH_channel"
-                # self.cutflow2_hist.Fill(4.5)
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [Tau[gTau_index[0]].decayMode, Tau[gTau_index[1]].decayMode])
+                
+                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]], sys), eta=Tau[gTau_index[0]].eta, phi=Tau[gTau_index[0]].phi, m=gettaumass(Tau[gTau_index[0]], sys),  leptonType='Tau', tauDecayMode=Tau[gTau_index[0]].decayMode)
+                
+                self.pair1FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
+                
+                secondLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[1]], sys), eta=Tau[gTau_index[1]].eta, phi=Tau[gTau_index[1]].phi, m=gettaumass(Tau[gTau_index[1]], sys), leptonType='Tau', tauDecayMode=Tau[gTau_index[1]].decayMode)
+                
+                self.pair2FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[1]], sys), Tau[gTau_index[1]].eta, Tau[gTau_index[1]].phi, gettaumass(Tau[gTau_index[1]], sys))
+                
+                elf.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
+
+                self.out.fillBranch("HTT_HPS_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_HPS_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_HPS_phi", self.higgsTTFV.Phi())
+
+                self.out.fillBranch("HTTvis_HPS_m", self.higgsTTvisFV.M())
+                self.out.fillBranch("HTTvis_HPS_eta", self.higgsTTvisFV.Eta())
+                self.out.fillBranch("HTTvis_HPS_phi", self.higgsTTvisFV.Phi())
+
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
+            
             elif Keymax == "be":
                 self.out.fillBranch("channel%s" % (sys), 1)
                 self.out.fillBranch("boost%s" % (sys), 1)
@@ -1587,35 +1315,30 @@ class cutsAndcategories(Module):
                 gboostedTau_index = [pairDict[Keymax][1]]
                 gElectron_index = [pairDict[Keymax][2]]
                 if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (
-                        sys), [boostedTau[gboostedTau_index[0]].decayMode])
-                # firstLepton  =  fastMTTlepton(pt = boostedTau[gboostedTau_index[0]].pt,eta = boostedTau[gboostedTau_index[0]].eta,phi = boostedTau[gboostedTau_index[0]].phi,m = boostedTau[gboostedTau_index[0]].mass,leptonType = 'Tau',tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
-                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],
-                                                        sys),
-                                            eta=boostedTau[gboostedTau_index[0]].eta,
-                                            phi=boostedTau[gboostedTau_index[0]].phi,
-                                            m=gettaumass(boostedTau[gboostedTau_index[0]],
-                                                         sys),
-                                            leptonType='Tau',
-                                            tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]],
-                                                   sys),
-                                          boostedTau[gboostedTau_index[0]].eta,
-                                          boostedTau[gboostedTau_index[0]].phi,
-                                          gettaumass(boostedTau[gboostedTau_index[0]],
-                                                     sys))
-                secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt,
-                                             eta=Electron[gElectron_index[0]].eta,
-                                             phi=Electron[gElectron_index[0]].phi,
-                                             m=0.51100e-3,
-                                             leptonType='Electron',
-                                             tauDecayMode=-1)
-                self.pair2FV.SetPtEtaPhiM(
-                    Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
-                # Fill the cutflow_hist for "SL_channel"
-                # self.cutflow2_hist.Fill(5.5)
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode])
+                
+                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]], sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]],sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
+                
+                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi,  gettaumass(boostedTau[gboostedTau_index[0]], sys))
+                
+                secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3,  leptonType='Electron', tauDecayMode=-1)
+                
+                self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
+
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+            
+                self.out.fillBranch("HTT_boosted_Ele_m",self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_Ele_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_Ele_phi", self.higgsTTFV.Phi())
+                
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
+            
             elif Keymax == "te":
                 self.out.fillBranch("channel%s" % (sys), 1)
                 self.out.fillBranch("boost%s" % (sys), 0)
@@ -1624,32 +1347,31 @@ class cutsAndcategories(Module):
                 gTau_index = [pairDict[Keymax][1]]
                 gElectron_index = [pairDict[Keymax][2]]
                 if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [
-                                        Tau[gTau_index[0]].decayMode])
-                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]],
-                                                        sys),
-                                            eta=Tau[gTau_index[0]].eta,
-                                            phi=Tau[gTau_index[0]].phi,
-                                            m=gettaumass(Tau[gTau_index[0]],
-                                                         sys),
-                                            leptonType='Tau',
-                                            tauDecayMode=Tau[gTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(
-                    Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
-                # firstLepton  =  fastMTTlepton(pt = Tau[gTau_index[0]].pt_nom,eta = Tau[gTau_index[0]].eta,phi = Tau[gTau_index[0]].phi,m = Tau[gTau_index[0]].mass_nom,leptonType = 'Tau',tauDecayMode=Tau[gTau_index[0]].decayMode)
-                # self.pair1FV.SetPtEtaPhiM(Tau[gTau_index[0]].pt_nom, Tau[gTau_index[0]].eta,Tau[gTau_index[0]].phi,Tau[gTau_index[0]].mass_nom)
-                secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt,
-                                             eta=Electron[gElectron_index[0]].eta,
-                                             phi=Electron[gElectron_index[0]].phi,
-                                             m=0.51100e-3,
-                                             leptonType='Electron',
-                                             tauDecayMode=-1)
-                self.pair2FV.SetPtEtaPhiM(
-                    Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
-                # Fill the cutflow_hist for "SL_channel"
-                # self.cutflow2_hist.Fill(5.5)
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [Tau[gTau_index[0]].decayMode])
+                
+                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]],sys), eta=Tau[gTau_index[0]].eta, phi=Tau[gTau_index[0]].phi, m=gettaumass(Tau[gTau_index[0]], sys), leptonType='Tau', tauDecayMode=Tau[gTau_index[0]].decayMode)
+                
+                self.pair1FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
+                
+                secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta,  phi=Electron[gElectron_index[0]].phi, m=0.51100e-3,  leptonType='Electron', tauDecayMode=-1)
+                
+                self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
+
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+
+                self.out.fillBranch("HTT_HPS_Ele_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_HPS_Ele_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_HPS_Ele_phi", self.higgsTTFV.Phi())
+                
+
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
+            
             elif Keymax == "bm":
                 self.out.fillBranch("channel%s" % (sys), 2)
                 self.out.fillBranch("boost%s" % (sys), 1)
@@ -1658,34 +1380,27 @@ class cutsAndcategories(Module):
                 gboostedTau_index = [pairDict[Keymax][1]]
                 gMuon_index = [pairDict[Keymax][2]]
                 if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (
-                        sys), [boostedTau[gboostedTau_index[0]].decayMode])
-                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],
-                                                        sys),
-                                            eta=boostedTau[gboostedTau_index[0]].eta,
-                                            phi=boostedTau[gboostedTau_index[0]].phi,
-                                            m=gettaumass(boostedTau[gboostedTau_index[0]],
-                                                         sys),
-                                            leptonType='Tau',
-                                            tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]],
-                                                   sys),
-                                          boostedTau[gboostedTau_index[0]].eta,
-                                          boostedTau[gboostedTau_index[0]].phi,
-                                          gettaumass(boostedTau[gboostedTau_index[0]],
-                                                     sys))
-                secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt,
-                                             eta=Muon[gMuon_index[0]].eta,
-                                             phi=Muon[gMuon_index[0]].phi,
-                                             m=Muon[gMuon_index[0]].mass,
-                                             leptonType='Muon',
-                                             tauDecayMode=-1)
-                self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt,
-                                          Muon[gMuon_index[0]].eta,
-                                          Muon[gMuon_index[0]].phi,
-                                          Muon[gMuon_index[0]].mass)
-                # Fill the cutflow_hist for "SL_channel"
-                # self.cutflow2_hist.Fill(5.5)
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode])
+
+                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
+                
+                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi,  gettaumass(boostedTau[gboostedTau_index[0]], sys))
+
+                secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt, eta=Muon[gMuon_index[0]].eta, phi=Muon[gMuon_index[0]].phi, m=Muon[gMuon_index[0]].mass,  leptonType='Muon', tauDecayMode=-1)
+
+                self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta, Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
+                
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+
+                self.out.fillBranch("HTT_boosted_Mu_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_Mu_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_Mu_phi", self.higgsTTFV.Phi())
+
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> MT_channel (max pt pair)"] += 1
 
@@ -1697,20 +1412,12 @@ class cutsAndcategories(Module):
                 gTau_index = [pairDict[Keymax][1]]
                 gMuon_index = [pairDict[Keymax][2]]
                 if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [
-                                        Tau[gTau_index[0]].decayMode])
-                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]],
-                                                        sys),
-                                            eta=Tau[gTau_index[0]].eta,
-                                            phi=Tau[gTau_index[0]].phi,
-                                            m=gettaumass(Tau[gTau_index[0]],
-                                                         sys),
-                                            leptonType='Tau',
-                                            tauDecayMode=Tau[gTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(
-                    Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
-                # firstLepton  =  fastMTTlepton(pt = Tau[gTau_index[0]].pt_nom,eta = Tau[gTau_index[0]].eta,phi = Tau[gTau_index[0]].phi,m = Tau[gTau_index[0]].mass_nom,leptonType = 'Tau',tauDecayMode=Tau[gTau_index[0]].decayMode)
-                # self.pair1FV.SetPtEtaPhiM(Tau[gTau_index[0]].pt_nom, Tau[gTau_index[0]].eta,Tau[gTau_index[0]].phi,Tau[gTau_index[0]].mass_nom)
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [Tau[gTau_index[0]].decayMode])
+                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]], sys), eta=Tau[gTau_index[0]].eta, phi=Tau[gTau_index[0]].phi, m=gettaumass(Tau[gTau_index[0]],sys), leptonType='Tau', tauDecayMode=Tau[gTau_index[0]].decayMode)
+
+                self.pair1FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
+                
+                
                 secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt,
                                              eta=Muon[gMuon_index[0]].eta,
                                              phi=Muon[gMuon_index[0]].phi,

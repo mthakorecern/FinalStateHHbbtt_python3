@@ -9,8 +9,8 @@ import sys
 sys.path.append(os.path.join(os.environ["CMSSW_BASE"], "python"))
 
 def normalize_path(p):
-    if p.startswith("/hdfs/store/"):
-        return p.replace("/hdfs", "", 1)  # drop the leading /hdfs
+    if p.startswith("/hdfs/"):
+        return "file:" + p  
     return p
 
 def main(args):
@@ -67,7 +67,7 @@ def main(args):
         f'--output-dag-file={dagLocation}/dag',
         f'--output-dir={args.destination}/{job_name}',
         '--opsys=rhel9',
-        '--memory-requirements=5000',
+        '--memory-requirements=2000',
         '--disk-requirements=10000',
         '--input-dir=/',
         f'--extra-inputs={extra_inputs}',
@@ -96,8 +96,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--destination", required=True, help="HDFS or local destination for output")
     parser.add_argument("--jobName", required=True, help="Base name for this submission")
-    parser.add_argument("--submitDirPath", default="/nfs_scratch/"+os.environ["USER"]+"/JetFatPuppiMET_JES_JER_VetoMaps_Condor",
-                        help="Scratch area for submit files (default =/nfs_scratch/mithakor/JetFatPuppiMET_JES_JER_VetoMaps_Condor)")
+    parser.add_argument("--submitDirPath", default="/nfs_scratch/"+os.environ["USER"]+"/JetID_FatJetID_PuppiMET_JES_JER_JetFatJetVetoMaps_Condor",
+                        help="Scratch area for submit files (default =/nfs_scratch/mithakor/JetID_FatJetID_PuppiMET_JES_JER_JetFatJetVetoMaps_Condor)")
     parser.add_argument("--goldenjson", required=False)
     parser.add_argument("--jetidjson", required=True)
     parser.add_argument("--vetomapjson", required=True)

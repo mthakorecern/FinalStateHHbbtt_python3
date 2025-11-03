@@ -14,14 +14,15 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NATModules.modules.jetId import jetId
 from PhysicsTools.NATModules.modules.fatjetId import fatJetId
 from PhysicsTools.NATModules.modules.jetVetoMap import jetVMAP
-from PhysicsTools.NATModules.modules.applyJercFJERC import ApplyJercAll  # <-- adjust import
+from PhysicsTools.NATModules.modules.fatJetvetoMap import fatJetVMAP
+from PhysicsTools.NATModules.modules.applyJercFJERC import ApplyJercAll  
 
 
-class EventCounter(Module):
-    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        print(">>> Events in this file before any skim:", inputTree.GetEntries())
-    def analyze(self, event):
-        return True
+# class EventCounter(Module):
+#     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+#         print(">>> Events in this file before any skim:", inputTree.GetEntries())
+#     def analyze(self, event):
+#         return True
 
 
 def process_file(inputFile, outputFile,
@@ -56,18 +57,13 @@ def process_file(inputFile, outputFile,
 
     print(">>> Preselection string:", preselection)
 
-    modules = [EventCounter()]
+    modules = []
 
-    modules.append(jetId(jetidjson, jetType="AK4PUPPI"))
+    modules.append(jetId("jetid.json", jetType="AK4PUPPI"))
     print("Added JetID module")
     
-    modules.append(fatJetId(jetidjson, jetType="AK8PUPPI"))
+    modules.append(fatJetId("jetid.json", jetType="AK8PUPPI"))
     print("Added FatJetID module")
-
-    modules.append(jetVMAP(vetomapjson,
-                           corrName="Summer24Prompt24_RunBCDEFGHI_V1",
-                           veto_map_name="jetvetomap"))
-    print("Added JetVetoMap module")
 
     # JERC (Jet Energy Corrections + JER smearing + MET)
     modules.append(
@@ -81,6 +77,15 @@ def process_file(inputFile, outputFile,
     )
     print("Added ApplyJercAll module")
 
+    modules.append(jetVMAP("jetvetomaps.json",
+                           corrName="Summer24Prompt24_RunBCDEFGHI_V1",
+                           veto_map_name="jetvetomap"))
+    print("Added JetVetoMap module")
+
+    modules.append(fatJetVMAP("jetvetomaps.json",
+                           corrName="Summer24Prompt24_RunBCDEFGHI_V1",
+                           veto_map_name="jetvetomap"))
+    print("Added FatJetVetoMap module")
 
     # PostProcessor
     if isMC:
@@ -127,12 +132,12 @@ if __name__ == "__main__":
 
     print(">>> nanoPostProc_helper.py called with arguments:")
     for k, v in vars(args).items():
-        print(f"    {k}: {v}")
+        print(f"{k}: {v}")
 
-    if not os.path.exists(args.inputFile) and not args.inputFile.startswith("root://"):
-        print(f"[ERROR] Input file {args.inputFile} does not exist or is not accessible!")
-    else:
-        print(f"[INFO] Opening input file: {args.inputFile}")
+    # if not os.path.exists(args.inputFile) and not args.inputFile.startswith("root://"):
+    #     print(f"[ERROR] Input file {args.inputFile} does not exist or is not accessible!")
+    # else:
+    #     print(f"[INFO] Opening input file: {args.inputFile}")
 
     process_file(
         args.inputFile, args.outputFile,

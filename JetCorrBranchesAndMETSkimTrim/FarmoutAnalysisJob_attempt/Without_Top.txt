@@ -74,6 +74,7 @@
 /hdfs/store/user/mithakor/2024_skimmed_hadded/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8_8.root
 /hdfs/store/user/mithakor/2024_skimmed_hadded/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8_9.root
 /hdfs/store/user/mithakor/2024_skimmed_hadded/ZZto2Nu2Q_TuneCP5_13p6TeV_powheg-pythia8.root
+/hdfs/store/user/mithakor/2024_skimmed_hadded/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8.root
 /hdfs/store/user/mithakor/2024_skimmed_hadded/WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8_0.root
 /hdfs/store/user/mithakor/2024_skimmed_hadded/WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8_1.root
 /hdfs/store/user/mithakor/2024_skimmed_hadded/WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8_10.root
