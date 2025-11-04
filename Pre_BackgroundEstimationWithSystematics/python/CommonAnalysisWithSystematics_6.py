@@ -137,7 +137,7 @@ class cutsAndcategories(Module):
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt >= 120", 0),
-                ("Events surviving the FatJet skim  (pt >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)", 0),
                 ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
@@ -173,7 +173,7 @@ class cutsAndcategories(Module):
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt >= 120", 0),
-                ("Events surviving the FatJet skim  (pt >= 180, |eta| <= 2.5, jetId>1)", 0),
+                ("Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)", 0),
                 ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
@@ -616,7 +616,7 @@ class cutsAndcategories(Module):
             - jetId > 1
             """
 
-            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) <= 2.5 and ak4Object_enu[1].jetId > 1: 
+            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and ak4Object_enu[1].jetId > 1: 
                 #and getattr(event, "Flag_JetVetoed", 0) == 0:
                 return True
             return False
@@ -1037,11 +1037,11 @@ class cutsAndcategories(Module):
         self.cutflow_dict["Pre-selection: PuppiMET_pt >= 120"] += 1
 
        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt >= 180) and abs(x[1].eta) <= 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt >= 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
         if (len(FatJet_skim_enu) == 0):
             return False
 
-        self.cutflow_dict["Events surviving the FatJet skim  (pt >= 180, |eta| <= 2.5, jetId>1)"] += 1
+        self.cutflow_dict["Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)"] += 1
         
         del FatJet_skim_enu
 
@@ -1075,7 +1075,7 @@ class cutsAndcategories(Module):
             FatJet_enu = [
                 x for x in enumerate(FatJet)
                 if (getjetpt(x[1], sys) > 180)
-                and (abs(x[1].eta) <= 2.5 and (x[1].jetId > 1))
+                and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))
 
             ]
 
@@ -1099,13 +1099,13 @@ class cutsAndcategories(Module):
 
             Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(x, sys)]
 
-            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) <= 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 3) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
+            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 3) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
 
-            boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) <= 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
+            boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
 
             self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1],sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
 
-            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) <= 2.5) and x[1].cutBased >= 2]
+            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].cutBased >= 2]
             
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
 

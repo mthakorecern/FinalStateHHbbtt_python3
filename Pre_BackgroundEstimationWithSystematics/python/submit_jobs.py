@@ -8,8 +8,8 @@ import sys
 sys.path.append(os.path.join(os.environ["CMSSW_BASE"], "python"))
 
 def normalize_path(p):
-    if p.startswith("/hdfs/store/"):
-        return p.replace("/hdfs", "", 1)
+    if p.startswith("/hdfs/"):
+        return "file:" + p  
     return p
 
 def main(args):
