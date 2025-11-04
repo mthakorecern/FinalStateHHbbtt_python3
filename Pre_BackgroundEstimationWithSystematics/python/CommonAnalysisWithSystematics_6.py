@@ -136,9 +136,9 @@ class cutsAndcategories(Module):
                 ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt >= 120", 0),
-                ("Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
+                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Events surviving the FatJet skim  (pt > 200, |eta| < 2.5, Tight jetId)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -155,9 +155,9 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
-                #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                # ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
-                #("Visible Mass HTT > 20 cut", 0),
+                # ("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
                 ("Final surviving events", 0),])
 
@@ -172,9 +172,9 @@ class cutsAndcategories(Module):
                 ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt >= 120", 0),
-                ("Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
+                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Events surviving the FatJet skim  (pt > 200, |eta| < 2.5, Tight jetId)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt > 180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -191,9 +191,9 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
-                #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                # ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
-                #("Visible Mass HTT > 20 cut", 0),
+                # ("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
                 ("Final surviving events", 0)])
 
@@ -612,25 +612,25 @@ class cutsAndcategories(Module):
             """
             Select central jets (2024 baseline):
             - pt > 30 GeV
-            - |eta| <= 2.5
+            - |eta| < 2.5
             - jetId > 1
             """
 
-            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and ak4Object_enu[1].jetId > 1: 
+            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and (ak4Object_enu[1].jetId & 2): 
                 #and getattr(event, "Flag_JetVetoed", 0) == 0:
                 return True
             return False
 
-        # def pass_cuts_EleID(electronObject_enu):
-        #     for cutnr in range(0, 10):
-        #         if cutnr == 7:
-        #             continue
-        #         # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
-        #         # 0x7) < self.eleID:
-        #         if (electronObject_enu[1].vidNestedWPBitmap >> (
-        #                 cutnr * 3) & 0x7) < 2:
-        #             return False
-        #     return True
+        def pass_cuts_EleID(electronObject_enu):
+            for cutnr in range(0, 10):
+                if cutnr == 7:
+                    continue
+                # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
+                # 0x7) < self.eleID:
+                if (electronObject_enu[1].vidNestedWPBitmap >> (
+                        cutnr * 3) & 0x7) < 2:
+                    return False
+            return True
 
         
         
@@ -767,10 +767,10 @@ class cutsAndcategories(Module):
                     deltaR_Pair = (self.pair1FV.DeltaR(self.pair2FV))
                     if ((deltaR_Pair <= 0.05)):
                         continue
-                    # Found the bug in the code - I was only applying isolation
-                    # for boostedTaus but none for HPS
+                    #Found the bug in the code - I was only applying isolation
+                    #for boostedTaus but none for HPS
                     
-                    ## Commenting out the isolation part for now. Might add it in the future.
+                    # Commenting out the isolation part for now. Might add it in the future.
 
                     # if ((tag == "be") or (tag == "te")):
                     #     if not ElectronIsolationCut(
@@ -803,49 +803,49 @@ class cutsAndcategories(Module):
         #     isolationCut = 0.25
 
         #     if (tag == "tm"):
-        #         if ((muo.pfRelIso04_all) < isolationCut):
+        #         if ((muo.miniPFRelIso_all) < isolationCut):
         #             return True
         #         else:
         #             return False
 
-        #     if deltaR < 0.7:
-        #         isTau = "close"
-        #     if isTau == "close":
-        #         self.leadingMatch.SetPtEtaPhiM(tau.LeadingMuonPt, tau.LeadingMuonEta, tau.LeadingMuonPhi,tau.LeadingMuonM)
-        #         self.subleadingMatch.SetPtEtaPhiM(tau.SubLeadingMuonPt,tau.SubLeadingMuonEta,tau.SubLeadingMuonPhi,tau.SubLeadingMuonM)
-        #         self.subsubleadingMatch.SetPtEtaPhiM(tau.SubSubLeadingMuonPt, tau.SubSubLeadingMuonEta,tau.SubSubLeadingMuonPhi, tau.SubSubLeadingMuonM)
-        #         if (self.muFV.DeltaR(self.leadingMatch) < 0.05):
-        #             if ((tau.LeadingMuonCorrIso / tau.LeadingMuonPt) < isolationCut):
-        #                 # print ("Leading Muon Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.muFV.DeltaR(self.subleadingMatch) < 0.05):
-        #             if ((tau.SubLeadingMuonCorrIso /
-        #                  tau.SubLeadingMuonPt) < isolationCut):
-        #                 # print ("subLeading Muon Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.muFV.DeltaR(self.subsubleadingMatch) < 0.05):
-        #             if ((tau.SubSubLeadingMuonCorrIso /
-        #                  tau.SubSubLeadingMuonPt) < isolationCut):
-        #                 # print ("subsubLeading Muon Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         else:
-        #             if ((muo.pfRelIso04_all) < isolationCut):
-        #                 # print ("pf Muon Isolation")
-        #                 return True
-        #             else:
-        #                 return False
+            # if deltaR < 0.7:
+            #     isTau = "close"
+            # if isTau == "close":
+            #     self.leadingMatch.SetPtEtaPhiM(tau.LeadingMuonPt, tau.LeadingMuonEta, tau.LeadingMuonPhi,tau.LeadingMuonM)
+            #     self.subleadingMatch.SetPtEtaPhiM(tau.SubLeadingMuonPt,tau.SubLeadingMuonEta,tau.SubLeadingMuonPhi,tau.SubLeadingMuonM)
+            #     self.subsubleadingMatch.SetPtEtaPhiM(tau.SubSubLeadingMuonPt, tau.SubSubLeadingMuonEta,tau.SubSubLeadingMuonPhi, tau.SubSubLeadingMuonM)
+            #     if (self.muFV.DeltaR(self.leadingMatch) < 0.05):
+            #         if ((tau.LeadingMuonCorrIso / tau.LeadingMuonPt) < isolationCut):
+            #             # print ("Leading Muon Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     elif (self.muFV.DeltaR(self.subleadingMatch) < 0.05):
+            #         if ((tau.SubLeadingMuonCorrIso /
+            #              tau.SubLeadingMuonPt) < isolationCut):
+            #             # print ("subLeading Muon Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     elif (self.muFV.DeltaR(self.subsubleadingMatch) < 0.05):
+            #         if ((tau.SubSubLeadingMuonCorrIso /
+            #              tau.SubSubLeadingMuonPt) < isolationCut):
+            #             # print ("subsubLeading Muon Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     else:
+            #         if ((muo.pfRelIso04_all) < isolationCut):
+            #             # print ("pf Muon Isolation")
+            #             return True
+            #         else:
+            #             return False
 
-        #     elif isTau == "":
-        #         if ((muo.pfRelIso04_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+            # elif isTau == "":
+            #     if ((muo.pfRelIso04_all) < isolationCut):
+            #         return True
+            #     else:
+            #         return False
 
         # passing the inidivial eletrons from the collection to apply the
         # correction
@@ -858,78 +858,78 @@ class cutsAndcategories(Module):
         #     isTau = ""
         #     isolationCut = 0.0
 
-        #     if abs(ele.eta) <= 1.479:
-        #         isolationCut = 0.194 + (0.535 / ele.pt)
-        #     elif (abs(ele.eta) > 1.479) and (abs(ele.eta) <= 2.5):
-        #         # Endcap values
-        #         # loose =  0.108 + (0.963/ele.pt)
-        #         # medium = 0.0658 + (0.963/ele.pt)
-        #         # tight =0.0445 + (0.963/ele.pt)
-        #         isolationCut = 0.184 + (0.519 / ele.pt)
-        #     else:
-        #         return False
+            # if abs(ele.eta) <= 1.479:
+            #     isolationCut = 0.194 + (0.535 / ele.pt)
+            # elif (abs(ele.eta) > 1.479) and (abs(ele.eta) <= 2.5):
+            #     # Endcap values
+            #     # loose =  0.108 + (0.963/ele.pt)
+            #     # medium = 0.0658 + (0.963/ele.pt)
+            #     # tight =0.0445 + (0.963/ele.pt)
+            #     isolationCut = 0.184 + (0.519 / ele.pt)
+            # else:
+            #     return False
 
-        #     if (tag == "te"):
-        #         if ((ele.pfRelIso03_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+            # if (tag == "te"):
+            #     if ((ele.miniPFRelIso_all) < isolationCut):
+            #         return True
+            #     else:
+            #         return False
 
-        #     self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
-        #     self.eleFV.SetPtEtaPhiM(ele.pt, ele.eta, ele.phi, 0.0)
-        #     deltaR = (self.tauFV).DeltaR(self.eleFV)
+            # self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
+            # self.eleFV.SetPtEtaPhiM(ele.pt, ele.eta, ele.phi, 0.0)
+            # deltaR = (self.tauFV).DeltaR(self.eleFV)
 
-        #     if deltaR < 0.6:
-        #         isTau = "close"
-        #     if isTau == "close":
-        #         self.leadingMatch.SetPtEtaPhiM(
-        #             tau.LeadingElectronPt,
-        #             tau.LeadingElectronEta,
-        #             tau.LeadingElectronPhi,
-        #             0.0)
-        #         self.subleadingMatch.SetPtEtaPhiM(
-        #             tau.SubLeadingElectronPt,
-        #             tau.SubLeadingElectronEta,
-        #             tau.SubLeadingElectronPhi,
-        #             0.0)
-        #         self.subsubleadingMatch.SetPtEtaPhiM(
-        #             tau.SubSubLeadingElectronPt,
-        #             tau.SubSubLeadingElectronEta,
-        #             tau.SubSubLeadingElectronPhi,
-        #             0.0)
-        #         if (self.eleFV.DeltaR(self.leadingMatch) < 0.05):
-        #             if ((tau.LeadingElectronCorrIso /
-        #                  tau.LeadingElectronPt) < isolationCut):
-        #                 # print ("Leading Ele Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.eleFV.DeltaR(self.subleadingMatch) < 0.05):
-        #             if ((tau.SubLeadingElectronCorrIso /
-        #                  tau.SubLeadingElectronPt) < isolationCut):
-        #                 # print ("subLeading Ele Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.eleFV.DeltaR(self.subsubleadingMatch) < 0.05):
-        #             if ((tau.SubSubLeadingElectronCorrIso /
-        #                  tau.SubSubLeadingElectronPt) < isolationCut):
-        #                 # print ("subsubLeading Ele Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         else:
-        #             if ((ele.pfRelIso03_all) < isolationCut):
-        #                 print("use pf Ele Isolation")
-        #                 return True
-        #             else:
-        #                 return False
+            # if deltaR < 0.6:
+            #     isTau = "close"
+            # if isTau == "close":
+            #     self.leadingMatch.SetPtEtaPhiM(
+            #         tau.LeadingElectronPt,
+            #         tau.LeadingElectronEta,
+            #         tau.LeadingElectronPhi,
+            #         0.0)
+            #     self.subleadingMatch.SetPtEtaPhiM(
+            #         tau.SubLeadingElectronPt,
+            #         tau.SubLeadingElectronEta,
+            #         tau.SubLeadingElectronPhi,
+            #         0.0)
+            #     self.subsubleadingMatch.SetPtEtaPhiM(
+            #         tau.SubSubLeadingElectronPt,
+            #         tau.SubSubLeadingElectronEta,
+            #         tau.SubSubLeadingElectronPhi,
+            #         0.0)
+            #     if (self.eleFV.DeltaR(self.leadingMatch) < 0.05):
+            #         if ((tau.LeadingElectronCorrIso /
+            #              tau.LeadingElectronPt) < isolationCut):
+            #             # print ("Leading Ele Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     elif (self.eleFV.DeltaR(self.subleadingMatch) < 0.05):
+            #         if ((tau.SubLeadingElectronCorrIso /
+            #              tau.SubLeadingElectronPt) < isolationCut):
+            #             # print ("subLeading Ele Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     elif (self.eleFV.DeltaR(self.subsubleadingMatch) < 0.05):
+            #         if ((tau.SubSubLeadingElectronCorrIso /
+            #              tau.SubSubLeadingElectronPt) < isolationCut):
+            #             # print ("subsubLeading Ele Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     else:
+            #         if ((ele.pfRelIso03_all) < isolationCut):
+            #             print("use pf Ele Isolation")
+            #             return True
+            #         else:
+            #             return False
 
-        #     elif isTau == "":
-        #         if ((ele.pfRelIso03_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+            # elif isTau == "":
+            #     if ((ele.pfRelIso03_all) < isolationCut):
+            #         return True
+            #     else:
+            #         return False
 
         # def ElectronIsolationCut_addlepveto(eleObject_enu):
         #     #For 2024: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun3 
@@ -1028,20 +1028,20 @@ class cutsAndcategories(Module):
 
         if (self.isMC):
             if (self.year_unc == "2024"):          
-                if event.PuppiMET_pt < 120:# and (
+                if event.PuppiMET_pt < 180:# and (
                     return False
         elif (self.isData):
-            if ((event.PuppiMET_pt < 120)):
+            if ((event.PuppiMET_pt < 180)):
                 return False
         
-        self.cutflow_dict["Pre-selection: PuppiMET_pt >= 120"] += 1
+        self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
 
        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt >= 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 200) and abs(x[1].eta) < 2.5 and (x[1].jetId & 2)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
         if (len(FatJet_skim_enu) == 0):
             return False
 
-        self.cutflow_dict["Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)"] += 1
+        self.cutflow_dict["Events surviving the FatJet skim  (pt > 200, |eta| < 2.5, Tight jetId)"] += 1
         
         del FatJet_skim_enu
 
@@ -1070,15 +1070,14 @@ class cutsAndcategories(Module):
                 continue
 
             if sys == "":
-                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >= 120"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt > 180"] += 1
 
             FatJet_enu = [
                 x for x in enumerate(FatJet)
-                if (getjetpt(x[1], sys) > 180)
-                and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))
+                if (getjetpt(x[1], sys) > 200)
+                and (abs(x[1].eta) < 2.5 and (x[1].jetId & 2))
 
             ]
-
 
 
             if (len(FatJet_enu) == 0):
@@ -1099,13 +1098,16 @@ class cutsAndcategories(Module):
 
             Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(x, sys)]
 
-            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 3) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
+            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 4) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
 
             boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
 
             self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1],sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
 
-            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].cutBased >= 2]
+            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5)]
+            
+            Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
+
             
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
 
@@ -1424,7 +1426,7 @@ class cutsAndcategories(Module):
             #     # move to next systematic
             #     continue
 
-            # # Fill cut flow
+            # Fill cut flow
             # if (sys == ""):
             #     self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
 

@@ -28,12 +28,22 @@ DEST=/hdfs/store/user/mithakor/2024_Categorized_MTT/MC
 #     --runNominal    \
 #     &> log_MC_Without_Top.txt &
 
+# python3 submit_jobs.py  \
+#     --inputDir $SOURCE  \
+#     --destination $DEST     \
+#     --jobName MC_MET120_Nocorrections_TightLeptonVeto  \
+#     --submitDirPath /nfs_scratch/mithakor/Corrections_MTT/MC   \
+#     --year 2024 \
+#     --isMC  \
+#     --runNominal    \
+#     &> log_MC_MET_120_Nocorrections.txt &
+
 python3 submit_jobs.py  \
     --inputDir $SOURCE  \
     --destination $DEST     \
-    --jobName MC_MET120_Nocorrections_TightLeptonVeto  \
-    --submitDirPath /nfs_scratch/mithakor/Corrections_MTT/MC   \
+    --jobName MC_MET180_FatJet_Nocorrections_TightLeptonVeto  \
+    --submitDirPath /nfs_scratch/mithakor/Corrections_MTT/MC_NanoAOD_default_branches   \
     --year 2024 \
     --isMC  \
     --runNominal    \
-    &> log_MC_MET_120_Nocorrections.txt &
+    &> log_MC_MET_180_Nocorrections.txt &
