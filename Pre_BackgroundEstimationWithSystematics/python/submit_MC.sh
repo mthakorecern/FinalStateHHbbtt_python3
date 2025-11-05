@@ -3,8 +3,6 @@
 # SOURCE_Without_Top=/hdfs/store/user/mithakor/2024_JETID_JetVetoMaps_JES_JER_GlobalparT3mass_softdrop/JME_JetFatJetMET_JES_JER_Updated/MC_Without_Top_05Oct25_1550
 
 SOURCE=/hdfs/store/user/mithakor/2024_skimmed_hadded
-
-
 DEST=/hdfs/store/user/mithakor/2024_Categorized_MTT/MC
 
 # python3 submit_jobs.py  \
@@ -41,8 +39,8 @@ DEST=/hdfs/store/user/mithakor/2024_Categorized_MTT/MC
 python3 submit_jobs.py  \
     --inputDir $SOURCE  \
     --destination $DEST     \
-    --jobName MC_MET180_FatJet_Nocorrections_TightLeptonVeto  \
-    --submitDirPath /nfs_scratch/mithakor/Corrections_MTT/MC_NanoAOD_default_branches   \
+    --jobName MC_MET180_FatJet_Jet_Nocorrections_TightLeptonVeto  \
+    --submitDirPath /nfs_scratch/mithakor/Corrections_MTT/MC_NanoAOD_default_branches/   \
     --year 2024 \
     --isMC  \
     --runNominal    \

@@ -13,7 +13,7 @@ import subprocess
 from collections import OrderedDict
 
 from FinalStateHHbbtt.fastMTTPython.fastMTTtool import *
-from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModule.TauEnergyScaleForHPSandBoosted import TauEnergyScaleForHPSandBoosted
+# from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModule.TauEnergyScaleForHPSandBoosted import TauEnergyScaleForHPSandBoosted
 
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
@@ -133,7 +133,7 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(6))),
                 ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(7))),
-                ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
+                ("Events remaining after Skimming", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt > 180", 0),
@@ -169,7 +169,7 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(4))),
                 ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(6))),
-                ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
+                ("Events remaining after Skimming", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt > 180", 0),
@@ -614,23 +614,29 @@ class cutsAndcategories(Module):
             - pt > 30 GeV
             - |eta| < 2.5
             - jetId > 1
+
+            ##  for future use remember that
+            ##  -   To select only Tight ID, use (jet.jetId & 2)
+            ##  -   To select only TightLepVeto ID, use (jet.jetId & 4)
+            ##  -   To select jets passing at least Tight (including TightLepVeto), use (jet.jetId > 1)
+            ##  -   or equivalently (jet.jetId & 6)
             """
 
-            if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and (ak4Object_enu[1].jetId & 2): 
+            if (getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and (ak4Object_enu[1].jetId > 1)): 
                 #and getattr(event, "Flag_JetVetoed", 0) == 0:
                 return True
             return False
 
-        def pass_cuts_EleID(electronObject_enu):
-            for cutnr in range(0, 10):
-                if cutnr == 7:
-                    continue
-                # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
-                # 0x7) < self.eleID:
-                if (electronObject_enu[1].vidNestedWPBitmap >> (
-                        cutnr * 3) & 0x7) < 2:
-                    return False
-            return True
+        # def pass_cuts_EleID(electronObject_enu):
+        #     for cutnr in range(0, 10):
+        #         if cutnr == 7:
+        #             continue
+        #         # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
+        #         # 0x7) < self.eleID:
+        #         if (electronObject_enu[1].vidNestedWPBitmap >> (
+        #                 cutnr * 3) & 0x7) < 2:
+        #             return False
+        #     return True
 
         
         
@@ -1028,16 +1034,16 @@ class cutsAndcategories(Module):
 
         if (self.isMC):
             if (self.year_unc == "2024"):          
-                if event.PuppiMET_pt < 180:# and (
+                if event.PuppiMET_pt < 180:
                     return False
         elif (self.isData):
-            if ((event.PuppiMET_pt < 180)):
+            if (event.PuppiMET_pt < 180):
                 return False
         
         self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
 
        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 200) and abs(x[1].eta) < 2.5 and (x[1].jetId & 2)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 200) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
         if (len(FatJet_skim_enu) == 0):
             return False
 
@@ -1053,6 +1059,7 @@ class cutsAndcategories(Module):
 
         nominal_bool = 0
         for sys in self.jesUnc:
+            self.theFastMTTtool = fastMTTtool()
 
             for vec in [
                 self.higgsTTFV,
@@ -1065,7 +1072,7 @@ class cutsAndcategories(Module):
             ]:
                 vec.SetPxPyPzE(0, 0, 0, 0)
         
-            if ((getMETpt(sys) < 120)):
+            if ((getMETpt(sys) < 180)):
                 fillBranchesWithDefault(sys)
                 continue
 
@@ -1075,7 +1082,7 @@ class cutsAndcategories(Module):
             FatJet_enu = [
                 x for x in enumerate(FatJet)
                 if (getjetpt(x[1], sys) > 200)
-                and (abs(x[1].eta) < 2.5 and (x[1].jetId & 2))
+                and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))
 
             ]
 
@@ -1106,7 +1113,7 @@ class cutsAndcategories(Module):
 
             Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5)]
             
-            Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
+            # Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
 
             
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
@@ -1653,7 +1660,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     start_time = time.time()
-
+    
+    met_selection = ["PuppiMET_pt > 180"]
+    
     trigger_2024 = [
         "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight",
         "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60",
@@ -1661,7 +1670,10 @@ if __name__ == "__main__":
     ]
 
     if args.year == "2024":
-        preselection = "(" + "||".join(trigger_2024) + ")"
+        preselection = (
+        "(" + "&&".join(met_selection) + ")" +
+        "&&(" + "||".join(trigger_2024) + ")"
+        )
 
     call_postpoc()
     
