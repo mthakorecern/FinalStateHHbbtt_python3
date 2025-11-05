@@ -31,9 +31,10 @@ DEST=/hdfs/store/user/mithakor/2024_Categorized_MTT/MC
 python3 submit_jobs.py  \
     --inputDir $SOURCE  \
     --destination $DEST     \
-    --jobName MC_MET120_Nocorrections_TightLeptonVeto  \
+    --jobName MC_MET120_Nocorrections_FatJetJetTightLeptonVeto  \
     --submitDirPath /nfs_scratch/mithakor/Corrections_MTT/MC   \
     --year 2024 \
     --isMC  \
     --runNominal    \
     &> log_MC_MET_120_Nocorrections.txt &
+

@@ -136,9 +136,9 @@ class cutsAndcategories(Module):
                 ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt >= 120", 0),
-                ("Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
+                ("Pre-selection: PuppiMET_pt > 120", 0),
+                ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -172,9 +172,9 @@ class cutsAndcategories(Module):
                 ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt >= 120", 0),
-                ("Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >= 120",0),
+                ("Pre-selection: PuppiMET_pt > 120", 0),
+                ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -612,7 +612,7 @@ class cutsAndcategories(Module):
             """
             Select central jets (2024 baseline):
             - pt > 30 GeV
-            - |eta| <= 2.5
+            - |eta| < 2.5
             - jetId > 1
             """
 
@@ -1034,14 +1034,14 @@ class cutsAndcategories(Module):
             if ((event.PuppiMET_pt < 120)):
                 return False
         
-        self.cutflow_dict["Pre-selection: PuppiMET_pt >= 120"] += 1
+        self.cutflow_dict["Pre-selection: PuppiMET_pt > 120"] += 1
 
        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt >= 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
         if (len(FatJet_skim_enu) == 0):
             return False
 
-        self.cutflow_dict["Events surviving the FatJet skim  (pt >= 180, |eta| < 2.5, jetId>1)"] += 1
+        self.cutflow_dict["Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)"] += 1
         
         del FatJet_skim_enu
 
@@ -1070,7 +1070,7 @@ class cutsAndcategories(Module):
                 continue
 
             if sys == "":
-                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >= 120"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  120"] += 1
 
             FatJet_enu = [
                 x for x in enumerate(FatJet)
