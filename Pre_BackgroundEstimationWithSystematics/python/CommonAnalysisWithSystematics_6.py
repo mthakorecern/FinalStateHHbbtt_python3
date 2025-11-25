@@ -141,9 +141,9 @@ class cutsAndcategories(Module):
                 ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 120", 0),
+                ("Pre-selection: PuppiMET_pt > 180", 0),
                 ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -177,9 +177,9 @@ class cutsAndcategories(Module):
                 ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 120", 0),
+                ("Pre-selection: PuppiMET_pt > 180", 0),
                 ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
@@ -316,8 +316,8 @@ class cutsAndcategories(Module):
                 self.out.branch("deltaPhi_subjet2_subtau", "F")
                 self.out.branch("deltaPhi_subjet2_ele", "F")
                 self.out.branch("deltaPhi_subjet2_mu", "F")
-                self.out.branch("pt_balance_hbb_htt", "F")
-
+                self.out.branch("pt_balance_hbb_htt_abs",  "F")
+                self.out.branch("pt_balance_hbb_htt_signed", "F")
                 # ------------------------------
                 # FatJet N-subjettiness ratios
                 # ------------------------------
@@ -337,10 +337,6 @@ class cutsAndcategories(Module):
                 # ------------------------------
                 self.out.branch("Tau_rawDeepTauVSjet_logit", "F", lenVar="ngood_Taus")
                 self.out.branch("boostedTau_rawDeepTauVSjet_logit", "F", lenVar="ngood_boostedTaus")
-
-
-
-                
                 
                 ### All Tau Branches
                 self.out.branch("nallTaus%s" % (sys), "I")
@@ -1096,7 +1092,8 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("deltaPhi_met_subleadingtau", -99.99)
                 self.out.fillBranch("deltaPhi_met_leadingele", -99.99)
                 self.out.fillBranch("deltaPhi_met_leadingmu", -99.99)
-                
+
+                self.out.fillBranch("deltaR_hbb_httvis", -99.99)
                 self.out.fillBranch("deltaPhi_hbb_httvis", -99.99)
                 self.out.fillBranch("deltaPhi_hbb_htt", -99.99)
                 self.out.fillBranch("deltaPhi_hbb_leadingtau", -99.99)
@@ -1154,7 +1151,9 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("Tau_rawDeepTauVSjet_logit", [])
                 self.out.fillBranch("boostedTau_rawDeepTauVSjet_logit", [])
 
-                self.out.fillBranch("pt_balance_hbb_htt", -99.99)
+                self.out.fillBranch("pt_balance_hbb_htt_abs", -99.99)
+                self.out.fillBranch("pt_balance_hbb_htt_signed", -99.99)
+
 
 
                 self.out.fillBranch("nallTaus%s" % (sys), 0)
@@ -1203,13 +1202,13 @@ class cutsAndcategories(Module):
 
         if (self.isMC):
             if (self.year_unc == "2024"):          
-                if event.PuppiMET_pt < 120:# and (
+                if event.PuppiMET_pt < 180:# and (
                     return False
         elif (self.isData):
-            if ((event.PuppiMET_pt < 120)):
+            if ((event.PuppiMET_pt < 180)):
                 return False
         
-        self.cutflow_dict["Pre-selection: PuppiMET_pt > 120"] += 1
+        self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
 
        
         FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
@@ -1247,16 +1246,9 @@ class cutsAndcategories(Module):
                 continue
 
             if sys == "":
-                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  120"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  180"] += 1
 
-            FatJet_enu = [
-                x for x in enumerate(FatJet)
-                if (getjetpt(x[1], sys) > 180)
-                and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))
-
-            ]
-
-
+            FatJet_enu = [x for x in enumerate(FatJet) if (getjetpt(x[1], sys) > 180) and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))]
 
             if (len(FatJet_enu) == 0):
                 fillBranchesWithDefault(sys)
@@ -1273,11 +1265,11 @@ class cutsAndcategories(Module):
 
             del HbbPtList
             del zipPair
-
+                        
             Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(x, sys)]
-
+            
             Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 4) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
-
+            
             boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
 
             self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1],sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
@@ -1300,93 +1292,8 @@ class cutsAndcategories(Module):
             boostedTau_enu = [x for x in boostedTau_enu if FatJetTauOverlap(x, boost=1)]
             boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(x, Electron_enu, boost=1)]
             boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(x, Muon_enu, boost=1)]
-
-           
-            if len(Jet_enu) > 0:
-                leadJet = Jet_enu[0][1]
-                self.jetLeadFV.SetPtEtaPhiM(leadJet.pt, leadJet.eta, leadJet.phi, leadJet.mass)
-
-            self.out.fillBranch("deltaR_hbb_ak4lead", self.higgsBBFV.DeltaR(self.jetLeadFV))
-            self.out.fillBranch("deltaPhi_hbb_ak4lead", abs(self.higgsBBFV.DeltaPhi(self.jetLeadFV)))
-
-
-            # -------------------------------
-            # Initialize flags
-            # -------------------------------
-            has_sj1 = False
-            has_sj2 = False
-
-            # -------------------------------
-            # Leading FatJet
-            # -------------------------------
-            if len(FatJet_enu) > 0:
-                fat = FatJet_enu[0][1]
-
-                # --- FatJet τ21, τ32 (ALWAYS defined if tau1,tau2,tau3 exist) ---
-                if fat.tau1 > 0:
-                    fat_tau21 = fat.tau2 / fat.tau1
-                    self.out.fillBranch("fatjet_tau21", fat_tau21)
-                else:
-                    self.out.fillBranch("fatjet_tau21", -99.99)
-
-                if fat.tau2 > 0:
-                    fat_tau32 = fat.tau3 / fat.tau2
-                    self.out.fillBranch("fatjet_tau32", fat_tau32)
-                else:
-                    self.out.fillBranch("fatjet_tau32", -99.99)
-
-                # -------------------------------
-                # SubJets associated to this FatJet
-                # -------------------------------
-                if hasattr(event, "nSubJet"):
-                    SubJet = Collection(event, "SubJet", "nSubJet")
-
-                    sj1_idx = getattr(fat, "subJetIdx1", -1)
-                    sj2_idx = getattr(fat, "subJetIdx2", -1)
-
-                    # ---- SubJet 1 ----
-                    if 0 <= sj1_idx < len(SubJet):
-                        sj1 = SubJet[sj1_idx]
-                        self.subjet1FV.SetPtEtaPhiM(sj1.pt, sj1.eta, sj1.phi, sj1.mass)
-                        has_sj1 = True
-
-                    # ---- SubJet 2 ----
-                    if 0 <= sj2_idx < len(SubJet):
-                        sj2 = SubJet[sj2_idx]
-                        self.subjet2FV.SetPtEtaPhiM(sj2.pt, sj2.eta, sj2.phi, sj2.mass)
-                        has_sj2 = True
-
-            # -------------------------------
-            # Fill SubJet-level variables ONLY if both exist
-            # -------------------------------
-            if has_sj1 and has_sj2:
-
-                # ΔR, Δφ between the two subjets
-                self.out.fillBranch("deltaR_subjets", self.subjet1FV.DeltaR(self.subjet2FV))
-                self.out.fillBranch("deltaPhi_subjets", abs(self.subjet1FV.DeltaPhi(self.subjet2FV)))
-
-                # SubJet τ21, τ32
-                sj1_tau21 = sj1.tau2 / sj1.tau1 if sj1.tau1 > 0 else -99.99
-                sj1_tau32 = sj1.tau3 / sj1.tau2 if sj1.tau2 > 0 else -99.99
-                self.out.fillBranch("subjet1_tau21", sj1_tau21)
-                self.out.fillBranch("subjet1_tau32", sj1_tau32)
-
-                sj2_tau21 = sj2.tau2 / sj2.tau1 if sj2.tau1 > 0 else -99.99
-                sj2_tau32 = sj2.tau3 / sj2.tau2 if sj2.tau2 > 0 else -99.99
-                self.out.fillBranch("subjet2_tau21", sj2_tau21)
-                self.out.fillBranch("subjet2_tau32", sj2_tau32)
-
-            else:
-                # No valid subjet pair → fill defaults
-                self.out.fillBranch("deltaR_subjets", -99.99)
-                self.out.fillBranch("deltaPhi_subjets", -99.99)
-                self.out.fillBranch("subjet1_tau21", -99.99)
-                self.out.fillBranch("subjet1_tau32", -99.99)
-                self.out.fillBranch("subjet2_tau21", -99.99)
-                self.out.fillBranch("subjet2_tau32", -99.99)
-
-
-
+          
+            
 
             # Cutflow counting
             if sys == "":
@@ -1434,6 +1341,70 @@ class cutsAndcategories(Module):
                 if ((pairDict["bm"][0] > 0) or (pairDict["tm"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauMuon_pair"] += 1
 
+            
+            ##### Everything related to subjects anf N-subjettiness of FatJets
+
+            has_sj1 = False
+            has_sj2 = False
+            sj1 = None
+            sj2 = None
+
+            if len(FatJet_enu) > 0:
+                fat = FatJet_enu[0][1]
+                if fat.tau1 > 0:
+                    fat_tau21 = fat.tau2 / fat.tau1
+                    self.out.fillBranch("fatjet_tau21", fat_tau21)
+                else:
+                    self.out.fillBranch("fatjet_tau21", -99.99)
+
+                if fat.tau2 > 0:
+                    fat_tau32 = fat.tau3 / fat.tau2
+                    self.out.fillBranch("fatjet_tau32", fat_tau32)
+                else:
+                    self.out.fillBranch("fatjet_tau32", -99.99)
+
+                if hasattr(event, "nSubJet"):
+                    SubJet = Collection(event, "SubJet", "nSubJet")
+
+                    sj1_idx = getattr(fat, "subJetIdx1", -1)
+                    sj2_idx = getattr(fat, "subJetIdx2", -1)
+
+                    if 0 <= sj1_idx < len(SubJet):
+                        sj1 = SubJet[sj1_idx]
+                        self.subjet1FV.SetPtEtaPhiM(sj1.pt, sj1.eta, sj1.phi, sj1.mass)
+                        has_sj1 = True
+
+                    if 0 <= sj2_idx < len(SubJet):
+                        sj2 = SubJet[sj2_idx]
+                        self.subjet2FV.SetPtEtaPhiM(sj2.pt, sj2.eta, sj2.phi, sj2.mass)
+                        has_sj2 = True
+
+            
+            if has_sj1 and has_sj2:
+
+                self.out.fillBranch("deltaR_subjets", self.subjet1FV.DeltaR(self.subjet2FV))
+                self.out.fillBranch("deltaPhi_subjets", abs(self.subjet1FV.DeltaPhi(self.subjet2FV)))
+
+                sj1_tau21 = sj1.tau2 / sj1.tau1 if sj1.tau1 > 0 else -99.99
+                sj1_tau32 = sj1.tau3 / sj1.tau2 if sj1.tau2 > 0 else -99.99
+                self.out.fillBranch("subjet1_tau21", sj1_tau21)
+                self.out.fillBranch("subjet1_tau32", sj1_tau32)
+
+                sj2_tau21 = sj2.tau2 / sj2.tau1 if sj2.tau1 > 0 else -99.99
+                sj2_tau32 = sj2.tau3 / sj2.tau2 if sj2.tau2 > 0 else -99.99
+                self.out.fillBranch("subjet2_tau21", sj2_tau21)
+                self.out.fillBranch("subjet2_tau32", sj2_tau32)
+
+            else:
+                self.out.fillBranch("deltaR_subjets", -99.99)
+                self.out.fillBranch("deltaPhi_subjets", -99.99)
+                self.out.fillBranch("subjet1_tau21", -99.99)
+                self.out.fillBranch("subjet1_tau32", -99.99)
+                self.out.fillBranch("subjet2_tau21", -99.99)
+                self.out.fillBranch("subjet2_tau32", -99.99)
+
+
+
             gFatJet_index = [FatJet_enu[0][0]]
             gTau_index = []
             gboostedTau_index = []
@@ -1448,27 +1419,7 @@ class cutsAndcategories(Module):
                 xx=event.PuppiMET_covXX, xy=event.PuppiMET_covXY, yy=event.PuppiMET_covYY)
             
             self.met.SetPtEtaPhiM(getMETpt(sys), 0.0, getMETphi(sys), 0.0)
-            self.out.fillBranch("deltaPhi_met_ak4lead", abs(self.met.DeltaPhi(self.jetLeadFV)))
 
-            tau_logit_list = []
-            for idx in gTau_index:
-                tau_obj = Tau[idx]
-                score = tau_obj.rawDeepTau2018v2p5VSjet
-                tau_logit_list.append(logit(score))
-
-            self.out.fillBranch("Tau_rawDeepTauVSjet_logit", tau_logit_list)
-
-
-            # ----------------------------------------------------
-            # Logit scores for ALL boosted taus
-            # ----------------------------------------------------
-            boosted_logit_list = []
-            for idx in gboostedTau_index:
-                btau_obj = boostedTau[idx]
-                score = btau_obj.rawBoostedDeepTauRunIIv2p0VSjet
-                boosted_logit_list.append(logit(score))
-
-            self.out.fillBranch("boostedTau_rawDeepTauVSjet_logit", boosted_logit_list)
 
             if Keymax == "bb":
                 self.out.fillBranch("channel%s" % (sys), 0)
@@ -1518,24 +1469,18 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTTvis_boosted_m", self.higgsTTvisFV.M())
                 self.out.fillBranch("HTTvis_boosted_eta", self.higgsTTvisFV.Eta())
                 self.out.fillBranch("HTTvis_boosted_phi", self.higgsTTvisFV.Phi())
+    
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
 
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
-                self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
-
-                self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
-
-                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV))
-                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)))
                 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
@@ -1588,24 +1533,19 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTTvis_HPS_m", self.higgsTTvisFV.M())
                 self.out.fillBranch("HTTvis_HPS_eta", self.higgsTTvisFV.Eta())
                 self.out.fillBranch("HTTvis_HPS_phi", self.higgsTTvisFV.Phi())
-
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
                 
-                self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
 
-                self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
-                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV))
-                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)))
+
 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
@@ -1649,20 +1589,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_boosted_Ele_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_boosted_Ele_phi", self.higgsTTFV.Phi())
 
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
-
-                self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
-                
-                self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                    
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
             
 
@@ -1709,20 +1645,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_HPS_Ele_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_HPS_Ele_phi", self.higgsTTFV.Phi())
 
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
-
-                self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
-                
-                self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                    
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
@@ -1765,21 +1697,17 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_boosted_Mu_m", self.higgsTTFV.M())
                 self.out.fillBranch("HTT_boosted_Mu_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_boosted_Mu_phi", self.higgsTTFV.Phi())
-                
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
 
-                self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
-                
-                self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                    
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
 
 
@@ -1826,20 +1754,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_HPS_Mu_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_HPS_Mu_phi", self.higgsTTFV.Phi())
 
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
-
-                self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
-                
-                self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                    
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
                 
                 
                 if (sys == ""):
@@ -1880,8 +1804,10 @@ class cutsAndcategories(Module):
             # self.higgsTTvisFV = self.pair1FV + self.pair2FV
             self.RadionvisFV = self.higgsTTvisFV + self.higgsBBFV
 
-            pt_balance = abs(self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
-            self.out.fillBranch("pt_balance_hbb_htt", pt_balance)
+            pt_balance_hbb_htt_abs = abs(self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
+            self.out.fillBranch("pt_balance_hbb_htt_abs", pt_balance_hbb_htt_abs)
+            pt_balance_hbb_htt_signed = (self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
+            self.out.fillBranch("pt_balance_hbb_htt_signed", pt_balance_hbb_htt_signed)
 
             # if (self.higgsTTvisFV.M() <= 20):
             #     fillBranchesWithDefault(sys)
@@ -1893,8 +1819,20 @@ class cutsAndcategories(Module):
             #     self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
 
             Jet_enu = [
-                x for x in Jet_enu if removeOverlapOfAK4WithLightHeavyLeptons(
-                    x, gTau_index, Tau, gboostedTau_index, boostedTau, gElectron_index, Electron, gMuon_index, Muon, sys)]
+                x for x in Jet_enu
+                if JetFatJetOverlap(x, sys)
+                and removeOverlapOfAK4WithLightHeavyLeptons(
+                    x, gTau_index, Tau, gboostedTau_index, boostedTau,
+                    gElectron_index, Electron, gMuon_index, Muon, sys
+                )
+            ]
+
+            if len(Jet_enu) == 0:
+                fillBranchesWithDefault(sys)
+                continue
+
+            Jet_enu = sorted(Jet_enu, key=lambda x: getjetpt(x[1], sys), reverse=True)
+
             gJet_index = [x[0] for x in Jet_enu]
             Jet_enu_Loose = [
                x for x in Jet_enu if x[1].btagUParTAK4B >= self.LooseJet]
@@ -1905,6 +1843,72 @@ class cutsAndcategories(Module):
             Jet_enu_Tight = [
                 x for x in Jet_enu if x[1].btagUParTAK4B >= self.TightJet]
             gJet_Tightindex = [x[0] for x in Jet_enu_Tight]
+
+            if len(Jet_enu) > 0:
+                leadJet = Jet_enu[0][1]
+                self.jetLeadFV.SetPtEtaPhiM(
+                    getjetpt(leadJet, sys),
+                    leadJet.eta,
+                    leadJet.phi,
+                    getjetmass(leadJet, sys)
+                )
+            self.out.fillBranch("deltaR_hbb_ak4lead", self.higgsBBFV.DeltaR(self.jetLeadFV))
+            self.out.fillBranch("deltaPhi_hbb_ak4lead", abs(self.higgsBBFV.DeltaPhi(self.jetLeadFV)))
+            self.out.fillBranch("deltaPhi_met_ak4lead", abs(self.met.DeltaPhi(self.jetLeadFV)))
+            
+            if Keymax == "bb":
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV))
+                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)))
+            elif Keymax == "tt":
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV))
+                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)))
+            elif Keymax == "be":
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+            elif Keymax == "te":
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+            elif Keymax == "bm":
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+            elif Keymax == "tm":
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+
+
+            tau_logit_list = []
+            for idx in gTau_index:
+                tau_obj = Tau[idx]
+                score = tau_obj.rawDeepTau2018v2p5VSjet
+                tau_logit_list.append(logit(score))
+
+            self.out.fillBranch("Tau_rawDeepTauVSjet_logit", tau_logit_list)
+
+
+            boosted_logit_list = []
+            for idx in gboostedTau_index:
+                btau_obj = boostedTau[idx]
+                score = btau_obj.rawBoostedDeepTauRunIIv2p0VSjet
+                boosted_logit_list.append(logit(score))
+
+            self.out.fillBranch("boostedTau_rawDeepTauVSjet_logit", boosted_logit_list)
+
 
             # compute the fastMTT vector
             # theFastMTTtool = fastMTTtool()
@@ -2128,6 +2132,9 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
+    met_selection = ["PuppiMET_pt > 180"]
+
+
     trigger_2024 = [
         "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight",
         "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60",
@@ -2135,7 +2142,11 @@ if __name__ == "__main__":
     ]
 
     if args.year == "2024":
-        preselection = "(" + "||".join(trigger_2024) + ")"
+        preselection = (
+        "(" + "&&".join(met_selection) + ")" +
+        "&&(" + "||".join(trigger_2024) + ")"
+        )
+    print(f"Applying pre-selection cuts:",{preselection})
 
     call_postpoc()
     
