@@ -218,7 +218,6 @@ class cutsAndcategories(Module):
                 self.out.branch("softdropmass%s" % (sys), "F")
                 self.out.branch("pnetmass%s" % (sys), "F")
 
-                ### Fast MTT Variables
                 self.out.branch("HTT_m%s" % (sys), "F")
                 self.out.branch("HTT_eta%s" % (sys), "F")
                 self.out.branch("HTT_phi%s" % (sys), "F")
@@ -230,7 +229,6 @@ class cutsAndcategories(Module):
                 self.out.branch("HTT_boosted_eta%s" % (sys), "F")
                 self.out.branch("HTT_boosted_phi%s" % (sys), "F")
 
-                ### Visible Variables
                 self.out.branch("HTTvis_m%s" % (sys), "F")
                 self.out.branch("HTTvis_eta%s" % (sys), "F")
                 self.out.branch("HTTvis_phi%s" % (sys), "F")
@@ -286,14 +284,11 @@ class cutsAndcategories(Module):
                 self.out.branch("deltaR_hbb_ak4lead", "F")
                 self.out.branch("deltaPhi_hbb_ak4lead", "F")
 
-
-
                 self.out.branch("deltaPhi_ak4_leadtau", "F")
                 self.out.branch("deltaPhi_ak4_subtau", "F")
                 self.out.branch("deltaPhi_ak4_ele", "F")
                 self.out.branch("deltaPhi_ak4_mu", "F")
 
-                # --- Subjet relationships ---
                 self.out.branch("deltaR_subjets", "F")
                 self.out.branch("deltaPhi_subjets", "F")
 
@@ -318,27 +313,18 @@ class cutsAndcategories(Module):
                 self.out.branch("deltaPhi_subjet2_mu", "F")
                 self.out.branch("pt_balance_hbb_htt_abs",  "F")
                 self.out.branch("pt_balance_hbb_htt_signed", "F")
-                # ------------------------------
-                # FatJet N-subjettiness ratios
-                # ------------------------------
                 self.out.branch("fatjet_tau21", "F")
                 self.out.branch("fatjet_tau32", "F")
 
-                # ------------------------------
-                # SubJet N-subjettiness ratios
-                # ------------------------------
                 self.out.branch("subjet1_tau21", "F")
                 self.out.branch("subjet1_tau32", "F")
                 self.out.branch("subjet2_tau21", "F")
                 self.out.branch("subjet2_tau32", "F")
 
-                # ------------------------------
-                # DeepTau logit transforms
-                # ------------------------------
+
                 self.out.branch("Tau_rawDeepTauVSjet_logit", "F", lenVar="ngood_Taus")
                 self.out.branch("boostedTau_rawDeepTauVSjet_logit", "F", lenVar="ngood_boostedTaus")
                 
-                ### All Tau Branches
                 self.out.branch("nallTaus%s" % (sys), "I")
                 self.out.branch("allTaus_pt%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
                 self.out.branch("allTaus_eta%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
@@ -346,7 +332,6 @@ class cutsAndcategories(Module):
                 self.out.branch("allTaus_mass%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
                 self.out.branch("allTaus_decayMode%s" % (sys), "F", lenVar="nallTaus%s" % (sys))
 
-                ### Resonance Branches
                 self.out.branch("Xvis_m%s" % (sys), "F")
                 self.out.branch("Xvis_eta%s" % (sys), "F")
                 self.out.branch("Xvis_phi%s" % (sys), "F")
@@ -379,6 +364,12 @@ class cutsAndcategories(Module):
             self.out.branch("index_gLooseJets%s"%(sys),"I",lenVar="ngood_LooseJets%s"%(sys))
             self.out.branch("index_gMediumJets%s" % (sys), "I", lenVar="ngood_MediumJets%s" % (sys))
             self.out.branch("index_gTightJets%s" % (sys), "I", lenVar="ngood_TightJets%s" % (sys))
+
+            self.out.branch("nDeltaR_boosted_HPS_preclean", "I")
+            self.out.branch("nDeltaR_boosted_HPS_postclean", "I")
+            self.out.branch("deltaR_boosted_HPS_preclean", "F", lenVar="nDeltaR_boosted_HPS_preclean")
+            self.out.branch("deltaR_boosted_HPS_postclean", "F", lenVar="nDeltaR_boosted_HPS_postclean")
+ 
             
             self.out.branch("Hbb_met_phi%s" % (sys), "F")
 
@@ -1211,7 +1202,7 @@ class cutsAndcategories(Module):
         self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
 
        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]# and getattr(event, "Flag_FatJetVetoed", 0) == 0]
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]
         if (len(FatJet_skim_enu) == 0):
             return False
 
@@ -1241,8 +1232,8 @@ class cutsAndcategories(Module):
                         self.jetLeadFV, self.subjet1FV, self.subjet2FV]:
                 vec.SetPxPyPzE(0, 0, 0, 0)
         
-            if ((getMETpt(sys) < 120)):
-                fillBranchesWithDefault(sys)
+            if ((getMETpt(sys) < 180)):
+                # fillBranchesWithDefault(sys)
                 continue
 
             if sys == "":
@@ -1251,7 +1242,7 @@ class cutsAndcategories(Module):
             FatJet_enu = [x for x in enumerate(FatJet) if (getjetpt(x[1], sys) > 180) and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))]
 
             if (len(FatJet_enu) == 0):
-                fillBranchesWithDefault(sys)
+                # fillBranchesWithDefault(sys)
                 continue
 
             HbbPtList = [(getjetpt(obj_enu[1], sys)) for obj_enu in FatJet_enu]
@@ -1277,6 +1268,18 @@ class cutsAndcategories(Module):
             Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].cutBased >= 2]
             
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
+
+            deltaR_boosted_HPS_preclean = []
+            for b in boostedTau_enu:
+                for h in Tau_enu:
+                    bfv = ROOT.TLorentzVector()
+                    hfv = ROOT.TLorentzVector()
+                    bfv.SetPtEtaPhiM(gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys))
+                    hfv.SetPtEtaPhiM(gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys))
+                    deltaR_boosted_HPS_preclean.append(bfv.DeltaR(hfv))
+
+            self.out.fillBranch("nDeltaR_boosted_HPS_preclean", len(deltaR_boosted_HPS_preclean))
+            self.out.fillBranch("deltaR_boosted_HPS_preclean", deltaR_boosted_HPS_preclean)
 
                         
             # Object cleaning procedures
@@ -1308,7 +1311,7 @@ class cutsAndcategories(Module):
             enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2))
             if not enoughleptonstopair:
                 # move to the next systematics
-                fillBranchesWithDefault(sys)
+                # fillBranchesWithDefault(sys)
                 continue
 
             if (sys == ""):
@@ -1329,7 +1332,7 @@ class cutsAndcategories(Module):
                 # return False
                 # Electron and Muon isolation failed - move on to the next
                 # systematics
-                fillBranchesWithDefault(sys)
+                # fillBranchesWithDefault(sys)
                 continue
 
             if (sys == ""):
@@ -1818,21 +1821,40 @@ class cutsAndcategories(Module):
             # if (sys == ""):
             #     self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
 
-            Jet_enu = [
-                x for x in Jet_enu
-                if JetFatJetOverlap(x, sys)
-                and removeOverlapOfAK4WithLightHeavyLeptons(
-                    x, gTau_index, Tau, gboostedTau_index, boostedTau,
-                    gElectron_index, Electron, gMuon_index, Muon, sys
-                )
-            ]
+            Jet_enu = [x for x in Jet_enu if removeOverlapOfAK4WithLightHeavyLeptons(
+                                x,
+                                gTau_index,
+                                Tau,
+                                gboostedTau_index,
+                                boostedTau,
+                                gElectron_index,
+                                Electron,
+                                gMuon_index,
+                                Muon,
+                                sys)]
 
-            if len(Jet_enu) == 0:
-                fillBranchesWithDefault(sys)
-                continue
+            # if len(Jet_enu) == 0:
+            #     fillBranchesWithDefault(sys)
+            #     continue
 
             Jet_enu = sorted(Jet_enu, key=lambda x: getjetpt(x[1], sys), reverse=True)
 
+            deltaR_boosted_HPS_postclean = []
+            for b in boostedTau_enu:
+                for h in Tau_enu:
+                    bfv = ROOT.TLorentzVector()
+                    hfv = ROOT.TLorentzVector()
+                    bfv.SetPtEtaPhiM(
+                        gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys)
+                    )
+                    hfv.SetPtEtaPhiM(
+                        gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys)
+                    )
+                    deltaR_boosted_HPS_postclean.append(bfv.DeltaR(hfv))
+
+            self.out.fillBranch("nDeltaR_boosted_HPS_postclean", len(deltaR_boosted_HPS_postclean))
+            self.out.fillBranch("deltaR_boosted_HPS_postclean", deltaR_boosted_HPS_postclean)
+            
             gJet_index = [x[0] for x in Jet_enu]
             Jet_enu_Loose = [
                x for x in Jet_enu if x[1].btagUParTAK4B >= self.LooseJet]
@@ -1846,50 +1868,46 @@ class cutsAndcategories(Module):
 
             if len(Jet_enu) > 0:
                 leadJet = Jet_enu[0][1]
-                self.jetLeadFV.SetPtEtaPhiM(
-                    getjetpt(leadJet, sys),
-                    leadJet.eta,
-                    leadJet.phi,
-                    getjetmass(leadJet, sys)
-                )
-            self.out.fillBranch("deltaR_hbb_ak4lead", self.higgsBBFV.DeltaR(self.jetLeadFV))
-            self.out.fillBranch("deltaPhi_hbb_ak4lead", abs(self.higgsBBFV.DeltaPhi(self.jetLeadFV)))
-            self.out.fillBranch("deltaPhi_met_ak4lead", abs(self.met.DeltaPhi(self.jetLeadFV)))
+                self.jetLeadFV.SetPtEtaPhiM(getjetpt(leadJet, sys), leadJet.eta, leadJet.phi, getjetmass(leadJet, sys))
+            
+            self.out.fillBranch("deltaR_hbb_ak4lead", self.higgsBBFV.DeltaR(self.jetLeadFV) if len(Jet_enu) > 0 else -99.99)
+            self.out.fillBranch("deltaPhi_hbb_ak4lead", abs(self.higgsBBFV.DeltaPhi(self.jetLeadFV)) if len(Jet_enu) > 0 else -99.99 )
+            self.out.fillBranch("deltaPhi_met_ak4lead", abs(self.met.DeltaPhi(self.jetLeadFV)) if len(Jet_enu) > 0 else -99.99)
             
             if Keymax == "bb":
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
-                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV))
-                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)))
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)) if len(Jet_enu) > 0 else -99.99)
             elif Keymax == "tt":
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
-                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV))
-                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)))
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_ak4_subtau", self.jetLeadFV.DeltaR(self.pair2FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_subtau", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_httvis_ak4lead", self.higgsTTvisFV.DeltaR(self.jetLeadFV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_httvis_ak4lead", abs(self.higgsTTvisFV.DeltaPhi(self.jetLeadFV)) if len(Jet_enu) > 0 else -99.99)
             elif Keymax == "be":
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)) if len(Jet_enu) > 0 else -99.99)
             elif Keymax == "te":
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_ak4_ele", self.jetLeadFV.DeltaR(self.pair2FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_ele", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)) if len(Jet_enu) > 0 else -99.99)
             elif Keymax == "bm":
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)) if len(Jet_enu) > 0 else -99.99)
             elif Keymax == "tm":
-                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV))
-                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV))
-                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_ak4_leadtau", self.jetLeadFV.DeltaR(self.pair1FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_leadtau", abs(self.jetLeadFV.DeltaPhi(self.pair1FV)) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaR_ak4_mu", self.jetLeadFV.DeltaR(self.pair2FV) if len(Jet_enu) > 0 else -99.99)
+                self.out.fillBranch("deltaPhi_ak4_mu", abs(self.jetLeadFV.DeltaPhi(self.pair2FV)) if len(Jet_enu) > 0 else -99.99)
 
 
             tau_logit_list = []
@@ -2026,7 +2044,7 @@ class cutsAndcategories(Module):
                 # self.out.fillBranch("addlepton_vetoflag_semi",0)
             if (sys == ""):
                 nominal_bool = 1
-            passAsingleSystematic = passAsingleSystematic + 1
+            passAsingleSystematic += 1
 
             del Tau_enu, boostedTau_enu, Electron_enu, Muon_enu, Jet_enu
             del firstLepton, secondLepton, theMET
@@ -2107,6 +2125,7 @@ def call_postpoc():
                 isData=not isMC,
             )], 
         postfix="",
+        # maxEntries=2000,
         noOut=False,
         outputbranchsel="Datadrop.txt",
         jsonInput=None if isMC else "GoldenJSON_2024.json"
