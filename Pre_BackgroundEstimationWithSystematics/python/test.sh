@@ -1,11 +1,11 @@
 python3 CommonAnalysisWithSystematics_6.py  \
-    --inputFile /hdfs/store/user/mithakor/2024_skimmed_hadded/WWto4Q_TuneCP5_13p6TeV_powheg-pythia8_0.root \
-    --outputFile test_output_WWto4Q_TuneCP5_13p6TeV_powheg-pythia8_0.root   \
+    --inputFile /hdfs/store/user/mithakor/2024_skimmed_hadded/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8_0.root \
+    --outputFile test_TTbar.root   \
     --year 2024  \
     --isMC  \
     --cutflowDir /afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python  \
     --runNominal    \
-    &> log_test_WWto4Q_TuneCP5_13p6TeV_powheg-pythia8_0.txt &
+    &> log_test_TTbar.txt &
 
 # python3 CommonAnalysisWithSystematics_6.py  \
 #     --inputFile /hdfs/store/user/mithakor/2024_JETID_JetVetoMaps_JES_JER_GlobalparT3mass_softdrop/WithFatJetID_FatJetVetoMaps/JETMET_Hadded/JetMET0_Run2024C-MINIv6NANOv15-v1_NANOAOD.root \
@@ -15,3 +15,12 @@ python3 CommonAnalysisWithSystematics_6.py  \
 #     &> log_data_test.txt &
 
 
+
+# python3 CommonAnalysisWithSystematics_6.py  \
+#     --inputFile /hdfs/store/user/mithakor/2024_skimmed_hadded/WWto4Q_TuneCP5_13p6TeV_powheg-pythia8_0.root \
+#     --outputFile test_WWto4Q_TuneCP5_13p6TeV_powheg.root   \
+#     --year 2024  \
+#     --isMC  \
+#     --cutflowDir /afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python  \
+#     --runNominal    \
+#     &> log_test_WWto4Q_TuneCP5_13p6TeV_powheg.txt &
