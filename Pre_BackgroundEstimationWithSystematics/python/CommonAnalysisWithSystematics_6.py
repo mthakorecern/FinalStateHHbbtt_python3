@@ -141,7 +141,7 @@ class cutsAndcategories(Module):
                 ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Pre-selection: PuppiMET_pt > 120", 0),
                 ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
                 ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
@@ -168,16 +168,24 @@ class cutsAndcategories(Module):
 
         else:
             self.cutflow_dict = OrderedDict([
-                ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(1))),
-                ("Skimming Stage: FatJet Requirement (nFatJet > 0) ", int(inputFile["cutflow"].GetBinContent(2))),
-                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 50)", int(inputFile["cutflow"].GetBinContent(3))),
-                ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(4))),
-                ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(5))),
-                ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(6))),
-                ("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
+                ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(1))),                
+                ("Skimming Stage: FatJet Requirement (nFatJet > 0)", int(inputFile["cutflow"].GetBinContent(2))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 80)", int(inputFile["cutflow"].GetBinContent(3))),
+                ("Skimming Stage: Passing Filter: Flag_goodVertices", int(inputFile["cutflow"].GetBinContent(4))),
+                ("Skimming Stage: Passing Filter: Flag_globalSuperTightHalo2016Filter", int(inputFile["cutflow"].GetBinContent(5))),
+                ("Skimming Stage: Passing Filter: Flag_EcalDeadCellTriggerPrimitiveFilter", int(inputFile["cutflow"].GetBinContent(6))),
+                ("Skimming Stage: Passing Filter: Flag_BadPFMuonFilter", int(inputFile["cutflow"].GetBinContent(7))),
+                ("Skimming Stage: Passing Filter: Flag_BadPFMuonDzFilter", int(inputFile["cutflow"].GetBinContent(8))),
+                ("Skimming Stage: Passing Filter: Flag_hfNoisyHitsFilter", int(inputFile["cutflow"].GetBinContent(9))),
+                ("Skimming Stage: Passing Filter: Flag_eeBadScFilter", int(inputFile["cutflow"].GetBinContent(10))),
+                ("Skimming Stage: Passing Filter: Flag_ecalBadCalibFilter", int(inputFile["cutflow"].GetBinContent(11))),
+                ("Skimming Stage: Good Primary Vertices (PV_ndof > 4) && (abs(PV_z) < 24) && (sqrt(PV_x*PV_x+PV_y*PV_y) < 2)", int(inputFile["cutflow"].GetBinContent(12))),
+                ("Skimming Stage: Events available after Skimming:", inputTree.GetEntries()),
+                
+                #("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Pre-selection: PuppiMET_pt > 120", 0),
                 ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
                 ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
@@ -1193,13 +1201,13 @@ class cutsAndcategories(Module):
 
         if (self.isMC):
             if (self.year_unc == "2024"):          
-                if event.PuppiMET_pt < 180:# and (
+                if event.PuppiMET_pt < 120:# and (
                     return False
         elif (self.isData):
-            if ((event.PuppiMET_pt < 180)):
+            if ((event.PuppiMET_pt < 120)):
                 return False
         
-        self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
+        self.cutflow_dict["Pre-selection: PuppiMET_pt > 120"] += 1
 
        
         FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]
@@ -1232,7 +1240,7 @@ class cutsAndcategories(Module):
                         self.jetLeadFV, self.subjet1FV, self.subjet2FV]:
                 vec.SetPxPyPzE(0, 0, 0, 0)
         
-            if ((getMETpt(sys) < 180)):
+            if ((getMETpt(sys) < 120)):
                 # fillBranchesWithDefault(sys)
                 continue
 
@@ -2151,20 +2159,22 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    met_selection = ["PuppiMET_pt > 180"]
+    met_selection = ["PuppiMET_pt > 120"]
+    Tau_selection = ["nTau > 0 || nboostedTau > 0"]
 
 
     trigger_2024 = [
-        "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight",
-        "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60",
-        "HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_FilterHF"
+        "HLT_IsoMu24", 
+        "HLT_Mu50",
+        "HLT_CascadeMu100",
+        "HLT_HighPtTkMu100"
     ]
 
     if args.year == "2024":
         preselection = (
-        "(" + "&&".join(met_selection) + ")" +
-        "&&(" + "||".join(trigger_2024) + ")"
+        "(" + "&&".join(met_selection) + ")" + "&&(" + "||".join(trigger_2024) + ")" + "&&(" + "&&".join(Tau_selection) + ")"
         )
+    
     print(f"Applying pre-selection cuts:",{preselection})
 
     call_postpoc()
