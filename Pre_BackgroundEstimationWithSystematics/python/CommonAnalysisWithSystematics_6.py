@@ -131,33 +131,41 @@ class cutsAndcategories(Module):
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         if self.isMC:
             self.cutflow_dict = OrderedDict([
-                ("Skimming Stage: Sum of Gen Weights for MC", int(inputFile["cutflow"].GetBinContent(1))),
-                ("Skimming Stage: Events Generated/No cuts", int(inputFile["cutflow"].GetBinContent(2))),
-                ("Skimming Stage: FatJet Requirement (nFatJet > 0) ", int(inputFile["cutflow"].GetBinContent(3))),
-                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 50)", int(inputFile["cutflow"].GetBinContent(4))),
-                ("Skimming Stage: METFilters (Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_BadPFMuonDzFilter && Flag_hfNoisyHitsFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter)", int(inputFile["cutflow"].GetBinContent(5))),
-                ("Skimming Stage: Good Primary Vertices (PV_npvsGood > 0)", int(inputFile["cutflow"].GetBinContent(6))),
-                ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(7))),
-                ("Events remaining after Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
+                ("Skimming Stage: Event-Level Sum of GenWeights", int(inputFile["cutflow"].GetBinContent(1))),                
+                ("Skimming Stage: Runs Tree-Level Sum of GenWeights", int(inputFile["cutflow"].GetBinContent(2))),
+                ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(3))),                
+                ("Skimming Stage: FatJet Requirement (nFatJet > 0)", int(inputFile["cutflow"].GetBinContent(4))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 120)", int(inputFile["cutflow"].GetBinContent(5))),
+                ("Skimming Stage: Passing Filter: Flag_goodVertices", int(inputFile["cutflow"].GetBinContent(6))),
+                ("Skimming Stage: Passing Filter: Flag_globalSuperTightHalo2016Filter", int(inputFile["cutflow"].GetBinContent(7))),
+                ("Skimming Stage: Passing Filter: Flag_EcalDeadCellTriggerPrimitiveFilter", int(inputFile["cutflow"].GetBinContent(8))),
+                ("Skimming Stage: Passing Filter: Flag_BadPFMuonFilter", int(inputFile["cutflow"].GetBinContent(9))),
+                ("Skimming Stage: Passing Filter: Flag_BadPFMuonDzFilter", int(inputFile["cutflow"].GetBinContent(10))),
+                ("Skimming Stage: Passing Filter: Flag_hfNoisyHitsFilter", int(inputFile["cutflow"].GetBinContent(11))),
+                ("Skimming Stage: Passing Filter: Flag_eeBadScFilter", int(inputFile["cutflow"].GetBinContent(12))),
+                ("Skimming Stage: Passing Filter: Flag_ecalBadCalibFilter", int(inputFile["cutflow"].GetBinContent(13))),
+                ("Skimming Stage: Good Primary Vertices (PV_ndof > 4) && (abs(PV_z) < 24) && (sqrt(PV_x*PV_x+PV_y*PV_y) < 2)", int(inputFile["cutflow"].GetBinContent(14))),
+                # ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(15))),
+                ("Skimming Stage: Events available after Skimming:", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt > 120", 0),
                 ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
                 (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
-                (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
+                # (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
                 
                 ("Atleast_2leptons_anykind", 0),
                 #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
                 (" ...breakdown..> Atleast_one_TauTau_pair", 0),
-                (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
+                # (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
                 (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
                 (" ...breakdown..> TT_channel (max pt pair)", 0),
-                (" ...breakdown..> ET_channel (max pt pair)", 0),
+                # (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
                 #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
@@ -170,7 +178,7 @@ class cutsAndcategories(Module):
             self.cutflow_dict = OrderedDict([
                 ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(1))),                
                 ("Skimming Stage: FatJet Requirement (nFatJet > 0)", int(inputFile["cutflow"].GetBinContent(2))),
-                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 80)", int(inputFile["cutflow"].GetBinContent(3))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 120)", int(inputFile["cutflow"].GetBinContent(3))),
                 ("Skimming Stage: Passing Filter: Flag_goodVertices", int(inputFile["cutflow"].GetBinContent(4))),
                 ("Skimming Stage: Passing Filter: Flag_globalSuperTightHalo2016Filter", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Passing Filter: Flag_EcalDeadCellTriggerPrimitiveFilter", int(inputFile["cutflow"].GetBinContent(6))),
@@ -180,35 +188,35 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: Passing Filter: Flag_eeBadScFilter", int(inputFile["cutflow"].GetBinContent(10))),
                 ("Skimming Stage: Passing Filter: Flag_ecalBadCalibFilter", int(inputFile["cutflow"].GetBinContent(11))),
                 ("Skimming Stage: Good Primary Vertices (PV_ndof > 4) && (abs(PV_z) < 24) && (sqrt(PV_x*PV_x+PV_y*PV_y) < 2)", int(inputFile["cutflow"].GetBinContent(12))),
+                # ("Skimming Stage: Tau requirments (nboostedTau > 0) || (nTau > 0)", int(inputFile["cutflow"].GetBinContent(13))),
                 ("Skimming Stage: Events available after Skimming:", inputTree.GetEntries()),
-                
-                #("Events remaining after GoldenJSON Filtering, Jet (FatJet) Id addition, Jet (FatJet) Veto maps application, JES, JER Corrections, Trigger selections, PuppiMET >= 120, nGood PVs > 0", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
                 ("Pre-selection: PuppiMET_pt > 120", 0),
                 ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
                 ("Events after all object-level selections (before overlap cleaning)", 0),
 
 
                 (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
-                (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
+                # (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
                 
                 ("Atleast_2leptons_anykind", 0),
                 #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
                 (" ...breakdown..> Atleast_one_TauTau_pair", 0),
-                (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
+                # (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
                 (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
                 (" ...breakdown..> TT_channel (max pt pair)", 0),
-                (" ...breakdown..> ET_channel (max pt pair)", 0),
+                # (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
                 #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
                 #("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
-                ("Final surviving events", 0)])
+                ("Final surviving events", 0),])
+
 
          
         if ((self.year == "2024") and (self.isMC)):
@@ -790,11 +798,11 @@ class cutsAndcategories(Module):
 
         def removeOverlapOfAK4WithLightHeavyLeptons(ak4Object_enu, gTau_index, Tau_coll, gbTau_index, bTau_coll, gEle_index, Ele_coll, gMu_index,   Mu_coll, sys):
             self.jetFV.SetPtEtaPhiM(getjetpt(ak4Object_enu[1], sys), ak4Object_enu[1].eta, ak4Object_enu[1].phi, getjetmass(ak4Object_enu[1], sys))
-            for index in gEle_index:
-                self.eleFV.SetPtEtaPhiM(Ele_coll[index].pt, Ele_coll[index].eta, Ele_coll[index].phi, 0.0)
-                deltaR = self.jetFV.DeltaR(self.eleFV)
-                if deltaR <= 0.4:
-                    return False
+            # for index in gEle_index:
+            #     self.eleFV.SetPtEtaPhiM(Ele_coll[index].pt, Ele_coll[index].eta, Ele_coll[index].phi, 0.0)
+            #     deltaR = self.jetFV.DeltaR(self.eleFV)
+            #     if deltaR <= 0.4:
+            #         return False
 
             for index in gMu_index:
                 self.muFV.SetPtEtaPhiM(Mu_coll[index].pt, Mu_coll[index].eta, Mu_coll[index].phi, Mu_coll[index].mass)
@@ -1273,7 +1281,7 @@ class cutsAndcategories(Module):
 
             self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1],sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
 
-            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].cutBased >= 2]
+            # Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].cutBased >= 2]
             
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
 
@@ -1295,13 +1303,13 @@ class cutsAndcategories(Module):
                 self.cutflow_dict["Events after all object-level selections (before overlap cleaning)"] += 1
 
             Jet_enu = [x for x in Jet_enu if JetFatJetOverlap(x, sys)]
-            Electron_enu = list(filter(FatJetConeIsolation, Electron_enu))
+            # Electron_enu = list(filter(FatJetConeIsolation, Electron_enu))
             Muon_enu = list(filter(FatJetConeIsolation, Muon_enu))
             Tau_enu = [x for x in Tau_enu if FatJetTauOverlap(x, boost=0)]
-            Tau_enu = [x for x in Tau_enu if ElectronTauOverlap(x, Electron_enu, boost=0)]
+            # Tau_enu = [x for x in Tau_enu if ElectronTauOverlap(x, Electron_enu, boost=0)]
             Tau_enu = [x for x in Tau_enu if MuonTauOverlap(x, Muon_enu, boost=0)]
             boostedTau_enu = [x for x in boostedTau_enu if FatJetTauOverlap(x, boost=1)]
-            boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(x, Electron_enu, boost=1)]
+            # boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(x, Electron_enu, boost=1)]
             boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(x, Muon_enu, boost=1)]
           
             
@@ -1312,9 +1320,9 @@ class cutsAndcategories(Module):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)"] += 1
                 if (len(Muon_enu) > 0):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)"] += 1
-                if (len(Electron_enu) > 0):
-                    self.cutflow_dict[
-                        " ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)"] += 1
+                # if (len(Electron_enu) > 0):
+                #     self.cutflow_dict[
+                #         " ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)"] += 1
 
             enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2))
             if not enoughleptonstopair:
@@ -1329,9 +1337,9 @@ class cutsAndcategories(Module):
             pairDict = {}
             pairDict["bb"] = selfPairing(boostedTau_enu, "bb")
             pairDict["tt"] = selfPairing(Tau_enu, "tt")
-            pairDict["be"] = crossPairing(boostedTau_enu, Electron_enu, "be")
+            # pairDict["be"] = crossPairing(boostedTau_enu, Electron_enu, "be")
             pairDict["bm"] = crossPairing(boostedTau_enu, Muon_enu, "bm")
-            pairDict["te"] = crossPairing(Tau_enu, Electron_enu, "te")
+            # pairDict["te"] = crossPairing(Tau_enu, Electron_enu, "te")
             pairDict["tm"] = crossPairing(Tau_enu, Muon_enu, "tm")
 
             Keymax = max(pairDict, key=lambda x: pairDict[x][0])
@@ -1347,8 +1355,8 @@ class cutsAndcategories(Module):
                 #self.cutflow_dict["Atleast_one_pair_anykind"] += 1
                 if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauTau_pair"] += 1
-                if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
-                    self.cutflow_dict[" ...breakdown..> Atleast_one_TauElectron_pair"] += 1
+                # if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
+                #     self.cutflow_dict[" ...breakdown..> Atleast_one_TauElectron_pair"] += 1
                 if ((pairDict["bm"][0] > 0) or (pairDict["tm"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauMuon_pair"] += 1
 
@@ -1562,113 +1570,113 @@ class cutsAndcategories(Module):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
             
             
-            elif Keymax == "be":
-                self.out.fillBranch("channel%s" % (sys), 1)
-                self.out.fillBranch("boost%s" % (sys), 1)
-                if (sys == ""):
-                    self.out.fillBranch("nallTaus%s" % (sys), 1)
-                gboostedTau_index = [pairDict[Keymax][1]]
-                gElectron_index = [pairDict[Keymax][2]]
-                if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode])
+            # elif Keymax == "be":
+            #     self.out.fillBranch("channel%s" % (sys), 1)
+            #     self.out.fillBranch("boost%s" % (sys), 1)
+            #     if (sys == ""):
+            #         self.out.fillBranch("nallTaus%s" % (sys), 1)
+            #     gboostedTau_index = [pairDict[Keymax][1]]
+            #     gElectron_index = [pairDict[Keymax][2]]
+            #     if (sys == ""):
+            #         self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode])
                 
-                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]],sys))
+            #     firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]],sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
+            #     self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]],sys))
                 
-                secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
-                self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
+            #     secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
+            #     self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
 
-                self.theFastMTTtool.setFirstLepton(firstLepton)
-                self.theFastMTTtool.setSecondLepton(secondLepton)
-                self.theFastMTTtool.setTheMET(theMET)
-                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+            #     self.theFastMTTtool.setFirstLepton(firstLepton)
+            #     self.theFastMTTtool.setSecondLepton(secondLepton)
+            #     self.theFastMTTtool.setTheMET(theMET)
+            #     higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
-                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+            #     self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
 
-                self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaPhi_met_leadingele", abs(self.met.DeltaPhi(self.pair2FV)))
-                self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
+            #     self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
+            #     self.out.fillBranch("deltaPhi_met_leadingele", abs(self.met.DeltaPhi(self.pair2FV)))
+            #     self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
 
-                self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaPhi_hbb_leadingele", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
+            #     self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
+            #     self.out.fillBranch("deltaPhi_hbb_leadingele", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
 
-                self.out.fillBranch("deltaPhi_tau_ele", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
-                self.out.fillBranch("deltaR_tau_ele", self.pair1FV.DeltaR(self.pair2FV))
+            #     self.out.fillBranch("deltaPhi_tau_ele", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
+            #     self.out.fillBranch("deltaR_tau_ele", self.pair1FV.DeltaR(self.pair2FV))
 
 
-                self.out.fillBranch("HTT_boosted_Ele_m",self.higgsTTFV.M())
-                self.out.fillBranch("HTT_boosted_Ele_eta", self.higgsTTFV.Eta())
-                self.out.fillBranch("HTT_boosted_Ele_phi", self.higgsTTFV.Phi())
+            #     self.out.fillBranch("HTT_boosted_Ele_m",self.higgsTTFV.M())
+            #     self.out.fillBranch("HTT_boosted_Ele_eta", self.higgsTTFV.Eta())
+            #     self.out.fillBranch("HTT_boosted_Ele_phi", self.higgsTTFV.Phi())
 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+            #     if has_sj1 and has_sj2:
+            #         self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+            #         self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+            #         self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
+            #         self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+            #         self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+            #         self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+            #         self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
+            #         self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
             
 
-                if (sys == ""):
-                    self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
+            #     if (sys == ""):
+            #         self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
             
             
-            elif Keymax == "te":
-                self.out.fillBranch("channel%s" % (sys), 1)
-                self.out.fillBranch("boost%s" % (sys), 0)
-                if (sys == ""):
-                    self.out.fillBranch("nallTaus%s" % (sys), 1)
-                gTau_index = [pairDict[Keymax][1]]
-                gElectron_index = [pairDict[Keymax][2]]
-                if (sys == ""):
-                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [Tau[gTau_index[0]].decayMode])
+            # elif Keymax == "te":
+            #     self.out.fillBranch("channel%s" % (sys), 1)
+            #     self.out.fillBranch("boost%s" % (sys), 0)
+            #     if (sys == ""):
+            #         self.out.fillBranch("nallTaus%s" % (sys), 1)
+            #     gTau_index = [pairDict[Keymax][1]]
+            #     gElectron_index = [pairDict[Keymax][2]]
+            #     if (sys == ""):
+            #         self.out.fillBranch("allTaus_decayMode%s" % (sys), [Tau[gTau_index[0]].decayMode])
                 
-                firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]], sys), eta=Tau[gTau_index[0]].eta, phi=Tau[gTau_index[0]].phi, m=gettaumass(Tau[gTau_index[0]], sys), leptonType='Tau', tauDecayMode=Tau[gTau_index[0]].decayMode)
-                self.pair1FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
+            #     firstLepton = fastMTTlepton(pt=gettaupt(Tau[gTau_index[0]], sys), eta=Tau[gTau_index[0]].eta, phi=Tau[gTau_index[0]].phi, m=gettaumass(Tau[gTau_index[0]], sys), leptonType='Tau', tauDecayMode=Tau[gTau_index[0]].decayMode)
+            #     self.pair1FV.SetPtEtaPhiM(gettaupt(Tau[gTau_index[0]], sys), Tau[gTau_index[0]].eta, Tau[gTau_index[0]].phi, gettaumass(Tau[gTau_index[0]], sys))
                 
-                secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
-                self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
+            #     secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
+            #     self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
 
                
-                self.theFastMTTtool.setFirstLepton(firstLepton)
-                self.theFastMTTtool.setSecondLepton(secondLepton)
-                self.theFastMTTtool.setTheMET(theMET)
-                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+            #     self.theFastMTTtool.setFirstLepton(firstLepton)
+            #     self.theFastMTTtool.setSecondLepton(secondLepton)
+            #     self.theFastMTTtool.setTheMET(theMET)
+            #     higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
-                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+            #     self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
 
-                self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaPhi_met_leadingele", abs(self.met.DeltaPhi(self.pair2FV)))
-                self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
+            #     self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
+            #     self.out.fillBranch("deltaPhi_met_leadingele", abs(self.met.DeltaPhi(self.pair2FV)))
+            #     self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
 
-                self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
-                self.out.fillBranch("deltaPhi_hbb_leadingele", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
+            #     self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
+            #     self.out.fillBranch("deltaPhi_hbb_leadingele", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
                 
-                self.out.fillBranch("deltaPhi_tau_ele", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
-                self.out.fillBranch("deltaR_tau_ele", self.pair1FV.DeltaR(self.pair2FV))
+            #     self.out.fillBranch("deltaPhi_tau_ele", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
+            #     self.out.fillBranch("deltaR_tau_ele", self.pair1FV.DeltaR(self.pair2FV))
 
                 
-                self.out.fillBranch("HTT_HPS_Ele_m", self.higgsTTFV.M())
-                self.out.fillBranch("HTT_HPS_Ele_eta", self.higgsTTFV.Eta())
-                self.out.fillBranch("HTT_HPS_Ele_phi", self.higgsTTFV.Phi())
+            #     self.out.fillBranch("HTT_HPS_Ele_m", self.higgsTTFV.M())
+            #     self.out.fillBranch("HTT_HPS_Ele_eta", self.higgsTTFV.Eta())
+            #     self.out.fillBranch("HTT_HPS_Ele_phi", self.higgsTTFV.Phi())
 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+            #     if has_sj1 and has_sj2:
+            #         self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+            #         self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+            #         self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
+            #         self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+            #         self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+            #         self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+            #         self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
+            #         self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
-                if (sys == ""):
-                    self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
+            #     if (sys == ""):
+            #         self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
             
             
             elif Keymax == "bm":
@@ -2054,7 +2062,7 @@ class cutsAndcategories(Module):
                 nominal_bool = 1
             passAsingleSystematic += 1
 
-            del Tau_enu, boostedTau_enu, Electron_enu, Muon_enu, Jet_enu
+            del Tau_enu, boostedTau_enu, Muon_enu, Jet_enu # Electron_enu,
             del firstLepton, secondLepton, theMET
 
 
