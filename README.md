@@ -27,7 +27,7 @@ Inside the folder ```Pre_BackgroundEstimationWithSystematics```, one can try the
 ```
 python3 CommonAnalysisWithSystematics_6.py  \
     --inputFile /hdfs/store/user/mithakor/Branch_addition_categorization/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8_1.root  \
-    --outputFile Test_Outputroot    \
+    --outputFile Test_Output.root    \
     --year 2024 \
     --isMC \
     --cutflowDir $pwd \
