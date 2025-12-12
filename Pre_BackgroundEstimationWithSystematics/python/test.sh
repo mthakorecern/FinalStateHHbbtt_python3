@@ -25,9 +25,18 @@
 #     --runNominal    \
 #     &> log_test_WWto4Q_TuneCP5_13p6TeV_powheg.txt &
 
-python3 CommonAnalysisWithSystematics_6.py  \
-    --inputFile /hdfs/store/user/mithakor/TriggerEfficiency_Skim/Hadded/Muon1_Run2024C-MINIv6NANOv15-v1.root \
-    --outputFile Muon1_Run2024C-MINIv6NANOv15-v1.root   \
-    --year 2024  \
-    --cutflowDir /afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python  \
-    &> log_Muon1_Run2024C-MINIv6NANOv15-v1.txt &
+# python3 CommonAnalysisWithSystematics_6.py  \
+#     --inputFile /hdfs/store/user/mithakor/TriggerEfficiency_Skim/Hadded/Muon1_Run2024C-MINIv6NANOv15-v1.root \
+#     --outputFile Muon1_Run2024C-MINIv6NANOv15-v1.root   \
+#     --year 2024  \
+#     --cutflowDir /afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python  \
+#     &> log_Muon1_Run2024C-MINIv6NANOv15-v1.txt &
+
+# python3 CommonAnalysisWithSystematics_6.py  \
+#     --inputFile /hdfs/store/user/mithakor/CRAB_skimmed_2024_MC/Hadded/QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8.root \
+#     --outputFile QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8.root   \
+#     --year 2024  \
+#     --isMC  \
+#     --cutflowDir /afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python  \
+#     --runNominal    \
+#     &> log_QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8.root.txt &

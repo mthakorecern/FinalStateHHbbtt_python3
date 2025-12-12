@@ -1253,7 +1253,7 @@ class cutsAndcategories(Module):
                 continue
 
             if sys == "":
-                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  180"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  120"] += 1
 
             FatJet_enu = [x for x in enumerate(FatJet) if (getjetpt(x[1], sys) > 180) and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))]
 
@@ -1324,14 +1324,14 @@ class cutsAndcategories(Module):
                 #     self.cutflow_dict[
                 #         " ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)"] += 1
 
-            enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2))
+            enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu)) >= 2))
             if not enoughleptonstopair:
                 # move to the next systematics
                 # fillBranchesWithDefault(sys)
                 continue
 
             if (sys == ""):
-                if (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2)):
+                if (((len(Tau_enu) + len(Muon_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu)) >= 2)):
                     self.cutflow_dict["Atleast_2leptons_anykind"] += 1
 
             pairDict = {}
