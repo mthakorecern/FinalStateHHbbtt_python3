@@ -31,7 +31,7 @@ python3 CommonAnalysisWithSystematics_6.py  \
     --year 2024 \
     --isMC \
     --cutflowDir $pwd \
-    --runNominal    \
+    --runNominal  
 ```
 
 The folder ```/hdfs/store/user/mithakor/Branch_addition_categorization``` has some root files corresponding to Data, Signal and Background, which can be used for testing this code. 
