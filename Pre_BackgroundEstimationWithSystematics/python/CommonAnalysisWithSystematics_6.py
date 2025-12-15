@@ -1277,7 +1277,7 @@ class cutsAndcategories(Module):
             
             Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 4) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
             
-            # boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
+            boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
 
             self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1],sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
 
@@ -1285,17 +1285,17 @@ class cutsAndcategories(Module):
             
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
 
-            # deltaR_boosted_HPS_preclean = []
-            # for b in boostedTau_enu:
-            #     for h in Tau_enu:
-            #         bfv = ROOT.TLorentzVector()
-            #         hfv = ROOT.TLorentzVector()
-            #         bfv.SetPtEtaPhiM(gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys))
-            #         hfv.SetPtEtaPhiM(gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys))
-            #         deltaR_boosted_HPS_preclean.append(bfv.DeltaR(hfv))
+            deltaR_boosted_HPS_preclean = []
+            for b in boostedTau_enu:
+                for h in Tau_enu:
+                    bfv = ROOT.TLorentzVector()
+                    hfv = ROOT.TLorentzVector()
+                    bfv.SetPtEtaPhiM(gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys))
+                    hfv.SetPtEtaPhiM(gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys))
+                    deltaR_boosted_HPS_preclean.append(bfv.DeltaR(hfv))
 
-            # self.out.fillBranch("nDeltaR_boosted_HPS_preclean", len(deltaR_boosted_HPS_preclean))
-            # self.out.fillBranch("deltaR_boosted_HPS_preclean", deltaR_boosted_HPS_preclean)
+            self.out.fillBranch("nDeltaR_boosted_HPS_preclean", len(deltaR_boosted_HPS_preclean))
+            self.out.fillBranch("deltaR_boosted_HPS_preclean", deltaR_boosted_HPS_preclean)
 
                         
             # Object cleaning procedures
@@ -1308,15 +1308,15 @@ class cutsAndcategories(Module):
             Tau_enu = [x for x in Tau_enu if FatJetTauOverlap(x, boost=0)]
             # Tau_enu = [x for x in Tau_enu if ElectronTauOverlap(x, Electron_enu, boost=0)]
             Tau_enu = [x for x in Tau_enu if MuonTauOverlap(x, Muon_enu, boost=0)]
-            # boostedTau_enu = [x for x in boostedTau_enu if FatJetTauOverlap(x, boost=1)]
+            boostedTau_enu = [x for x in boostedTau_enu if FatJetTauOverlap(x, boost=1)]
             # boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(x, Electron_enu, boost=1)]
-            # boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(x, Muon_enu, boost=1)]
+            boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(x, Muon_enu, boost=1)]
           
             
 
             # Cutflow counting
             if sys == "":
-                if (len(Tau_enu) > 0): # or len(boostedTau_enu) > 0):
+                if (len(Tau_enu) > 0 or len(boostedTau_enu) > 0):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)"] += 1
                 if (len(Muon_enu) > 0):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)"] += 1
@@ -1324,21 +1324,21 @@ class cutsAndcategories(Module):
                 #     self.cutflow_dict[
                 #         " ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)"] += 1
 
-            enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu)) >= 2))# or ((len(boostedTau_enu) + len(Muon_enu)) >= 2))
+            enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu)) >= 2))
             if not enoughleptonstopair:
                 # move to the next systematics
                 # fillBranchesWithDefault(sys)
                 continue
 
             if (sys == ""):
-                if (((len(Tau_enu) + len(Muon_enu)) >= 2)):# or ((len(boostedTau_enu) + len(Muon_enu)) >= 2)):
+                if (((len(Tau_enu) + len(Muon_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu)) >= 2)):
                     self.cutflow_dict["Atleast_2leptons_anykind"] += 1
 
             pairDict = {}
-            # pairDict["bb"] = selfPairing(boostedTau_enu, "bb")
+            pairDict["bb"] = selfPairing(boostedTau_enu, "bb")
             pairDict["tt"] = selfPairing(Tau_enu, "tt")
             # pairDict["be"] = crossPairing(boostedTau_enu, Electron_enu, "be")
-            # pairDict["bm"] = crossPairing(boostedTau_enu, Muon_enu, "bm")
+            pairDict["bm"] = crossPairing(boostedTau_enu, Muon_enu, "bm")
             # pairDict["te"] = crossPairing(Tau_enu, Electron_enu, "te")
             pairDict["tm"] = crossPairing(Tau_enu, Muon_enu, "tm")
 
@@ -1353,13 +1353,13 @@ class cutsAndcategories(Module):
 
             if (sys == ""):
                 #self.cutflow_dict["Atleast_one_pair_anykind"] += 1
-                #if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
-                if ((pairDict["tt"][0] > 0)):
+                if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
+                # if ((pairDict["tt"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauTau_pair"] += 1
                 # if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
                 #     self.cutflow_dict[" ...breakdown..> Atleast_one_TauElectron_pair"] += 1
-                # if ((pairDict["bm"][0] > 0) or (pairDict["tm"][0] > 0)):
-                if ((pairDict["tm"][0] > 0)):
+                if ((pairDict["bm"][0] > 0) or (pairDict["tm"][0] > 0)):
+                # if ((pairDict["tm"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauMuon_pair"] += 1
 
             
@@ -1442,69 +1442,69 @@ class cutsAndcategories(Module):
             self.met.SetPtEtaPhiM(getMETpt(sys), 0.0, getMETphi(sys), 0.0)
 
 
-            # if Keymax == "bb":
-            #     self.out.fillBranch("channel%s" % (sys), 0)
-            #     self.out.fillBranch("boost%s" % (sys), 1)
-            #     if (sys == ""):
-            #         self.out.fillBranch("nallTaus%s" % (sys), 2)
-            #     gboostedTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
-            #     if (sys == ""):
-            #         self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode, boostedTau[gboostedTau_index[1]].decayMode])
+            if Keymax == "bb":
+                self.out.fillBranch("channel%s" % (sys), 0)
+                self.out.fillBranch("boost%s" % (sys), 1)
+                if (sys == ""):
+                    self.out.fillBranch("nallTaus%s" % (sys), 2)
+                gboostedTau_index = [pairDict[Keymax][1], pairDict[Keymax][2]]
+                if (sys == ""):
+                    self.out.fillBranch("allTaus_decayMode%s" % (sys), [boostedTau[gboostedTau_index[0]].decayMode, boostedTau[gboostedTau_index[1]].decayMode])
                 
-            #     firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]], sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys),leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
+                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]], sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys),leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
             
-            #     self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]], sys))
+                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]], sys))
                 
-            #     secondLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[1]], sys), eta=boostedTau[gboostedTau_index[1]].eta, phi=boostedTau[gboostedTau_index[1]].phi, m=gettaumass(boostedTau[gboostedTau_index[1]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[1]].decayMode)
+                secondLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[1]], sys), eta=boostedTau[gboostedTau_index[1]].eta, phi=boostedTau[gboostedTau_index[1]].phi, m=gettaumass(boostedTau[gboostedTau_index[1]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[1]].decayMode)
                
-            #     self.pair2FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[1]], sys), boostedTau[gboostedTau_index[1]].eta, boostedTau[gboostedTau_index[1]].phi, gettaumass(boostedTau[gboostedTau_index[1]], sys))
+                self.pair2FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[1]], sys), boostedTau[gboostedTau_index[1]].eta, boostedTau[gboostedTau_index[1]].phi, gettaumass(boostedTau[gboostedTau_index[1]], sys))
 
-            #     self.theFastMTTtool.setFirstLepton(firstLepton)
-            #     self.theFastMTTtool.setSecondLepton(secondLepton)
-            #     self.theFastMTTtool.setTheMET(theMET)
-            #     higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
-            #     self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
-            #     self.higgsTTvisFV = self.pair1FV + self.pair2FV
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
                 
-            #     self.out.fillBranch("deltaPhi_met_tautau", abs(self.met.DeltaPhi(self.higgsTTvisFV)))
-            #     self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
-            #     self.out.fillBranch("deltaPhi_met_subleadingtau", abs(self.met.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaPhi_met_tautau", abs(self.met.DeltaPhi(self.higgsTTvisFV)))
+                self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaPhi_met_subleadingtau", abs(self.met.DeltaPhi(self.pair2FV)))
 
-            #     self.out.fillBranch("deltaR_hbb_httvis", self.higgsBBFV.DeltaR(self.higgsTTvisFV))
-            #     self.out.fillBranch("deltaPhi_hbb_httvis", abs(self.higgsBBFV.DeltaPhi(self.higgsTTvisFV)))                
+                self.out.fillBranch("deltaR_hbb_httvis", self.higgsBBFV.DeltaR(self.higgsTTvisFV))
+                self.out.fillBranch("deltaPhi_hbb_httvis", abs(self.higgsBBFV.DeltaPhi(self.higgsTTvisFV)))                
                 
-            #     self.out.fillBranch("deltaR_hbb_htt", self.higgsBBFV.DeltaR(self.higgsTTFV))
-            #     self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
+                self.out.fillBranch("deltaR_hbb_htt", self.higgsBBFV.DeltaR(self.higgsTTFV))
+                self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
                 
-            #     self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
-            #     self.out.fillBranch("deltaPhi_hbb_subleadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaPhi_hbb_subleadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
 
-            #     self.out.fillBranch("deltaPhi_tau1_tau2", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
-            #     self.out.fillBranch("deltaR_tau1_tau2", self.pair1FV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_tau1_tau2", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_tau1_tau2", self.pair1FV.DeltaR(self.pair2FV))
                 
-            #     self.out.fillBranch("HTT_boosted_m", self.higgsTTFV.M())
-            #     self.out.fillBranch("HTT_boosted_eta", self.higgsTTFV.Eta())
-            #     self.out.fillBranch("HTT_boosted_phi", self.higgsTTFV.Phi())
+                self.out.fillBranch("HTT_boosted_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_phi", self.higgsTTFV.Phi())
 
-            #     self.out.fillBranch("HTTvis_boosted_m", self.higgsTTvisFV.M())
-            #     self.out.fillBranch("HTTvis_boosted_eta", self.higgsTTvisFV.Eta())
-            #     self.out.fillBranch("HTTvis_boosted_phi", self.higgsTTvisFV.Phi())
+                self.out.fillBranch("HTTvis_boosted_m", self.higgsTTvisFV.M())
+                self.out.fillBranch("HTTvis_boosted_eta", self.higgsTTvisFV.Eta())
+                self.out.fillBranch("HTTvis_boosted_phi", self.higgsTTvisFV.Phi())
     
-            #     if has_sj1 and has_sj2:
-            #         self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-            #         self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-            #         self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
-            #         self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
 
-            #         self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-            #         self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-            #         self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
-            #         self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
                 
-            #     if (sys == ""):
-            #         self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
+                if (sys == ""):
+                    self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
             
             
             if Keymax == "tt":
@@ -1681,59 +1681,59 @@ class cutsAndcategories(Module):
             #         self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
             
             
-            # elif Keymax == "bm":
-            #     self.out.fillBranch("channel%s" % (sys), 2)
-            #     self.out.fillBranch("boost%s" % (sys), 1)
-            #     if (sys == ""):
-            #         self.out.fillBranch("nallTaus%s" % (sys), 1)
-            #     gboostedTau_index = [pairDict[Keymax][1]]
-            #     gMuon_index = [pairDict[Keymax][2]]
-            #     if (sys == ""):
-            #         self.out.fillBranch("allTaus_decayMode%s" % (
-            #             sys), [boostedTau[gboostedTau_index[0]].decayMode])
+            elif Keymax == "bm":
+                self.out.fillBranch("channel%s" % (sys), 2)
+                self.out.fillBranch("boost%s" % (sys), 1)
+                if (sys == ""):
+                    self.out.fillBranch("nallTaus%s" % (sys), 1)
+                gboostedTau_index = [pairDict[Keymax][1]]
+                gMuon_index = [pairDict[Keymax][2]]
+                if (sys == ""):
+                    self.out.fillBranch("allTaus_decayMode%s" % (
+                        sys), [boostedTau[gboostedTau_index[0]].decayMode])
                 
-            #     firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]], sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
+                firstLepton = fastMTTlepton(pt=gettaupt(boostedTau[gboostedTau_index[0]], sys), eta=boostedTau[gboostedTau_index[0]].eta, phi=boostedTau[gboostedTau_index[0]].phi, m=gettaumass(boostedTau[gboostedTau_index[0]], sys), leptonType='Tau', tauDecayMode=boostedTau[gboostedTau_index[0]].decayMode)
 
-            #     self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]],sys))
+                self.pair1FV.SetPtEtaPhiM(gettaupt(boostedTau[gboostedTau_index[0]], sys), boostedTau[gboostedTau_index[0]].eta, boostedTau[gboostedTau_index[0]].phi, gettaumass(boostedTau[gboostedTau_index[0]],sys))
                 
-            #     secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt, eta=Muon[gMuon_index[0]].eta, phi=Muon[gMuon_index[0]].phi, m=Muon[gMuon_index[0]].mass, leptonType='Muon', tauDecayMode=-1)
-            #     self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta,  Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
+                secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt, eta=Muon[gMuon_index[0]].eta, phi=Muon[gMuon_index[0]].phi, m=Muon[gMuon_index[0]].mass, leptonType='Muon', tauDecayMode=-1)
+                self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta,  Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
 
-            #     self.theFastMTTtool.setFirstLepton(firstLepton)
-            #     self.theFastMTTtool.setSecondLepton(secondLepton)
-            #     self.theFastMTTtool.setTheMET(theMET)
-            #     higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
+                self.theFastMTTtool.setFirstLepton(firstLepton)
+                self.theFastMTTtool.setSecondLepton(secondLepton)
+                self.theFastMTTtool.setTheMET(theMET)
+                higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
 
-            #     self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
+                self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
 
-            #     self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
-            #     self.out.fillBranch("deltaPhi_met_leadingmu", abs(self.met.DeltaPhi(self.pair2FV)))
-            #     self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
-            #     self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
-            #     self.out.fillBranch("deltaPhi_hbb_leadingmu", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaPhi_met_leadingtau", abs(self.met.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaPhi_met_leadingmu", abs(self.met.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaPhi_hbb_htt", abs(self.higgsBBFV.DeltaPhi(self.higgsTTFV)))
+                self.out.fillBranch("deltaPhi_hbb_leadingtau", abs(self.higgsBBFV.DeltaPhi(self.pair1FV)))
+                self.out.fillBranch("deltaPhi_hbb_leadingmu", abs(self.higgsBBFV.DeltaPhi(self.pair2FV)))
 
-            #     self.out.fillBranch("deltaPhi_tau_mu", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
-            #     self.out.fillBranch("deltaR_tau_mu", self.pair1FV.DeltaR(self.pair2FV))
+                self.out.fillBranch("deltaPhi_tau_mu", abs(self.pair1FV.DeltaPhi(self.pair2FV)))
+                self.out.fillBranch("deltaR_tau_mu", self.pair1FV.DeltaR(self.pair2FV))
 
-            #     self.out.fillBranch("HTT_boosted_Mu_m", self.higgsTTFV.M())
-            #     self.out.fillBranch("HTT_boosted_Mu_eta", self.higgsTTFV.Eta())
-            #     self.out.fillBranch("HTT_boosted_Mu_phi", self.higgsTTFV.Phi())
+                self.out.fillBranch("HTT_boosted_Mu_m", self.higgsTTFV.M())
+                self.out.fillBranch("HTT_boosted_Mu_eta", self.higgsTTFV.Eta())
+                self.out.fillBranch("HTT_boosted_Mu_phi", self.higgsTTFV.Phi())
 
-            #     if has_sj1 and has_sj2:
-            #         self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-            #         self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-            #         self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
-            #         self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                if has_sj1 and has_sj2:
+                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-            #         self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-            #         self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-            #         self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
-            #         self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                    self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
+                    self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
 
 
-            #     if (sys == ""):
-            #         self.cutflow_dict[" ...breakdown..> MT_channel (max pt pair)"] += 1
+                if (sys == ""):
+                    self.cutflow_dict[" ...breakdown..> MT_channel (max pt pair)"] += 1
 
             elif Keymax == "tm":
                 self.out.fillBranch("channel%s" % (sys), 2)
@@ -1857,21 +1857,21 @@ class cutsAndcategories(Module):
 
             Jet_enu = sorted(Jet_enu, key=lambda x: getjetpt(x[1], sys), reverse=True)
 
-            # deltaR_boosted_HPS_postclean = []
-            # for b in boostedTau_enu:
-            #     for h in Tau_enu:
-            #         bfv = ROOT.TLorentzVector()
-            #         hfv = ROOT.TLorentzVector()
-            #         bfv.SetPtEtaPhiM(
-            #             gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys)
-            #         )
-            #         hfv.SetPtEtaPhiM(
-            #             gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys)
-            #         )
-            #         deltaR_boosted_HPS_postclean.append(bfv.DeltaR(hfv))
+            deltaR_boosted_HPS_postclean = []
+            for b in boostedTau_enu:
+                for h in Tau_enu:
+                    bfv = ROOT.TLorentzVector()
+                    hfv = ROOT.TLorentzVector()
+                    bfv.SetPtEtaPhiM(
+                        gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys)
+                    )
+                    hfv.SetPtEtaPhiM(
+                        gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys)
+                    )
+                    deltaR_boosted_HPS_postclean.append(bfv.DeltaR(hfv))
 
-            # self.out.fillBranch("nDeltaR_boosted_HPS_postclean", len(deltaR_boosted_HPS_postclean))
-            # self.out.fillBranch("deltaR_boosted_HPS_postclean", deltaR_boosted_HPS_postclean)
+            self.out.fillBranch("nDeltaR_boosted_HPS_postclean", len(deltaR_boosted_HPS_postclean))
+            self.out.fillBranch("deltaR_boosted_HPS_postclean", deltaR_boosted_HPS_postclean)
             
             gJet_index = [x[0] for x in Jet_enu]
             Jet_enu_Loose = [
@@ -2170,7 +2170,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     met_selection = ["PuppiMET_pt > 120"]
-    Tau_selection = ["nTau > 0"] # || nboostedTau > 0"]
+    Tau_selection = ["nTau > 0 || nboostedTau > 0"]
 
 
     trigger_2024 = [
