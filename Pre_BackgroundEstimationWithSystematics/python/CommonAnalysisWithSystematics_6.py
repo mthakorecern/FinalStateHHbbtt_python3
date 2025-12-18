@@ -1247,7 +1247,7 @@ class cutsAndcategories(Module):
                         self.jetLeadFV, self.subjet1FV, self.subjet2FV]:
                 vec.SetPxPyPzE(0, 0, 0, 0)
         
-            if ((getMETpt(sys) < 180)):
+            if ((getMETpt(sys) < 120)):
                 # fillBranchesWithDefault(sys)
                 continue
 
