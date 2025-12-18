@@ -1,0 +1,23 @@
+{
+    "WtoENu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 21493.86,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WtoENu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8.root",
+        "kFac": 0
+    },
+    "WtoMuNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 21493.86,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WtoMuNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8.root",
+        "kFac": 0
+    },
+    "WtoTauNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 21493.86,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WtoTauNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8.root",
+        "kFac": 0
+    }
+}

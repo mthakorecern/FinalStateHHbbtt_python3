@@ -1,0 +1,79 @@
+{
+    "QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 312300000,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 58470000,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 25220000,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 1963000,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 94870,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 13420,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 2992,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 879.1,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 384.5,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 125.5,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    },
+    "QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 25.78,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8.root",
+        "kFac": 0
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "GluGlutoRadiontoHHto2B2Tau_M-1000": {
+        "EquiLumi": null,
+        "XS": 0.073,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/GluGlutoRadiontoHHto2B2Tau_M-1000.root",
+        "kFac": 0
+    },
+    "GluGlutoRadiontoHHto2B2Tau_M-2000": {
+        "EquiLumi": null,
+        "XS": 0.073,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/GluGlutoRadiontoHHto2B2Tau_M-2000.root",
+        "kFac": 0
+    },
+    "GluGlutoRadiontoHHto2B2Tau_M-3000": {
+        "EquiLumi": null,
+        "XS": 0.073,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/GluGlutoRadiontoHHto2B2Tau_M-3000.root",
+        "kFac": 0
+    },
+    "GluGlutoRadiontoHHto2B2Tau_M-4000": {
+        "EquiLumi": null,
+        "XS": 0.073,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/GluGlutoRadiontoHHto2B2Tau_M-4000.root",
+        "kFac": 0
+    },
+    "GluGlutoRadiontoHHto2B2Tau_M-4500": {
+        "EquiLumi": null,
+        "XS": 0.073,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/GluGlutoRadiontoHHto2B2Tau_M-45000.root",
+        "kFac": 0
+    }
+}

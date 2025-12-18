@@ -1,0 +1,72 @@
+{
+    "DYto2L-2Jets_Bin-1J-MLL-50-PTLL-40to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 475.3,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-2J-MLL-50-PTLL-40to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 179.3,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-1J-MLL-50-PTLL-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 45.42,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-2J-MLL-50-PTLL-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 51.68,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-1J-MLL-50-PTLL-200to400_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 3.382,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-2J-MLL-50-PTLL-200to400_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 7.159,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-1J-MLL-50-PTLL-400to600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.1162,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-2J-MLL-50-PTLL-400to600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.4157,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-1J-MLL-50-PTLL-600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.01392,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "DYto2L-2Jets_Bin-2J-MLL-50-PTLL-600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.07019,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    }
+}

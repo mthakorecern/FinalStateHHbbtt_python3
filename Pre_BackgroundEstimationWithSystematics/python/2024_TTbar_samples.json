@@ -1,0 +1,23 @@
+{
+    "TTto4Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 419.69,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Skimmed_Datasets/2024/MET120/Hadded/MC/TTto4Q_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 405.87,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8",
+        "kFac": 0
+    },
+    "TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 98.04,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8",
+        "kFac": 0
+    }
+}

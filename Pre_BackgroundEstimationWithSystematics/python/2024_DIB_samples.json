@@ -1,0 +1,93 @@
+{
+    "ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 1.245448,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/ZZto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 8.08,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "ZZto4L_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 1.67912,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "ZZto2Nu2Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 5.829808,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/ZZto2Nu2Q_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 14.46633,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WWto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "WWto4Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 55.57,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WWto4Q_TuneCP5_13p6TeV_powheg-pythia8/.root",
+        "kFac": 0
+    },
+    "WWtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 60.04938,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WWtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 7.991808,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 5.31,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "WZtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8": {
+        "EquiLumi": null,
+        "XS": 15.87,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WZtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8.root",
+        "kFac": 0
+    },
+    "WW_TuneCP5_13p6TeV_pythia8": {
+        "EquiLumi": null,
+        "XS": 125.7,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WW_TuneCP5_13p6TeV_pythia8.root",
+        "kFac": 0
+    },
+    "WZ_TuneCP5_13p6TeV_pythia8": {
+        "EquiLumi": null,
+        "XS": 55.2,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MC/WZ_TuneCP5_13p6TeV_pythia8.root",
+        "kFac": 0
+    },
+    "ZZ_TuneCP5_13p6TeV_pythia8": {
+        "EquiLumi": null,
+        "XS": 19.43,
+        "Increase": "no",
+        "file": "/hdfs/store/user/mithakor/Default_variables_2024/MCZZ_TuneCP5_13p6TeV_pythia8.root",
+        "kFac": 0
+    }
+}

@@ -1,0 +1,100 @@
+{
+    "WtoLNu-2Jets_Bin-1J-PTLNu-40to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 4427,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-2J-PTLNu-40to100_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 1598,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-1J-PTLNu-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 368.2,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-2J-PTLNu-100to200_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 421.9,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-1J-PTLNu-200to400_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 25.6,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-2J-PTLNu-200to400_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 54.77,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-1J-PTLNu-400to600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.8785,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-2J-PTLNu-400to600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 3.119,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-1J-PTLNu-600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.1053,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-2Jets_Bin-2J-PTLNu-600_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": {
+        "EquiLumi": null,
+        "XS": 0.5261,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-4Jets_Bin-1J_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 11044.88,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-4Jets_Bin-2J_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 3535.62,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-4Jets_Bin-3J_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 1042.173,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    },
+    "WtoLNu-4Jets_Bin-4J_TuneCP5_13p6TeV_madgraphMLM-pythia8": {
+        "EquiLumi": null,
+        "XS": 505.538,
+        "Increase": "no",
+        "file": "",
+        "kFac": 0
+    }
+}
