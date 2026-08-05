@@ -7,9 +7,15 @@ import sys
 
 sys.path.append(os.path.join(os.environ["CMSSW_BASE"], "python"))
 
+# def normalize_path(p):
+#     if p.startswith("/hdfs/"):
+#         return "file:" + p  
+#         # return "root://cmsxrootd.hep.wisc.edu"
+#     return p
+
 def normalize_path(p):
     if p.startswith("/hdfs/"):
-        return "file:" + p  
+        return "root://cmsxrootd.hep.wisc.edu/" + p[len("/hdfs"):]
     return p
 
 def main(args):
@@ -57,7 +63,15 @@ def main(args):
         # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/2024_old_samples.json.json",
         "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/2024_CRAB_processed.json",
         "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/2024_DY_PT_Binned.json",
-        "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/2024_WJets_PT_Binned.json"
+        "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/2024_WJets_PT_Binned.json",
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_VLoose.py",
+        "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6.py",
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_PFRelIso_Loose.py"
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_PFRelIso_Loose.py",
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_PFRelIso_Loose.py",
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_PFRelIso_Loose.py",
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_VTight.py",
+        # "/afs/hep.wisc.edu/home/mithakor/HH_bb_tautau_Analysis/Branch_addition_systematics/CMSSW_15_0_10/src/FinalStateHHbbtt/Pre_BackgroundEstimationWithSystematics/python/CommonAnalysisWithSystematics_6_VVTight.py"
 
 
     ]))
@@ -72,7 +86,7 @@ def main(args):
         f'--input-file-list={inputFileTextName}',
         '--assume-input-files-exist',
         '--max-usercode-size=350',
-        '--use-hdfs',
+        # '--use-hdfs',
         f'--submit-dir={overallSubmitDir}/submit',
         f'--output-dag-file={dagLocation}/dag',
         f'--output-dir={args.destination}/{job_name}',
@@ -86,8 +100,8 @@ def main(args):
         '--',
         '\'--inputFile=$inputFileNames\'',
         '\'--outputFile=$outputFileName\'',
-        f'\'--year={args.year}\'',
-        f"'--cutflowDir={args.destination}/{job_name}/cutflows'"
+        f'\'--year={args.year}\''
+        # f"'--cutflowDir={args.destination}/{job_name}/cutflows'"
 
     ]
 

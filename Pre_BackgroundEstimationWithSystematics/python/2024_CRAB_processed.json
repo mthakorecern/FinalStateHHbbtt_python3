@@ -80,5 +80,12 @@
     "ZZto2L2Q_TuneCP5_13p6TeV_powheg-pythia8": 1165248640.0,
     "ZZto2Nu2Q_TuneCP5_13p6TeV_powheg-pythia8": 222217840.0,
     "ZZto4L_TuneCP5_13p6TeV_powheg-pythia8": 329198016.0,
-    "ZZto4Q-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": 65887308.0
+    "ZZto4Q-1Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8": 65887308.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-1000_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-1500_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-2000_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-2500_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-3000_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-4000_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0,
+    "GluGlutoRadiontoHHto2B2Tau_M-4500_narrow_TuneCP5_13p6TeV_madgraph-pythia8": 100000.0
 }

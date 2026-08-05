@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import os
 import time
 import ROOT
@@ -14,7 +13,6 @@ from collections import OrderedDict
 
 from FinalStateHHbbtt.fastMTTPython.fastMTTtool import *
 from FinalStateHHbbtt.Pre_BackgroundEstimationWithSystematics.TauEnergyScaleModule.TauEnergyScaleForHPSandBoosted import TauEnergyScaleForHPSandBoosted
-
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
@@ -23,11 +21,12 @@ from PhysicsTools.NATModules.modules.jetId import jetId
 from PhysicsTools.NATModules.modules.jetVetoMap import jetVMAP
 from PhysicsTools.NATModules.modules.fatJetvetoMap import fatJetVMAP
 from PhysicsTools.NATModules.modules.xsWeights import XSWeightOnly
+# from PhysicsTools.NATModules.modules.GenMatch import TruthMatchFlags
 
 import math
 
 class cutsAndcategories(Module):
-    def __init__(self, filename, year, isData, runNominal=False, cutflowDir=None):
+    def __init__(self, filename, year, isData, runNominal=False):
 
         self.runNominal = runNominal
         print("ACTIVATE: cutsAndcategories")
@@ -38,59 +37,22 @@ class cutsAndcategories(Module):
         self.isMC = not isData
         self.isData = isData
         self.filename = filename
-        self.cutflowDir = cutflowDir
 
         if ((self.isData) or (self.runNominal)):
             self.jesUnc = [""]
         else:
-            self.jesUnc = [
-                "",
-                "jesTotalUp",
-                "jesTotalDown",
-                "jerUp",
-                "jerDown",
-                "jesAbsoluteUp",
-                "jesAbsoluteDown",
-                "jesAbsolute_%sUp" %
-                (self.year_unc),
-                "jesAbsolute_%sDown" %
-                (self.year_unc),
-                "jesBBEC1Up",
-                "jesBBEC1Down",
-                "jesBBEC1_%sUp" %
-                (self.year_unc),
-                "jesBBEC1_%sDown" %
-                (self.year_unc),
-                "jesEC2Up",
-                "jesEC2Down",
-                "jesEC2_%sUp" %
-                (self.year_unc),
-                "jesEC2_%sDown" %
-                (self.year_unc),
-                "jesFlavorQCDUp",
-                "jesFlavorQCDDown",
-                "jesHFUp",
-                "jesHFDown",
-                "jesHF_%sUp" %
-                (self.year_unc),
-                "jesHF_%sDown" %
-                (self.year_unc),
-                "jesRelativeBalUp",
-                "jesRelativeBalDown",
-                "jesRelativeSample_%sUp" %
-                (self.year_unc),
-                "jesRelativeSample_%sDown" %
-                (self.year_unc),
-                "UnclustUp",
-                "UnclustDown",
-                "tesUp",
-                "tesDown"]
+            self.jesUnc = ["", "jesTotalUp", "jesTotalDown", "jerUp", "jerDown", "jesAbsoluteUp", "jesAbsoluteDown",
+                            "jesAbsolute_%sUp" % (self.year_unc), "jesAbsolute_%sDown" % (self.year_unc), "jesBBEC1Up",
+                            "jesBBEC1Down", "jesBBEC1_%sUp" % (self.year_unc), "jesBBEC1_%sDown" % (self.year_unc), "jesEC2Up",
+                            "jesEC2Down", "jesEC2_%sUp" % (self.year_unc), "jesEC2_%sDown" % (self.year_unc), "jesFlavorQCDUp",
+                            "jesFlavorQCDDown", "jesHFUp", "jesHFDown", "jesHF_%sUp" % (self.year_unc), "jesHF_%sDown" % (self.year_unc),
+                            "jesRelativeBalUp", "jesRelativeBalDown", "jesRelativeSample_%sUp" % (self.year_unc), "jesRelativeSample_%sDown" % (self.year_unc),
+                            "UnclustUp", "UnclustDown", "tesUp", "tesDown"]
 
         # Instantiating the fastMTT tool once (to be used multiple times later)
         self.theFastMTTtool = fastMTTtool()
 
-        # Define the TLorentz vectors as memeber variables to avoid multiple
-        # reinitializations within loops
+        # Define the TLorentz vectors as memeber variables to avoid multiple reinitializations within loops
         self.lepFV = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
         self.eleFV = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
         self.muFV = ROOT.TLorentzVector(0.0, 0.0, 0.0, 0.0)
@@ -117,10 +79,15 @@ class cutsAndcategories(Module):
 
         ## https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer24/#ak4-b-tagging
         if self.year == "2024":
-            self.LooseJet = 0.0246
-            self.MediumJet = 0.1272
-            self.TightJet = 0.4678
-        
+            self.UparTLooseJet = 0.0246
+            self.UparTMediumJet = 0.1272
+            self.UparTTightJet = 0.4648
+
+        ## https://btv-wiki.docs.cern.ch/ScaleFactors/Run3Summer22EE/
+            self.DeepJetLooseJet = 0.0479
+            self.DeepJetMediumJet = 0.2431
+            self.DeepJetTightJet = 0.6553
+               
 
     def beginJob(self):
         pass
@@ -135,7 +102,7 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: Runs Tree-Level Sum of GenWeights", int(inputFile["cutflow"].GetBinContent(2))),
                 ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(3))),                
                 ("Skimming Stage: FatJet Requirement (nFatJet > 0)", int(inputFile["cutflow"].GetBinContent(4))),
-                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 120)", int(inputFile["cutflow"].GetBinContent(5))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 180)", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Passing Filter: Flag_goodVertices", int(inputFile["cutflow"].GetBinContent(6))),
                 ("Skimming Stage: Passing Filter: Flag_globalSuperTightHalo2016Filter", int(inputFile["cutflow"].GetBinContent(7))),
                 ("Skimming Stage: Passing Filter: Flag_EcalDeadCellTriggerPrimitiveFilter", int(inputFile["cutflow"].GetBinContent(8))),
@@ -149,18 +116,17 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: Events available after Skimming:", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 120", 0),
-                ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
-                ("Events after all object-level selections (before overlap cleaning)", 0),
-
+                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Events surviving the FatJet skim  (pt > 200, |eta| < 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
 
                 (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
                 
                 ("Atleast_2leptons_anykind", 0),
-                #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
+
+                ("Atleast_one_pair_anykind", 0),
                 (" ...breakdown..> Atleast_one_TauTau_pair", 0),
                 (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
                 (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
@@ -168,17 +134,18 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
-                #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
-                #("Visible Mass HTT > 20 cut", 0),
+                ("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
-                ("Final surviving events", 0),])
+                ("Final surviving events", 0),
+                ])
 
         else:
             self.cutflow_dict = OrderedDict([
                 ("Skimming Stage: Events before any cuts", int(inputFile["cutflow"].GetBinContent(1))),                
                 ("Skimming Stage: FatJet Requirement (nFatJet > 0)", int(inputFile["cutflow"].GetBinContent(2))),
-                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 120)", int(inputFile["cutflow"].GetBinContent(3))),
+                ("Skimming Stage: PuppiMET_pt Threshold (PuppiMET_pt > 180)", int(inputFile["cutflow"].GetBinContent(3))),
                 ("Skimming Stage: Passing Filter: Flag_goodVertices", int(inputFile["cutflow"].GetBinContent(4))),
                 ("Skimming Stage: Passing Filter: Flag_globalSuperTightHalo2016Filter", int(inputFile["cutflow"].GetBinContent(5))),
                 ("Skimming Stage: Passing Filter: Flag_EcalDeadCellTriggerPrimitiveFilter", int(inputFile["cutflow"].GetBinContent(6))),
@@ -192,18 +159,16 @@ class cutsAndcategories(Module):
                 ("Skimming Stage: Events available after Skimming:", inputTree.GetEntries()),
                 
                 ## Pre-selection Cuts
-                ("Pre-selection: PuppiMET_pt > 120", 0),
-                ("Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)", 0),
-                ("Events after FatJet Skimming and PuppiMET_pt >  120",0),
-                ("Events after all object-level selections (before overlap cleaning)", 0),
-
+                ("Pre-selection: PuppiMET_pt > 180", 0),
+                ("Events surviving the FatJet skim  (pt > 200, |eta| < 2.5, jetId>1)", 0),
+                ("Events after FatJet Skimming and PuppiMET_pt >  180",0),
 
                 (" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)", 0),
                 (" ...breakdown..> Atleast_one_Muon (Reco + IDnoIso + cleaning)", 0),
                 
                 ("Atleast_2leptons_anykind", 0),
-                #("Atleast_one_pair_anykind (Iso-cut applied for e/mu)", 0),
+                ("Atleast_one_pair_anykind", 0),
                 (" ...breakdown..> Atleast_one_TauTau_pair", 0),
                 (" ...breakdown..> Atleast_one_TauElectron_pair", 0),
                 (" ...breakdown..> Atleast_one_TauMuon_pair", 0),
@@ -211,12 +176,15 @@ class cutsAndcategories(Module):
                 (" ...breakdown..> ET_channel (max pt pair)", 0),
                 (" ...breakdown..> MT_channel (max pt pair)", 0),
                 
-                #("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
+                ("DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut", 0),
                 
-                #("Visible Mass HTT > 20 cut", 0),
+                ("Visible Mass HTT > 20 cut", 0),
                 ("Medium AK4 b-tag veto (events with 0 medium b-tagged jets)", 0),
-                ("Final surviving events", 0),])
+                ("Final surviving events", 0),
+                
+                ])
 
+       
          
         if ((self.year == "2024") and (self.isMC)):
             self.totalEvents = int(inputTree.GetEntries())
@@ -224,6 +192,8 @@ class cutsAndcategories(Module):
         self.out = wrappedOutputTree
         self.out.branch("eventnominal", "I")
         self.out.branch("FatJet_globalParT3Xbb_mass", "F", lenVar="nFatJet")
+        self.out.branch("FatJet_globalParT3_XbbvsQCD", "F", lenVar="nFatJet")
+
 
         
         for sys in self.jesUnc:
@@ -272,8 +242,8 @@ class cutsAndcategories(Module):
                 self.out.branch("deltaPhi_tau1_tau2", "F")
                 
                 self.out.branch("deltaR_hbb_httvis", "F")
-                self.out.branch("deltaR_hbb_ak4", "F")
-                self.out.branch("deltaPhi_hbb_ak4", "F")
+                # self.out.branch("deltaR_hbb_ak4", "F")
+                # self.out.branch("deltaPhi_hbb_ak4", "F")
                 self.out.branch("deltaPhi_hbb_httvis", "F")
                 self.out.branch("deltaR_hbb_htt", "F")
                 self.out.branch("deltaPhi_hbb_htt", "F")
@@ -304,37 +274,37 @@ class cutsAndcategories(Module):
                 self.out.branch("deltaPhi_ak4_ele", "F")
                 self.out.branch("deltaPhi_ak4_mu", "F")
 
-                self.out.branch("deltaR_subjets", "F")
-                self.out.branch("deltaPhi_subjets", "F")
+                # self.out.branch("deltaR_subjets", "F")
+                # self.out.branch("deltaPhi_subjets", "F")
 
-                self.out.branch("deltaR_subjet1_leadtau", "F")
-                self.out.branch("deltaR_subjet1_subtau", "F")
-                self.out.branch("deltaR_subjet1_ele", "F")
-                self.out.branch("deltaR_subjet1_mu", "F")
+                # self.out.branch("deltaR_subjet1_leadtau", "F")
+                # self.out.branch("deltaR_subjet1_subtau", "F")
+                # self.out.branch("deltaR_subjet1_ele", "F")
+                # self.out.branch("deltaR_subjet1_mu", "F")
 
-                self.out.branch("deltaPhi_subjet1_leadtau", "F")
-                self.out.branch("deltaPhi_subjet1_subtau", "F")
-                self.out.branch("deltaPhi_subjet1_ele", "F")
-                self.out.branch("deltaPhi_subjet1_mu", "F")
+                # self.out.branch("deltaPhi_subjet1_leadtau", "F")
+                # self.out.branch("deltaPhi_subjet1_subtau", "F")
+                # self.out.branch("deltaPhi_subjet1_ele", "F")
+                # self.out.branch("deltaPhi_subjet1_mu", "F")
 
-                self.out.branch("deltaR_subjet2_leadtau", "F")
-                self.out.branch("deltaR_subjet2_subtau", "F")
-                self.out.branch("deltaR_subjet2_ele", "F")
-                self.out.branch("deltaR_subjet2_mu", "F")
+                # self.out.branch("deltaR_subjet2_leadtau", "F")
+                # self.out.branch("deltaR_subjet2_subtau", "F")
+                # self.out.branch("deltaR_subjet2_ele", "F")
+                # self.out.branch("deltaR_subjet2_mu", "F")
 
-                self.out.branch("deltaPhi_subjet2_leadtau", "F")
-                self.out.branch("deltaPhi_subjet2_subtau", "F")
-                self.out.branch("deltaPhi_subjet2_ele", "F")
-                self.out.branch("deltaPhi_subjet2_mu", "F")
-                self.out.branch("pt_balance_hbb_htt_abs",  "F")
-                self.out.branch("pt_balance_hbb_htt_signed", "F")
-                self.out.branch("fatjet_tau21", "F")
-                self.out.branch("fatjet_tau32", "F")
+                # self.out.branch("deltaPhi_subjet2_leadtau", "F")
+                # self.out.branch("deltaPhi_subjet2_subtau", "F")
+                # self.out.branch("deltaPhi_subjet2_ele", "F")
+                # self.out.branch("deltaPhi_subjet2_mu", "F")
+                # self.out.branch("pt_balance_hbb_htt_abs",  "F")
+                # self.out.branch("pt_balance_hbb_htt_signed", "F")
+                # self.out.branch("fatjet_tau21", "F")
+                # self.out.branch("fatjet_tau32", "F")
 
-                self.out.branch("subjet1_tau21", "F")
-                self.out.branch("subjet1_tau32", "F")
-                self.out.branch("subjet2_tau21", "F")
-                self.out.branch("subjet2_tau32", "F")
+                # self.out.branch("subjet1_tau21", "F")
+                # self.out.branch("subjet1_tau32", "F")
+                # self.out.branch("subjet2_tau21", "F")
+                # self.out.branch("subjet2_tau32", "F")
 
 
                 self.out.branch("Tau_rawDeepTauVSjet_logit", "F", lenVar="ngood_Taus")
@@ -366,9 +336,12 @@ class cutsAndcategories(Module):
             self.out.branch("ngood_Muons%s" % (sys), "I")
             self.out.branch("ngood_FatJets%s" % (sys), "I")
             self.out.branch("ngood_Jets%s" % (sys), "I")
-            self.out.branch("ngood_LooseJets%s"%(sys),"I")
-            self.out.branch("ngood_MediumJets%s" % (sys), "I")
-            self.out.branch("ngood_TightJets%s" % (sys), "I")
+            self.out.branch("ngood_UparTLooseJets%s"%(sys),"I")
+            self.out.branch("ngood_UparTMediumJets%s" % (sys), "I")
+            self.out.branch("ngood_UparTTightJets%s" % (sys), "I")
+            self.out.branch("ngood_DeepJetLooseJets%s"%(sys),"I")
+            self.out.branch("ngood_DeepJetMediumJets%s" % (sys), "I")
+            self.out.branch("ngood_DeepJetTightJets%s" % (sys), "I")
 
             self.out.branch("index_gElectrons%s" % (sys), "I", lenVar="ngood_Electrons%s" % (sys))
             self.out.branch("index_gMuons%s" % (sys), "I", lenVar="ngood_Muons%s" % (sys))
@@ -376,45 +349,32 @@ class cutsAndcategories(Module):
             self.out.branch("index_gboostedTaus%s" % (sys), "I", lenVar="ngood_boostedTaus%s" % (sys))
             self.out.branch("index_gFatJets%s" % (sys), "I", lenVar="ngood_FatJets%s" % (sys))
             self.out.branch("index_gJets%s" % (sys), "I", lenVar="ngood_Jets%s" % (sys))
-            self.out.branch("index_gLooseJets%s"%(sys),"I",lenVar="ngood_LooseJets%s"%(sys))
-            self.out.branch("index_gMediumJets%s" % (sys), "I", lenVar="ngood_MediumJets%s" % (sys))
-            self.out.branch("index_gTightJets%s" % (sys), "I", lenVar="ngood_TightJets%s" % (sys))
-
-            self.out.branch("nDeltaR_boosted_HPS_preclean", "I")
-            self.out.branch("nDeltaR_boosted_HPS_postclean", "I")
-            self.out.branch("deltaR_boosted_HPS_preclean", "F", lenVar="nDeltaR_boosted_HPS_preclean")
-            self.out.branch("deltaR_boosted_HPS_postclean", "F", lenVar="nDeltaR_boosted_HPS_postclean")
- 
-            
+            self.out.branch("index_gUparTLooseJets%s"%(sys),"I",lenVar="ngood_UparTLooseJets%s"%(sys))
+            self.out.branch("index_gUparTMediumJets%s" % (sys), "I", lenVar="ngood_UparTMediumJets%s" % (sys))
+            self.out.branch("index_gUparTTightJets%s" % (sys), "I", lenVar="ngood_UparTTightJets%s" % (sys))
+            self.out.branch("index_gDeepJetLooseJets%s"%(sys),"I",lenVar="ngood_DeepJetLooseJets%s"%(sys))
+            self.out.branch("index_gDeepJetMediumJets%s" % (sys), "I", lenVar="ngood_DeepJetMediumJets%s" % (sys))
+            self.out.branch("index_gDeepJetTightJets%s" % (sys), "I", lenVar="ngood_DeepJetTightJets%s" % (sys))
             self.out.branch("Hbb_met_phi%s" % (sys), "F")
 
 
+
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
-        output_dir = os.path.dirname(outputFile.GetName())
+        # output_dir = os.path.dirname(outputFile.GetName())
         base_name = os.path.splitext(os.path.basename(outputFile.GetName()))[0]
-
-        local_json_path = os.path.join(output_dir, f"{base_name}_cutflow.json")
-        with open(local_json_path, "w") as outfile:
-            json.dump(self.cutflow_dict, outfile, indent=4)
-        print(f"[INFO] Cutflow JSON written locally: {local_json_path}")
-
-        cutflow_dir = getattr(self, "cutflowDir", None)
-
-        if cutflow_dir is None or cutflow_dir.strip() == "":
-            print("[INFO] No cutflowDir provided. Defaulting to ROOT output directory.")
-            cutflow_dir = output_dir  
-        os.makedirs(cutflow_dir, exist_ok=True)
-
-        final_json_path = os.path.join(cutflow_dir, f"{base_name}_cutflow.json")
-        try:
-            shutil.move(local_json_path, final_json_path)
-            print(f"[INFO] Cutflow JSON moved to: {final_json_path}")
-        except Exception as e:
-            print(f"[ERROR] Failed to move cutflow JSON to {final_json_path}")
-            print(f"       Reason: {e}")
-
+        print(f"Cutflow JSON for: {base_name}")
+        print(json.dumps(self.cutflow_dict, indent=4))
+        print("\n")
+       
 
     def analyze(self, event):
+
+        if getattr(event, "Flag_JetVetoed", 0) != 0:
+            return False
+        if getattr(event, "Flag_FatJetVetoed", 0) != 0:
+            return False
+
+
         def gettaupt(tau, sys):
             if (sys == "tesUp"):
                 return tau.pt_tesUp
@@ -434,7 +394,8 @@ class cutsAndcategories(Module):
         def getjetpt(jet, sys):
             if ((sys == "") or (sys == "UnclustUp") or (
                     sys == "UnclustDown") or (sys == "tesUp") or (sys == "tesDown")):
-                return jet.pt
+                # return jet.pt
+                return jet.pt_nom
             elif sys == "jesTotalUp":
                 return jet.pt_jesTotalUp
             elif sys == "jesTotalDown":
@@ -501,7 +462,8 @@ class cutsAndcategories(Module):
         def getjetmass(jet, sys):
             if ((sys == "") or (sys == "UnclustUp") or (
                     sys == "UnclustDown") or (sys == "tesUp") or (sys == "tesDown")):
-                return jet.mass
+                # return jet.mass
+                return jet.mass_nom
             elif sys == "jesTotalUp":
                 return jet.mass_jesTotalUp
             elif sys == "jesTotalDown":
@@ -567,7 +529,8 @@ class cutsAndcategories(Module):
 
         def getMETpt(sys):
             if ((sys == "") or (sys == "tesUp") or (sys == "tesDown")):
-                return event.PuppiMET_pt
+                # return event.PuppiMET_pt
+                return event.PuppiMET_pt_nom
             elif sys == "jesTotalUp":
                 return event.PuppiMET_pt_jesTotalUp
             elif sys == "jesTotalDown":
@@ -638,7 +601,9 @@ class cutsAndcategories(Module):
         def getMETphi(sys):
             if ((sys == "")  or (sys == "UnclustUp") or (
                     sys == "UnclustDown") or (sys == "tesUp") or (sys == "tesDown")):
-                return event.PuppiMET_phi
+                # return event.PuppiMET_phi
+                return event.PuppiMET_phi_nom
+
             elif sys == "jesTotalUp":
                 return event.PuppiMET_phi_jesTotalUp
             elif sys == "jesTotalDown":
@@ -715,26 +680,20 @@ class cutsAndcategories(Module):
             """
 
             if getjetpt(ak4Object_enu[1], sys) > 30 and abs(ak4Object_enu[1].eta) < 2.5 and ak4Object_enu[1].jetId > 1: 
-                #and getattr(event, "Flag_JetVetoed", 0) == 0:
                 return True
             return False
 
         def logit(x):
             return math.log(x/(1 - x))
 
-        # def pass_cuts_EleID(electronObject_enu):
-        #     for cutnr in range(0, 10):
-        #         if cutnr == 7:
-        #             continue
-        #         # if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr*3) &
-        #         # 0x7) < self.eleID:
-        #         if (electronObject_enu[1].vidNestedWPBitmap >> (
-        #                 cutnr * 3) & 0x7) < 2:
-        #             return False
-        #     return True
-
-        
-        
+        def pass_cuts_EleID(electronObject_enu):
+            for cutnr in range(0, 10):
+                if (cutnr == 7):
+                    continue
+                if (electronObject_enu[1].vidNestedWPBitmap >> (cutnr * 3) & 0x7) < 2:
+                    return False
+            return True
+      
         # FatJet and Jet overlap, separation > 1.2 
         def JetFatJetOverlap(jetObject_enu, sys):
             self.jetFV.SetPtEtaPhiM(getjetpt(jetObject_enu[1],sys), jetObject_enu[1].eta, jetObject_enu[1].phi, getjetmass(jetObject_enu[1], sys))
@@ -873,14 +832,14 @@ class cutsAndcategories(Module):
                     
                     ## Commenting out the isolation part for now. Might add it in the future.
 
-                    # if ((tag == "be") or (tag == "te")):
-                    #     if not ElectronIsolationCut(
-                    #             col1[i][1], col2[j][1], tag):
-                    #         continue
+                    if ((tag == "be") or (tag == "te")):
+                        if not ElectronIsolationCut(
+                                col1[i][1], col2[j][1], tag):
+                            continue
 
-                    # elif ((tag == "bm") or (tag == "tm")):
-                    #     if not MuonIsolationCut(col1[i][1], col2[j][1], tag):
-                    #         continue
+                    if ((tag == "bm") or (tag == "tm")):
+                        if not MuonIsolationCut(col1[i][1], col2[j][1], tag):
+                            continue
 
                     sumFourVector = self.pair1FV + self.pair2FV
                     pt = sumFourVector.Pt()
@@ -890,147 +849,156 @@ class cutsAndcategories(Module):
                         index2 = col2[j][0]
             return (combinedPt, index1, index2)
 
-        # def MuonIsolationCut(tau, muo, tag):
-        #     tagprotection = ((tag == "bm") or (tag == "tm"))
-        #     if not tagprotection:
-        #         print("The tags are not correct in Electron Isolation ##ERROR##------")
-        #         sys.exit()
+        def MuonIsolationCut(tau, muo, tag):
+            tagprotection = ((tag == "bm") or (tag == "tm"))
+            if not tagprotection:
+                print("The tags are not correct in Electron Isolation ##ERROR##------")
+                sys.exit()
 
-        #     isTau = ""
+            isolationCut = 0.40 #https://muon-wiki.docs.cern.ch/guidelines/recommendations/#mini-isolation:~:text=Cut%20value-,Loose,0.40,-Medium
+            return  ((muo.pfRelIso04_all) < (isolationCut))
 
-        #     self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
-        #     self.muFV.SetPtEtaPhiM(muo.pt, muo.eta, muo.phi, muo.mass)
-        #     deltaR = (self.tauFV).DeltaR(self.muFV)
-        #     isolationCut = 0.25
 
-        #     if (tag == "tm"):
-        #         if ((muo.pfRelIso04_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+            # isTau = ""
 
-        #     if deltaR < 0.7:
-        #         isTau = "close"
-        #     if isTau == "close":
-        #         self.leadingMatch.SetPtEtaPhiM(tau.LeadingMuonPt, tau.LeadingMuonEta, tau.LeadingMuonPhi,tau.LeadingMuonM)
-        #         self.subleadingMatch.SetPtEtaPhiM(tau.SubLeadingMuonPt,tau.SubLeadingMuonEta,tau.SubLeadingMuonPhi,tau.SubLeadingMuonM)
-        #         self.subsubleadingMatch.SetPtEtaPhiM(tau.SubSubLeadingMuonPt, tau.SubSubLeadingMuonEta,tau.SubSubLeadingMuonPhi, tau.SubSubLeadingMuonM)
-        #         if (self.muFV.DeltaR(self.leadingMatch) < 0.05):
-        #             if ((tau.LeadingMuonCorrIso / tau.LeadingMuonPt) < isolationCut):
-        #                 # print ("Leading Muon Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.muFV.DeltaR(self.subleadingMatch) < 0.05):
-        #             if ((tau.SubLeadingMuonCorrIso /
-        #                  tau.SubLeadingMuonPt) < isolationCut):
-        #                 # print ("subLeading Muon Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.muFV.DeltaR(self.subsubleadingMatch) < 0.05):
-        #             if ((tau.SubSubLeadingMuonCorrIso /
-        #                  tau.SubSubLeadingMuonPt) < isolationCut):
-        #                 # print ("subsubLeading Muon Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         else:
-        #             if ((muo.pfRelIso04_all) < isolationCut):
-        #                 # print ("pf Muon Isolation")
-        #                 return True
-        #             else:
-        #                 return False
+            # self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
+            # self.muFV.SetPtEtaPhiM(muo.pt, muo.eta, muo.phi, muo.mass)
+            # deltaR = (self.tauFV).DeltaR(self.muFV)
 
-        #     elif isTau == "":
-        #         if ((muo.pfRelIso04_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+            # if (tag == "tm") or (tag == "bm") :
+            #     if ((muo.miniPFRelIso_all) < isolationCut):
+            #         return True
+            #     else:
+            #         return False
 
+            # if deltaR < 0.7:
+            #     isTau = "close"
+            # if isTau == "close":
+            #     self.leadingMatch.SetPtEtaPhiM(tau.LeadingMuonPt, tau.LeadingMuonEta, tau.LeadingMuonPhi,tau.LeadingMuonM)
+            #     self.subleadingMatch.SetPtEtaPhiM(tau.SubLeadingMuonPt,tau.SubLeadingMuonEta,tau.SubLeadingMuonPhi,tau.SubLeadingMuonM)
+            #     self.subsubleadingMatch.SetPtEtaPhiM(tau.SubSubLeadingMuonPt, tau.SubSubLeadingMuonEta,tau.SubSubLeadingMuonPhi, tau.SubSubLeadingMuonM)
+            #     if (self.muFV.DeltaR(self.leadingMatch) < 0.05):
+            #         if ((tau.LeadingMuonCorrIso / tau.LeadingMuonPt) < isolationCut):
+            #             # print ("Leading Muon Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     elif (self.muFV.DeltaR(self.subleadingMatch) < 0.05):
+            #         if ((tau.SubLeadingMuonCorrIso /
+            #              tau.SubLeadingMuonPt) < isolationCut):
+            #             # print ("subLeading Muon Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     elif (self.muFV.DeltaR(self.subsubleadingMatch) < 0.05):
+            #         if ((tau.SubSubLeadingMuonCorrIso /
+            #              tau.SubSubLeadingMuonPt) < isolationCut):
+            #             # print ("subsubLeading Muon Matched")
+            #             return True
+            #         else:
+            #             return False
+            #     else:
+            #         if ((muo.miniPFRelIso_all) < isolationCut):
+            #             # print ("pf Muon Isolation")
+            #             return True
+            #         else:
+            #             return False
+
+            # elif isTau == "":
+            #     if ((muo.miniPFRelIso_all) < isolationCut):
+            #         return True
+            #     else:
+            #         return False
+        
+        # https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun3#:~:text=report%20to%20us.-,Working%20points%20for%20Run3%20v1%20ID%20(trained%20with%20122X%20samples),-Offline%20selection%20criteria
         # passing the inidivial eletrons from the collection to apply the
         # correction
-        # def ElectronIsolationCut(tau, ele, tag):
-        #     tagprotection = ((tag == "be") or (tag == "te"))
-        #     if not tagprotection:
-        #         print("The tags are not correct in Electron Isolation ##ERROR##------")
-        #         sys.exit()
+        def ElectronIsolationCut(tau, ele, tag):
+            tagprotection = ((tag == "be") or (tag == "te"))
+            if not tagprotection:
+                print("The tags are not correct in Electron Isolation ##ERROR##------")
+                sys.exit()
 
-        #     isTau = ""
-        #     isolationCut = 0.0
+            isTau = ""
+            isolationCut = 0.0
 
-        #     if abs(ele.eta) <= 1.479:
-        #         isolationCut = 0.194 + (0.535 / ele.pt)
-        #     elif (abs(ele.eta) > 1.479) and (abs(ele.eta) <= 2.5):
-        #         # Endcap values
-        #         # loose =  0.108 + (0.963/ele.pt)
-        #         # medium = 0.0658 + (0.963/ele.pt)
-        #         # tight =0.0445 + (0.963/ele.pt)
-        #         isolationCut = 0.184 + (0.519 / ele.pt)
-        #     else:
-        #         return False
+            if abs(ele.eta) <= 1.479:
+                isolationCut = 0.194 + (0.535 / ele.pt)
+                # Loose = 0.194 + (0.535/ele.pt)
+                # Medium = 0.0837 + (0.535/ele.pt)
+                # Tight = 0.0388 + (0.535/ele.pt)
 
-        #     if (tag == "te"):
-        #         if ((ele.pfRelIso03_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+            elif (abs(ele.eta) > 1.479) and (abs(ele.eta) <= 2.5):
+                isolationCut = 0.184 + (0.519 / ele.pt)
+                # Endcap values
+                # Loose =  0.184 + (0.519/ele.pt)
+                # Medium = 0.0741 + (0.519/ele.pt)
+                # Tight = 0.0544 + (0.519/ele.pt)
+                
+            else:
+                return False
 
-        #     self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
-        #     self.eleFV.SetPtEtaPhiM(ele.pt, ele.eta, ele.phi, 0.0)
-        #     deltaR = (self.tauFV).DeltaR(self.eleFV)
+            if (tag == "te") or (tag == "be"):
+                if ((ele.miniPFRelIso_all) < isolationCut):
+                    return True
+                else:
+                    return False
 
-        #     if deltaR < 0.6:
-        #         isTau = "close"
-        #     if isTau == "close":
-        #         self.leadingMatch.SetPtEtaPhiM(
-        #             tau.LeadingElectronPt,
-        #             tau.LeadingElectronEta,
-        #             tau.LeadingElectronPhi,
-        #             0.0)
-        #         self.subleadingMatch.SetPtEtaPhiM(
-        #             tau.SubLeadingElectronPt,
-        #             tau.SubLeadingElectronEta,
-        #             tau.SubLeadingElectronPhi,
-        #             0.0)
-        #         self.subsubleadingMatch.SetPtEtaPhiM(
-        #             tau.SubSubLeadingElectronPt,
-        #             tau.SubSubLeadingElectronEta,
-        #             tau.SubSubLeadingElectronPhi,
-        #             0.0)
-        #         if (self.eleFV.DeltaR(self.leadingMatch) < 0.05):
-        #             if ((tau.LeadingElectronCorrIso /
-        #                  tau.LeadingElectronPt) < isolationCut):
-        #                 # print ("Leading Ele Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.eleFV.DeltaR(self.subleadingMatch) < 0.05):
-        #             if ((tau.SubLeadingElectronCorrIso /
-        #                  tau.SubLeadingElectronPt) < isolationCut):
-        #                 # print ("subLeading Ele Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         elif (self.eleFV.DeltaR(self.subsubleadingMatch) < 0.05):
-        #             if ((tau.SubSubLeadingElectronCorrIso /
-        #                  tau.SubSubLeadingElectronPt) < isolationCut):
-        #                 # print ("subsubLeading Ele Matched")
-        #                 return True
-        #             else:
-        #                 return False
-        #         else:
-        #             if ((ele.pfRelIso03_all) < isolationCut):
-        #                 print("use pf Ele Isolation")
-        #                 return True
-        #             else:
-        #                 return False
+        #     # self.tauFV.SetPtEtaPhiM(tau.pt, tau.eta, tau.phi, tau.mass)
+        #     # self.eleFV.SetPtEtaPhiM(ele.pt, ele.eta, ele.phi, 0.0)
+        #     # deltaR = (self.tauFV).DeltaR(self.eleFV)
 
-        #     elif isTau == "":
-        #         if ((ele.pfRelIso03_all) < isolationCut):
-        #             return True
-        #         else:
-        #             return False
+        #     # if deltaR < 0.6:
+        #     #     isTau = "close"
+        #     # if isTau == "close":
+        #     #     self.leadingMatch.SetPtEtaPhiM(
+        #     #         tau.LeadingElectronPt,
+        #     #         tau.LeadingElectronEta,
+        #     #         tau.LeadingElectronPhi,
+        #     #         0.0)
+        #     #     self.subleadingMatch.SetPtEtaPhiM(
+        #     #         tau.SubLeadingElectronPt,
+        #     #         tau.SubLeadingElectronEta,
+        #     #         tau.SubLeadingElectronPhi,
+        #     #         0.0)
+        #     #     self.subsubleadingMatch.SetPtEtaPhiM(
+        #     #         tau.SubSubLeadingElectronPt,
+        #     #         tau.SubSubLeadingElectronEta,
+        #     #         tau.SubSubLeadingElectronPhi,
+        #     #         0.0)
+        #     #     if (self.eleFV.DeltaR(self.leadingMatch) < 0.05):
+        #     #         if ((tau.LeadingElectronCorrIso /
+        #     #              tau.LeadingElectronPt) < isolationCut):
+        #     #             # print ("Leading Ele Matched")
+        #     #             return True
+        #     #         else:
+        #     #             return False
+        #     #     elif (self.eleFV.DeltaR(self.subleadingMatch) < 0.05):
+        #     #         if ((tau.SubLeadingElectronCorrIso /
+        #     #              tau.SubLeadingElectronPt) < isolationCut):
+        #     #             # print ("subLeading Ele Matched")
+        #     #             return True
+        #     #         else:
+        #     #             return False
+        #     #     elif (self.eleFV.DeltaR(self.subsubleadingMatch) < 0.05):
+        #     #         if ((tau.SubSubLeadingElectronCorrIso /
+        #     #              tau.SubSubLeadingElectronPt) < isolationCut):
+        #     #             # print ("subsubLeading Ele Matched")
+        #     #             return True
+        #     #         else:
+        #     #             return False
+        #     #     else:
+        #     #         if ((ele.pfRelIso03_all) < isolationCut):
+        #     #             print("use pf Ele Isolation")
+        #     #             return True
+        #     #         else:
+        #     #             return False
+
+        #     # elif isTau == "":
+        #     #     if ((ele.pfRelIso03_all) < isolationCut):
+        #     #         return True
+        #     #     else:
+        #     #         return False
 
         # def ElectronIsolationCut_addlepveto(eleObject_enu):
         #     #For 2024: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun3 
@@ -1045,8 +1013,8 @@ class cutsAndcategories(Module):
         #         return True
         #     else:
         #         return False
-        
-        
+
+
         def fillBranchesWithDefault(sys):
             if sys == "":
                 self.out.fillBranch("Hbb_lep1_deltaR%s" % (sys), -99.99)
@@ -1125,42 +1093,40 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("deltaPhi_met_ak4lead", -99.99)
 
 
-                self.out.fillBranch("deltaR_subjets", -99.99)
-                self.out.fillBranch("deltaPhi_subjets", -99.99)
+                # self.out.fillBranch("deltaR_subjets", -99.99)
+                # self.out.fillBranch("deltaPhi_subjets", -99.99)
                 
-                self.out.fillBranch("deltaR_subjet1_leadtau", -99.99)
-                self.out.fillBranch("deltaPhi_subjet1_leadtau", -99.99)
-                self.out.fillBranch("deltaR_subjet1_subtau", -99.99)
-                self.out.fillBranch("deltaPhi_subjet1_subtau", -99.99)
-                self.out.fillBranch("deltaR_subjet1_ele", -99.99)
-                self.out.fillBranch("deltaPhi_subjet1_ele", -99.99)
-                self.out.fillBranch("deltaR_subjet1_mu", -99.99)
-                self.out.fillBranch("deltaPhi_subjet1_mu", -99.99)
+                # self.out.fillBranch("deltaR_subjet1_leadtau", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet1_leadtau", -99.99)
+                # self.out.fillBranch("deltaR_subjet1_subtau", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet1_subtau", -99.99)
+                # self.out.fillBranch("deltaR_subjet1_ele", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet1_ele", -99.99)
+                # self.out.fillBranch("deltaR_subjet1_mu", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet1_mu", -99.99)
 
-                self.out.fillBranch("deltaR_subjet2_leadtau", -99.99)
-                self.out.fillBranch("deltaPhi_subjet2_leadtau", -99.99)
-                self.out.fillBranch("deltaR_subjet2_subtau", -99.99)
-                self.out.fillBranch("deltaPhi_subjet2_subtau", -99.99)
-                self.out.fillBranch("deltaR_subjet2_ele", -99.99)
-                self.out.fillBranch("deltaPhi_subjet2_ele", -99.99)
-                self.out.fillBranch("deltaR_subjet2_mu", -99.99)
-                self.out.fillBranch("deltaPhi_subjet2_mu", -99.99)
+                # self.out.fillBranch("deltaR_subjet2_leadtau", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet2_leadtau", -99.99)
+                # self.out.fillBranch("deltaR_subjet2_subtau", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet2_subtau", -99.99)
+                # self.out.fillBranch("deltaR_subjet2_ele", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet2_ele", -99.99)
+                # self.out.fillBranch("deltaR_subjet2_mu", -99.99)
+                # self.out.fillBranch("deltaPhi_subjet2_mu", -99.99)
 
-                self.out.fillBranch("fatjet_tau21", -99.99)
-                self.out.fillBranch("fatjet_tau32", -99.99)
+                # self.out.fillBranch("fatjet_tau21", -99.99)
+                # self.out.fillBranch("fatjet_tau32", -99.99)
 
-                self.out.fillBranch("subjet1_tau21", -99.99)
-                self.out.fillBranch("subjet1_tau32", -99.99)
-                self.out.fillBranch("subjet2_tau21", -99.99)
-                self.out.fillBranch("subjet2_tau32", -99.99)
+                # self.out.fillBranch("subjet1_tau21", -99.99)
+                # self.out.fillBranch("subjet1_tau32", -99.99)
+                # self.out.fillBranch("subjet2_tau21", -99.99)
+                # self.out.fillBranch("subjet2_tau32", -99.99)
 
                 self.out.fillBranch("Tau_rawDeepTauVSjet_logit", [])
                 self.out.fillBranch("boostedTau_rawDeepTauVSjet_logit", [])
 
-                self.out.fillBranch("pt_balance_hbb_htt_abs", -99.99)
-                self.out.fillBranch("pt_balance_hbb_htt_signed", -99.99)
-
-
+                # self.out.fillBranch("pt_balance_hbb_htt_abs", -99.99)
+                # self.out.fillBranch("pt_balance_hbb_htt_signed", -99.99)
 
                 self.out.fillBranch("nallTaus%s" % (sys), 0)
                 self.out.fillBranch("allTaus_pt%s" % (sys), [])
@@ -1188,9 +1154,12 @@ class cutsAndcategories(Module):
             self.out.fillBranch("ngood_Muons%s" % (sys), 0)
             self.out.fillBranch("ngood_FatJets%s" % (sys), 0)
             self.out.fillBranch("ngood_Jets%s" % (sys), 0)
-            self.out.fillBranch("ngood_LooseJets%s"%(sys),0)
-            self.out.fillBranch("ngood_MediumJets%s" % (sys), 0)
-            self.out.fillBranch("ngood_TightJets%s" % (sys), 0)
+            self.out.fillBranch("ngood_UparTLooseJets%s"%(sys),0)
+            self.out.fillBranch("ngood_UparTMediumJets%s" % (sys), 0)
+            self.out.fillBranch("ngood_UparTTightJets%s" % (sys), 0)
+            self.out.fillBranch("ngood_DeepJetLooseJets%s"%(sys),0)
+            self.out.fillBranch("ngood_DeepJetMediumJets%s" % (sys), 0)
+            self.out.fillBranch("ngood_DeepJetTightJets%s" % (sys), 0)
 
             self.out.fillBranch("index_gElectrons%s" % (sys), [])
             self.out.fillBranch("index_gMuons%s" % (sys), [])
@@ -1198,9 +1167,12 @@ class cutsAndcategories(Module):
             self.out.fillBranch("index_gboostedTaus%s" % (sys), [])
             self.out.fillBranch("index_gFatJets%s" % (sys), [])
             self.out.fillBranch("index_gJets%s" % (sys), [])
-            self.out.fillBranch("index_gLooseJets%s"%(sys),[])
-            self.out.fillBranch("index_gMediumJets%s" % (sys), [])
-            self.out.fillBranch("index_gTightJets%s" % (sys), [])
+            self.out.fillBranch("index_gUparTLooseJets%s"%(sys),[])
+            self.out.fillBranch("index_gUparTMediumJets%s" % (sys), [])
+            self.out.fillBranch("index_gUparTTightJets%s" % (sys), [])
+            self.out.fillBranch("index_gDeepJetLooseJets%s"%(sys),[])
+            self.out.fillBranch("index_gDeepJetMediumJets%s" % (sys), [])
+            self.out.fillBranch("index_gDeepJetTightJets%s" % (sys), [])
 
         Jet = Collection(event, 'Jet', 'nJet')
         Electron = Collection(event, 'Electron', 'nElectron')
@@ -1208,20 +1180,19 @@ class cutsAndcategories(Module):
 
         if (self.isMC):
             if (self.year_unc == "2024"):          
-                if event.PuppiMET_pt < 120:# and (
+                if event.PuppiMET_pt_nom < 180:# and (
                     return False
         elif (self.isData):
-            if ((event.PuppiMET_pt < 120)):
+            if ((event.PuppiMET_pt_nom < 180)):
                 return False
         
-        self.cutflow_dict["Pre-selection: PuppiMET_pt > 120"] += 1
-
+        self.cutflow_dict["Pre-selection: PuppiMET_pt > 180"] += 1
        
-        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt > 180) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]
+        FatJet_skim_enu = [x for x in enumerate(FatJet) if (x[1].pt_nom > 200) and abs(x[1].eta) < 2.5 and (x[1].jetId > 1)]
         if (len(FatJet_skim_enu) == 0):
             return False
 
-        self.cutflow_dict["Events surviving the FatJet skim  (pt > 180, |eta| < 2.5, jetId>1)"] += 1
+        self.cutflow_dict["Events surviving the FatJet skim  (pt > 200, |eta| < 2.5, jetId>1)"] += 1
         
         del FatJet_skim_enu
 
@@ -1247,14 +1218,16 @@ class cutsAndcategories(Module):
                         self.jetLeadFV, self.subjet1FV, self.subjet2FV]:
                 vec.SetPxPyPzE(0, 0, 0, 0)
         
-            if ((getMETpt(sys) < 120)):
+            if ((getMETpt(sys) < 180)):
                 # fillBranchesWithDefault(sys)
                 continue
 
             if sys == "":
-                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  120"] += 1
+                self.cutflow_dict["Events after FatJet Skimming and PuppiMET_pt >  180"] += 1
 
-            FatJet_enu = [x for x in enumerate(FatJet) if (getjetpt(x[1], sys) > 180) and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))]
+
+
+            FatJet_enu = [x for x in enumerate(FatJet) if (getjetpt(x[1], sys) > 200) and (abs(x[1].eta) < 2.5 and (x[1].jetId > 1))]
 
             if (len(FatJet_enu) == 0):
                 # fillBranchesWithDefault(sys)
@@ -1274,36 +1247,23 @@ class cutsAndcategories(Module):
                         
             Jet_enu = [x for x in enumerate(Jet) if applyPOGselectionToAK4(x, sys)]
             
-            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 4) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)]
+            Tau_enu = [x for x in enumerate(Tau) if (gettaupt(x[1], sys) > 20) and (abs(x[1].eta) < 2.5) and (abs(x[1].dz) < 0.2) and (x[1].idDecayModeNewDMs) and (x[1].idDeepTau2018v2p5VSjet >= 4) and (x[1].idDeepTau2018v2p5VSe >= 2) and (x[1].idDeepTau2018v2p5VSmu >= 1)] 
             
             boostedTau_enu = [x for x in enumerate(boostedTau) if (gettaupt(x[1], sys) > 25) and (abs(x[1].eta) < 2.5) and (x[1].rawBoostedDeepTauRunIIv2p0VSjet >= 0.85)]
 
             self.higgsBBFV.SetPtEtaPhiM(getjetpt(FatJet_enu[0][1],sys), FatJet_enu[0][1].eta, FatJet_enu[0][1].phi, getjetmass(FatJet_enu[0][1], sys))
 
-            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5) and x[1].cutBased >= 2]
             
+            Electron_enu = [x for x in enumerate(Electron) if x[1].pt > 10 and (abs(x[1].eta) < 2.5)]   
+            Electron_enu = list(filter(pass_cuts_EleID, Electron_enu))
+        
             Muon_enu = [x for x in enumerate(Muon) if x[1].pt > 15 and (abs(x[1].eta) < 2.4) and x[1].looseId]
 
-            deltaR_boosted_HPS_preclean = []
-            for b in boostedTau_enu:
-                for h in Tau_enu:
-                    bfv = ROOT.TLorentzVector()
-                    hfv = ROOT.TLorentzVector()
-                    bfv.SetPtEtaPhiM(gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys))
-                    hfv.SetPtEtaPhiM(gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys))
-                    deltaR_boosted_HPS_preclean.append(bfv.DeltaR(hfv))
-
-            self.out.fillBranch("nDeltaR_boosted_HPS_preclean", len(deltaR_boosted_HPS_preclean))
-            self.out.fillBranch("deltaR_boosted_HPS_preclean", deltaR_boosted_HPS_preclean)
-
-                        
-            # Object cleaning procedures
-            if sys == "":  # only count once for nominal
-                self.cutflow_dict["Events after all object-level selections (before overlap cleaning)"] += 1
-
+                                  
+           
             Jet_enu = [x for x in Jet_enu if JetFatJetOverlap(x, sys)]
             Electron_enu = list(filter(FatJetConeIsolation, Electron_enu))
-            Muon_enu = list(filter(FatJetConeIsolation, Muon_enu))
+            Muon_enu = list(filter(FatJetConeIsolation, Muon_enu))            
             Tau_enu = [x for x in Tau_enu if FatJetTauOverlap(x, boost=0)]
             Tau_enu = [x for x in Tau_enu if ElectronTauOverlap(x, Electron_enu, boost=0)]
             Tau_enu = [x for x in Tau_enu if MuonTauOverlap(x, Muon_enu, boost=0)]
@@ -1311,9 +1271,6 @@ class cutsAndcategories(Module):
             boostedTau_enu = [x for x in boostedTau_enu if ElectronTauOverlap(x, Electron_enu, boost=1)]
             boostedTau_enu = [x for x in boostedTau_enu if MuonTauOverlap(x, Muon_enu, boost=1)]
           
-            
-
-            # Cutflow counting
             if sys == "":
                 if (len(Tau_enu) > 0 or len(boostedTau_enu) > 0):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_Tau (Reco + ID + cleaning)"] += 1
@@ -1324,6 +1281,7 @@ class cutsAndcategories(Module):
                         " ...breakdown..> Atleast_one_Electron (Reco + IDnoIso + cleaning)"] += 1
 
             enoughleptonstopair = (((len(Tau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2) or ((len(boostedTau_enu) + len(Muon_enu) + len(Electron_enu)) >= 2))
+            # enoughleptonstopair = (((len(Tau_enu) > 0 or len(boostedTau_enu) > 0) and (len(Electron_enu) > 0 or len(Muon_enu) > 0)))
             if not enoughleptonstopair:
                 # move to the next systematics
                 # fillBranchesWithDefault(sys)
@@ -1351,7 +1309,7 @@ class cutsAndcategories(Module):
                 continue
 
             if (sys == ""):
-                #self.cutflow_dict["Atleast_one_pair_anykind"] += 1
+                self.cutflow_dict["Atleast_one_pair_anykind"] += 1
                 if ((pairDict["bb"][0] > 0) or (pairDict["tt"][0] > 0)):
                     self.cutflow_dict[" ...breakdown..> Atleast_one_TauTau_pair"] += 1
                 if ((pairDict["be"][0] > 0) or (pairDict["te"][0] > 0)):
@@ -1362,64 +1320,64 @@ class cutsAndcategories(Module):
             
             ##### Everything related to subjects anf N-subjettiness of FatJets
 
-            has_sj1 = False
-            has_sj2 = False
-            sj1 = None
-            sj2 = None
+            # has_sj1 = False
+            # has_sj2 = False
+            # sj1 = None
+            # sj2 = None
 
-            if len(FatJet_enu) > 0:
-                fat = FatJet_enu[0][1]
-                if fat.tau1 > 0:
-                    fat_tau21 = fat.tau2 / fat.tau1
-                    self.out.fillBranch("fatjet_tau21", fat_tau21)
-                else:
-                    self.out.fillBranch("fatjet_tau21", -99.99)
+            # if len(FatJet_enu) > 0:
+            #     fat = FatJet_enu[0][1]
+            #     if fat.tau1 > 0:
+            #         fat_tau21 = fat.tau2 / fat.tau1
+            #         self.out.fillBranch("fatjet_tau21", fat_tau21)
+            #     else:
+            #         self.out.fillBranch("fatjet_tau21", -99.99)
 
-                if fat.tau2 > 0:
-                    fat_tau32 = fat.tau3 / fat.tau2
-                    self.out.fillBranch("fatjet_tau32", fat_tau32)
-                else:
-                    self.out.fillBranch("fatjet_tau32", -99.99)
+            #     if fat.tau2 > 0:
+            #         fat_tau32 = fat.tau3 / fat.tau2
+            #         self.out.fillBranch("fatjet_tau32", fat_tau32)
+            #     else:
+            #         self.out.fillBranch("fatjet_tau32", -99.99)
 
-                if hasattr(event, "nSubJet"):
-                    SubJet = Collection(event, "SubJet", "nSubJet")
+            #     if hasattr(event, "nSubJet"):
+            #         SubJet = Collection(event, "SubJet", "nSubJet")
 
-                    sj1_idx = getattr(fat, "subJetIdx1", -1)
-                    sj2_idx = getattr(fat, "subJetIdx2", -1)
+            #         sj1_idx = getattr(fat, "subJetIdx1", -1)
+            #         sj2_idx = getattr(fat, "subJetIdx2", -1)
 
-                    if 0 <= sj1_idx < len(SubJet):
-                        sj1 = SubJet[sj1_idx]
-                        self.subjet1FV.SetPtEtaPhiM(sj1.pt, sj1.eta, sj1.phi, sj1.mass)
-                        has_sj1 = True
+            #         if 0 <= sj1_idx < len(SubJet):
+            #             sj1 = SubJet[sj1_idx]
+            #             self.subjet1FV.SetPtEtaPhiM(sj1.pt, sj1.eta, sj1.phi, sj1.mass)
+            #             has_sj1 = True
 
-                    if 0 <= sj2_idx < len(SubJet):
-                        sj2 = SubJet[sj2_idx]
-                        self.subjet2FV.SetPtEtaPhiM(sj2.pt, sj2.eta, sj2.phi, sj2.mass)
-                        has_sj2 = True
+            #         if 0 <= sj2_idx < len(SubJet):
+            #             sj2 = SubJet[sj2_idx]
+            #             self.subjet2FV.SetPtEtaPhiM(sj2.pt, sj2.eta, sj2.phi, sj2.mass)
+            #             has_sj2 = True
 
             
-            if has_sj1 and has_sj2:
+            # if has_sj1 and has_sj2:
 
-                self.out.fillBranch("deltaR_subjets", self.subjet1FV.DeltaR(self.subjet2FV))
-                self.out.fillBranch("deltaPhi_subjets", abs(self.subjet1FV.DeltaPhi(self.subjet2FV)))
+            #     self.out.fillBranch("deltaR_subjets", self.subjet1FV.DeltaR(self.subjet2FV))
+            #     self.out.fillBranch("deltaPhi_subjets", abs(self.subjet1FV.DeltaPhi(self.subjet2FV)))
 
-                sj1_tau21 = sj1.tau2 / sj1.tau1 if sj1.tau1 > 0 else -99.99
-                sj1_tau32 = sj1.tau3 / sj1.tau2 if sj1.tau2 > 0 else -99.99
-                self.out.fillBranch("subjet1_tau21", sj1_tau21)
-                self.out.fillBranch("subjet1_tau32", sj1_tau32)
+            #     sj1_tau21 = sj1.tau2 / sj1.tau1 if sj1.tau1 > 0 else -99.99
+            #     sj1_tau32 = sj1.tau3 / sj1.tau2 if sj1.tau2 > 0 else -99.99
+            #     self.out.fillBranch("subjet1_tau21", sj1_tau21)
+            #     self.out.fillBranch("subjet1_tau32", sj1_tau32)
 
-                sj2_tau21 = sj2.tau2 / sj2.tau1 if sj2.tau1 > 0 else -99.99
-                sj2_tau32 = sj2.tau3 / sj2.tau2 if sj2.tau2 > 0 else -99.99
-                self.out.fillBranch("subjet2_tau21", sj2_tau21)
-                self.out.fillBranch("subjet2_tau32", sj2_tau32)
+            #     sj2_tau21 = sj2.tau2 / sj2.tau1 if sj2.tau1 > 0 else -99.99
+            #     sj2_tau32 = sj2.tau3 / sj2.tau2 if sj2.tau2 > 0 else -99.99
+            #     self.out.fillBranch("subjet2_tau21", sj2_tau21)
+            #     self.out.fillBranch("subjet2_tau32", sj2_tau32)
 
-            else:
-                self.out.fillBranch("deltaR_subjets", -99.99)
-                self.out.fillBranch("deltaPhi_subjets", -99.99)
-                self.out.fillBranch("subjet1_tau21", -99.99)
-                self.out.fillBranch("subjet1_tau32", -99.99)
-                self.out.fillBranch("subjet2_tau21", -99.99)
-                self.out.fillBranch("subjet2_tau32", -99.99)
+            # else:
+            #     self.out.fillBranch("deltaR_subjets", -99.99)
+            #     self.out.fillBranch("deltaPhi_subjets", -99.99)
+            #     self.out.fillBranch("subjet1_tau21", -99.99)
+            #     self.out.fillBranch("subjet1_tau32", -99.99)
+            #     self.out.fillBranch("subjet2_tau21", -99.99)
+            #     self.out.fillBranch("subjet2_tau32", -99.99)
 
 
 
@@ -1488,16 +1446,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTTvis_boosted_eta", self.higgsTTvisFV.Eta())
                 self.out.fillBranch("HTTvis_boosted_phi", self.higgsTTvisFV.Phi())
     
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                # if has_sj1 and has_sj2:
+                #     self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
 
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                #     self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
                 
                 if (sys == ""):
@@ -1552,16 +1510,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTTvis_HPS_eta", self.higgsTTvisFV.Eta())
                 self.out.fillBranch("HTTvis_HPS_phi", self.higgsTTvisFV.Phi())
                 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                # if has_sj1 and has_sj2:
+                #     self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet1_subtau", self.subjet1FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_subtau", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
 
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                #     self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet2_subtau", self.subjet2FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_subtau", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
 
 
@@ -1569,7 +1527,7 @@ class cutsAndcategories(Module):
                     self.cutflow_dict[" ...breakdown..> TT_channel (max pt pair)"] += 1
             
             
-            elif Keymax == "be":
+            if Keymax == "be":
                 self.out.fillBranch("channel%s" % (sys), 1)
                 self.out.fillBranch("boost%s" % (sys), 1)
                 if (sys == ""):
@@ -1584,6 +1542,8 @@ class cutsAndcategories(Module):
                 
                 secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
                 self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
+
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
 
                 self.theFastMTTtool.setFirstLepton(firstLepton)
                 self.theFastMTTtool.setSecondLepton(secondLepton)
@@ -1607,16 +1567,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_boosted_Ele_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_boosted_Ele_phi", self.higgsTTFV.Phi())
 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                # if has_sj1 and has_sj2:
+                #     self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                #     self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
             
 
@@ -1640,6 +1600,7 @@ class cutsAndcategories(Module):
                 secondLepton = fastMTTlepton(pt=Electron[gElectron_index[0]].pt, eta=Electron[gElectron_index[0]].eta, phi=Electron[gElectron_index[0]].phi, m=0.51100e-3, leptonType='Electron', tauDecayMode=-1)
                 self.pair2FV.SetPtEtaPhiM(Electron[gElectron_index[0]].pt, Electron[gElectron_index[0]].eta, Electron[gElectron_index[0]].phi, 0.0)
 
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
                
                 self.theFastMTTtool.setFirstLepton(firstLepton)
                 self.theFastMTTtool.setSecondLepton(secondLepton)
@@ -1663,16 +1624,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_HPS_Ele_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_HPS_Ele_phi", self.higgsTTFV.Phi())
 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                # if has_sj1 and has_sj2:
+                #     self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet1_ele", self.subjet1FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_ele", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                #     self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet2_ele", self.subjet2FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_ele", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> ET_channel (max pt pair)"] += 1
@@ -1696,6 +1657,9 @@ class cutsAndcategories(Module):
                 secondLepton = fastMTTlepton(pt=Muon[gMuon_index[0]].pt, eta=Muon[gMuon_index[0]].eta, phi=Muon[gMuon_index[0]].phi, m=Muon[gMuon_index[0]].mass, leptonType='Muon', tauDecayMode=-1)
                 self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta,  Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
 
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
+
+
                 self.theFastMTTtool.setFirstLepton(firstLepton)
                 self.theFastMTTtool.setSecondLepton(secondLepton)
                 self.theFastMTTtool.setTheMET(theMET)
@@ -1716,16 +1680,16 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_boosted_Mu_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_boosted_Mu_phi", self.higgsTTFV.Phi())
 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                # if has_sj1 and has_sj2:
+                #     self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                #     self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
 
 
 
@@ -1751,6 +1715,7 @@ class cutsAndcategories(Module):
 
                 self.pair2FV.SetPtEtaPhiM(Muon[gMuon_index[0]].pt, Muon[gMuon_index[0]].eta, Muon[gMuon_index[0]].phi, Muon[gMuon_index[0]].mass)
 
+                self.higgsTTvisFV = self.pair1FV + self.pair2FV
                
                 self.theFastMTTtool.setFirstLepton(firstLepton)
                 self.theFastMTTtool.setSecondLepton(secondLepton)
@@ -1772,69 +1737,55 @@ class cutsAndcategories(Module):
                 self.out.fillBranch("HTT_HPS_Mu_eta", self.higgsTTFV.Eta())
                 self.out.fillBranch("HTT_HPS_Mu_phi", self.higgsTTFV.Phi())
 
-                if has_sj1 and has_sj2:
-                    self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
+                # if has_sj1 and has_sj2:
+                #     self.out.fillBranch("deltaR_subjet1_leadtau", self.subjet1FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_leadtau", abs(self.subjet1FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet1_mu", self.subjet1FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet1_mu", abs(self.subjet1FV.DeltaPhi(self.pair2FV)))
                     
-                    self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
-                    self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
-                    self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
-                    self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
+                #     self.out.fillBranch("deltaR_subjet2_leadtau", self.subjet2FV.DeltaR(self.pair1FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_leadtau", abs(self.subjet2FV.DeltaPhi(self.pair1FV)))
+                #     self.out.fillBranch("deltaR_subjet2_mu", self.subjet2FV.DeltaR(self.pair2FV))
+                #     self.out.fillBranch("deltaPhi_subjet2_mu", abs(self.subjet2FV.DeltaPhi(self.pair2FV)))
                 
                 
                 if (sys == ""):
                     self.cutflow_dict[" ...breakdown..> MT_channel (max pt pair)"] += 1
             
                        
-            # pass_quality_delcuts = (
-            #     ((abs(
-            #         self.higgsBBFV.DeltaPhi(
-            #             self.met))) > 1) and (
-            #         (self.pair1FV.DeltaR(
-            #             self.pair2FV)) > 0) and (
-            #         (self.pair1FV.DeltaR(
-            #             self.pair2FV)) < 1.5))
+            pass_quality_delcuts = (((abs(self.higgsBBFV.DeltaPhi(self.met))) > 1) and ((self.pair1FV.DeltaR(self.pair2FV)) > 0) and ((self.pair1FV.DeltaR(self.pair2FV)) < 1.5))
 
-            # if not pass_quality_delcuts:
+            if not pass_quality_delcuts:
             #     # move on to the next systematic
             #     fillBranchesWithDefault(sys)
-            #     continue
-            # # delete the temp variable
-            # del pass_quality_delcuts
+                continue
 
-            # # Fill cut flow
-            # if (sys == ""):
-            #     self.cutflow_dict["DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut"] += 1
+            del pass_quality_delcuts
+
+            # Fill cut flow
+            if (sys == ""):
+                self.cutflow_dict["DeltaR_LL<1.5 and abs(Hbb_met_phi) > 1 cut"] += 1
 
             self.out.fillBranch("Hbb_met_phi%s" %
                                 (sys), self.higgsBBFV.DeltaPhi(self.met))
 
-            # self.theFastMTTtool.setFirstLepton(firstLepton)
-            # self.theFastMTTtool.setSecondLepton(secondLepton)
-            # self.theFastMTTtool.setTheMET(theMET)
-            # higgsFV_list = self.theFastMTTtool.getFastMTTfourvector()
-            
-            # self.higgsTTFV.SetPtEtaPhiM(higgsFV_list[0], higgsFV_list[1], higgsFV_list[2], higgsFV_list[3])
             self.RadionFV = self.higgsTTFV + self.higgsBBFV
 
-            # self.higgsTTvisFV = self.pair1FV + self.pair2FV
             self.RadionvisFV = self.higgsTTvisFV + self.higgsBBFV
 
-            pt_balance_hbb_htt_abs = abs(self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
-            self.out.fillBranch("pt_balance_hbb_htt_abs", pt_balance_hbb_htt_abs)
-            pt_balance_hbb_htt_signed = (self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
-            self.out.fillBranch("pt_balance_hbb_htt_signed", pt_balance_hbb_htt_signed)
+            # pt_balance_hbb_htt_abs = abs(self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
+            # self.out.fillBranch("pt_balance_hbb_htt_abs", pt_balance_hbb_htt_abs)
+            # pt_balance_hbb_htt_signed = (self.higgsBBFV.Pt() - self.higgsTTFV.Pt()) / (self.higgsBBFV.Pt() + self.higgsTTFV.Pt())
+            # self.out.fillBranch("pt_balance_hbb_htt_signed", pt_balance_hbb_htt_signed)
 
-            # if (self.higgsTTvisFV.M() <= 20):
+            if (self.higgsTTvisFV.M() <= 20):
             #     fillBranchesWithDefault(sys)
             #     # move to next systematic
-            #     continue
+                continue
 
-            # # Fill cut flow
-            # if (sys == ""):
-            #     self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
+            # Fill cut flow
+            if (sys == ""):
+                self.cutflow_dict["Visible Mass HTT > 20 cut"] += 1
 
             Jet_enu = [x for x in Jet_enu if removeOverlapOfAK4WithLightHeavyLeptons(
                                 x,
@@ -1853,33 +1804,29 @@ class cutsAndcategories(Module):
             #     continue
 
             Jet_enu = sorted(Jet_enu, key=lambda x: getjetpt(x[1], sys), reverse=True)
-
-            deltaR_boosted_HPS_postclean = []
-            for b in boostedTau_enu:
-                for h in Tau_enu:
-                    bfv = ROOT.TLorentzVector()
-                    hfv = ROOT.TLorentzVector()
-                    bfv.SetPtEtaPhiM(
-                        gettaupt(b[1], sys), b[1].eta, b[1].phi, gettaumass(b[1], sys)
-                    )
-                    hfv.SetPtEtaPhiM(
-                        gettaupt(h[1], sys), h[1].eta, h[1].phi, gettaumass(h[1], sys)
-                    )
-                    deltaR_boosted_HPS_postclean.append(bfv.DeltaR(hfv))
-
-            self.out.fillBranch("nDeltaR_boosted_HPS_postclean", len(deltaR_boosted_HPS_postclean))
-            self.out.fillBranch("deltaR_boosted_HPS_postclean", deltaR_boosted_HPS_postclean)
             
             gJet_index = [x[0] for x in Jet_enu]
-            Jet_enu_Loose = [
-               x for x in Jet_enu if x[1].btagUParTAK4B >= self.LooseJet]
-            gJet_Looseindex = [x[0] for x in Jet_enu_Loose]
-            Jet_enu_Medium = [
-                x for x in Jet_enu if x[1].btagUParTAK4B >= self.MediumJet]
-            gJet_Mediumindex = [x[0] for x in Jet_enu_Medium]
-            Jet_enu_Tight = [
-                x for x in Jet_enu if x[1].btagUParTAK4B >= self.TightJet]
-            gJet_Tightindex = [x[0] for x in Jet_enu_Tight]
+
+            ## UparT
+            Jet_enu_Loose_UparT = [x for x in Jet_enu if x[1].btagUParTAK4B >= self.UparTLooseJet]
+            gJet_Looseindex_UparT = [x[0] for x in Jet_enu_Loose_UparT]
+
+            Jet_enu_Medium_UparT = [x for x in Jet_enu if x[1].btagUParTAK4B >= self.UparTMediumJet]
+            gJet_Mediumindex_UparT = [x[0] for x in Jet_enu_Medium_UparT]
+            
+            Jet_enu_Tight_UparT = [x for x in Jet_enu if x[1].btagUParTAK4B >= self.UparTTightJet]
+            gJet_Tightindex_UparT = [x[0] for x in Jet_enu_Tight_UparT]
+
+            ## UparT
+
+            Jet_enu_Loose_DeepJet = [x for x in Jet_enu if x[1].btagDeepFlavB >= self.DeepJetLooseJet]
+            gJet_Looseindex_DeepJet = [x[0] for x in Jet_enu_Loose_DeepJet]
+            
+            Jet_enu_Medium_DeepJet = [x for x in Jet_enu if x[1].btagDeepFlavB >= self.DeepJetMediumJet]
+            gJet_Mediumindex_DeepJet = [x[0] for x in Jet_enu_Medium_DeepJet]
+            
+            Jet_enu_Tight_DeepJet = [x for x in Jet_enu if x[1].btagDeepFlavB >= self.DeepJetTightJet]
+            gJet_Tightindex_DeepJet = [x[0] for x in Jet_enu_Tight_DeepJet]
 
             if len(Jet_enu) > 0:
                 leadJet = Jet_enu[0][1]
@@ -1943,9 +1890,6 @@ class cutsAndcategories(Module):
             self.out.fillBranch("boostedTau_rawDeepTauVSjet_logit", boosted_logit_list)
 
 
-            # compute the fastMTT vector
-            # theFastMTTtool = fastMTTtool()
-
             if sys == "":
                 self.out.fillBranch("HTT_m%s" % (sys), self.higgsTTFV.M())
                 self.out.fillBranch("HTT_eta%s" % (sys), self.higgsTTFV.Eta())
@@ -1973,8 +1917,7 @@ class cutsAndcategories(Module):
                                     (sys), FatJet_enu[0][1].msoftdrop)
                 self.out.fillBranch("pnetmass%s" % (
                     sys), FatJet_enu[0][1].particleNetLegacy_mass)
-                # self.out.fillBranch("globalparT3mass%s" %(
-                #     sys), FatJet_enu[0][1].globalParT3Xbb_mass)
+
                 
 
             self.out.fillBranch("X_m%s" % (sys), self.RadionFV.M())
@@ -2002,15 +1945,21 @@ class cutsAndcategories(Module):
             self.out.fillBranch("ngood_Muons%s" % (sys), len(gMuon_index))
             self.out.fillBranch("ngood_FatJets%s" % (sys), len(gFatJet_index))
             self.out.fillBranch("ngood_Jets%s" % (sys), len(gJet_index))
-            self.out.fillBranch("ngood_LooseJets%s"%(sys),len(gJet_Looseindex))
-            self.out.fillBranch("ngood_MediumJets%s" %
-                                (sys), len(gJet_Mediumindex))
-            self.out.fillBranch("ngood_TightJets%s" %
-                                (sys), len(gJet_Tightindex))
+            self.out.fillBranch("ngood_UparTLooseJets%s"%(sys),len(gJet_Looseindex_UparT))
+            self.out.fillBranch("ngood_UparTMediumJets%s" %
+                                (sys), len(gJet_Mediumindex_UparT))
+            self.out.fillBranch("ngood_UparTTightJets%s" %
+                                (sys), len(gJet_Tightindex_UparT))
+            
+            self.out.fillBranch("ngood_DeepJetLooseJets%s"%(sys),len(gJet_Looseindex_DeepJet))
+            self.out.fillBranch("ngood_DeepJetMediumJets%s" %
+                                (sys), len(gJet_Mediumindex_DeepJet))
+            self.out.fillBranch("ngood_DeepJetTightJets%s" %
+                                (sys), len(gJet_Tightindex_DeepJet))
 
             # Fill cut flow
             if (sys == ""):
-                if ((len(gJet_Mediumindex) == 0)):
+                if ((len(gJet_Mediumindex_UparT) == 0)):
                     self.cutflow_dict["Medium AK4 b-tag veto (events with 0 medium b-tagged jets)"] += 1
 
             self.out.fillBranch("index_gboostedTaus%s" %
@@ -2020,10 +1969,15 @@ class cutsAndcategories(Module):
             self.out.fillBranch("index_gMuons%s" % (sys), gMuon_index)
             self.out.fillBranch("index_gFatJets%s" % (sys), gFatJet_index)
             self.out.fillBranch("index_gJets%s" % (sys), gJet_index)
-            self.out.fillBranch("index_gLooseJets%s"%(sys),gJet_Looseindex)
-            self.out.fillBranch("index_gMediumJets%s" %
-                                (sys), gJet_Mediumindex)
-            self.out.fillBranch("index_gTightJets%s" % (sys), gJet_Tightindex)
+            self.out.fillBranch("index_gUparTLooseJets%s"%(sys),gJet_Looseindex_UparT)
+            self.out.fillBranch("index_gUparTMediumJets%s" %
+                                (sys), gJet_Mediumindex_UparT)
+            self.out.fillBranch("index_gUparTTightJets%s" % (sys), gJet_Tightindex_UparT)
+
+            self.out.fillBranch("index_gDeepJetLooseJets%s"%(sys),gJet_Looseindex_DeepJet)
+            self.out.fillBranch("index_gDeepJetMediumJets%s" %
+                                (sys), gJet_Mediumindex_DeepJet)
+            self.out.fillBranch("index_gDeepJetTightJets%s" % (sys), gJet_Tightindex_DeepJet)
 
             if ((Keymax == "bb") or (Keymax == "tt")):
                 if (sys == ""):
@@ -2076,6 +2030,19 @@ class cutsAndcategories(Module):
             else:
                 gp3_masses.append(-999.0)
         self.out.fillBranch("FatJet_globalParT3Xbb_mass", gp3_masses)
+
+        gp3_bbsvsqcdscore = []
+        for fj in FatJet:
+            if hasattr(fj, "globalParT3_Xbb") and hasattr(fj, "globalParT3_Xqq") :
+                denominator = (fj.globalParT3_Xbb + fj.globalParT3_Xqq)
+                if denominator > 0:
+                    score = fj.globalParT3_Xbb / denominator
+                else:
+                    score = -999.0
+                gp3_bbsvsqcdscore.append(score)
+            else:
+                gp3_bbsvsqcdscore.append(-999.0)
+        self.out.fillBranch("FatJet_globalParT3_XbbvsQCD", gp3_bbsvsqcdscore)
         
         if passAsingleSystematic > 0:
             if (nominal_bool == 1):
@@ -2106,7 +2073,7 @@ def call_postpoc():
         # def tesModule():
         #     return TauEnergyScaleForHPSandBoosted(args.year, True, tauID_wp='Loose', ele_wp='VVLoose')
         def mainModule():
-            return cutsAndcategories(filename, args.year, True, args.runNominal, args.cutflowDir)
+            return cutsAndcategories(filename, args.year, True, args.runNominal)
         
     else:
         print(("This is a ", args.year, " MC file: ", filename))
@@ -2115,7 +2082,7 @@ def call_postpoc():
         #     return TauEnergyScaleForHPSandBoosted(args.year, False, tauID_wp='Loose', ele_wp='VVLoose')
         
         def mainModule():
-            return cutsAndcategories(filename, args.year, False, args.runNominal, args.cutflowDir)
+            return cutsAndcategories(filename, args.year, False, args.runNominal)
               
     module_inst = mainModule()   
     
@@ -2133,6 +2100,7 @@ def call_postpoc():
                 fatJetVMAP("jetvetomaps.json",
                            corrName="Summer24Prompt24_RunBCDEFGHI_V1",
                            veto_map_name="jetvetomap"),
+                # TruthMatchFlags(isData=not isMC, debug=False),
                 module_inst,
                  XSWeightOnly(
                 filename=os.path.basename(inputFile),
@@ -2160,13 +2128,13 @@ if __name__ == "__main__":
     parser.add_argument("--outputFile", required=True, help="Name of the ROOT output file")
     parser.add_argument("--year", required=True, choices=["2024"])
     parser.add_argument("--isMC", action="store_true", help="Set this flag if processing MC")
-    parser.add_argument("--cutflowDir", required=True, help="Directory to save cutflow JSON")
+    # parser.add_argument("--cutflowDir", required=True, help="Directory to save cutflow JSON")
     parser.add_argument("--runNominal", action="store_true", help="Disable systematics")
     args = parser.parse_args()
 
     start_time = time.time()
 
-    met_selection = ["PuppiMET_pt > 120"]
+    met_selection = ["PuppiMET_pt_nom > 180"]
 
 
     trigger_2024 = [
